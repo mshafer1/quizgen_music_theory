@@ -6,3 +6,10 @@ plugins:
 collections:
   quizes:
     output: true
+
+defaults:
+  - scope:
+      path: ""
+      type: "quizes"
+    values:
+      layout: quiz

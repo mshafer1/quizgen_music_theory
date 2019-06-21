@@ -1,5 +1,29 @@
 ---
-layout: default
+type: intervals
+
+inputs:
+  '# of Major Scales':
+    type: number
+    default: 4
+    name: MScales
+  'Major scale tonic pitches':
+    type: multi
+    name: 'MPitches[]'
+    values:
+    - a
+    - b
+    - c
+  '# of Minor Scales':
+    type: number
+    default: 4
+    name: mScales
+  'Minor scale tonic pitches':
+    type: multi
+    name: 'mPitches[]'
+    values:
+    - a
+    - b
+    - c
 ---
 
-test
+{% include form.html inputs=page.inputs %}

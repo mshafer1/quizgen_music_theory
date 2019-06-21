@@ -1,0 +1,5 @@
+<div style="border: 1px black solid;">
+    {% for value in include.values %}
+        <input type="checkbox" value="{{ value }}" name="{{ include.name }}" id="{{ include.name }}_{{ value }}"/><label for="{{ include.name }}_{{ value }}"> {{ value }} </label><br/>
+    {% endfor %}
+</div>
