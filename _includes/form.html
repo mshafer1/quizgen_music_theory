@@ -1,24 +1,24 @@
 <form action="{{ page.url }}" method="GET">
     <div class="striped-w3">
         {% for input in include.inputs %}
-        <div class="w3-row-padding w3-margin-top w3-margin w3-padding">
-            <div class="w3-col s2">
-                <label for="{{ input[0] }}">{{ input[0] }}: </label>
-            </div>
-            <div class="w3-col s2">
-                {% if input[1]=>type == "multi" %}
-                    {% assign name = input[1]=>name %}
-                    {% assign values = input[1]=>values %}
-                    {% include multi_input.html values=values name=name %}
-                {% else %}
-                    <input type="{{ input[1]=>type }}" name="{{ input[1]=>name }}" id="{{ input[0] }}" placeholder="{{ input[0] }}" 
-                    {% if input[1]=>default %}
-                        value={{input[1]=>default}}
-                    {% endif %}
-                    />
-                {% endif %}
-            </div>
-        </div>
+            {% if input[1]=>type == "hidden" %}
+                {% include basic_input.html %}
+            {% else %}
+                <div class="w3-row-padding w3-margin-top w3-margin w3-padding">
+                    <div class="w3-col s2">
+                        <label for="{{ input[0] }}">{{ input[0] }}: </label>
+                    </div>
+                    <div class="w3-col s2">
+                        {% if input[1]=>type == "multi" %}
+                            {% assign name = input[1]=>name %}
+                            {% assign values = input[1]=>values %}
+                            {% include multi_input.html values=values name=name %}
+                        {% else %}
+                            {% include basic_input.html %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
         {% endfor %}
         <div class="w3-row-padding w3-margin-top w3-margin w3-padding">
             <input type="submit" class="w3-btn w3-black" value="Generate"/>
