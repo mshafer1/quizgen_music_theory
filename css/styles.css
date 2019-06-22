@@ -7,3 +7,7 @@ div.striped-w3 > div:nth-child(odd) {
     background-color:#646464;
     color: black;
 }
+
+.QuizBody h1 {
+    text-align: center;
+}
