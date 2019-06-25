@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "test": "jest"
+  },
+  "dependencies": {
+    "document-ready": "^2.0.2",
+    "jest": "^24.8.0",
+    "vexflow": "^1.2.89"
+  }
+}
