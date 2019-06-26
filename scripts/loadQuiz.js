@@ -41,7 +41,7 @@ function init() {
 function note_to_key(note) {
     letter = note[0];
     accidental = '';
-    if(letter.length == 2) {
+    if (letter.length == 2) {
         number = Number(note[1]);
     } else {
         accidental = note[1];
@@ -89,8 +89,15 @@ function handle_lable_scale(data) {
 
     staves = [];
 
-    mNotes = shuffled_starting_notes(mScales, data[mStartingNotes]);
-    MNotes = shuffled_starting_notes(MScales, data[MStartingNotes]);
+    mNotes = [];
+    MNotes = [];
+
+    if(mStartingNotes in data) {
+        mNotes = shuffled_starting_notes(mScales, data[mStartingNotes]);
+    }
+    if(MStartingNotes in data) {
+        MNotes = shuffled_starting_notes(MScales, data[MStartingNotes]);
+    }
 
     mMscales = random_major_minor(MScales, mScales);
     for (i = 0; i < mMscales.length; i++) {
@@ -101,7 +108,7 @@ function handle_lable_scale(data) {
         stave = new_stave('Stave' + i);
 
         // pop starting note off of end of corresponding list
-        if(mMscales[i] == Major) {
+        if (mMscales[i] == Major) {
             starting_note = MNotes.pop();
         } else { // Minor
             starting_note = mNOtes.pop();
@@ -111,7 +118,14 @@ function handle_lable_scale(data) {
 
         scale = gen_scale(mMscales[i], starting_note);
 
-        Draw_stave(stave, clef, null, [keys_to_note(scale)], 'w');
+        var notes = [];
+        for(var i = 0; i < scale.length; i++) {
+            var key = scale[i];
+            notes.push(keys_to_note([key]))
+        }
+        // var notes = [keys_to_note(scale)];
+
+        Draw_stave(stave, clef, null, notes, 'w');
 
         // staves.push(stave);
     }
@@ -122,18 +136,17 @@ function gen_scale(mM, starting_note) {
     result = Array();
     var note = teoria.note(starting_note);
 
-    if(mM == Major) {
-        notes = note.scale('ionian').notes();    
+    if (mM == Major) {
+        notes = note.scale('ionian').notes();
     } else { // minor
         notes = note.scale('aeolian').notes();
     }
 
-    for(i = 0; i < notes.length; i++)
-    {
-        result = result.concat(teorian_note_to_key(String(notes[i])));
+    for (i = 0; i < notes.length; i++) {
+        result.push(teorian_note_to_key(String(notes[i])));
     }
 
-    result.concat(teorian_note_to_key(note.name() + note.accidental() + (note.octave() + 1)));
+    result.push(teorian_note_to_key(note.name() + note.accidental() + (note.octave() + 1)));
 
     return result;
 }
@@ -151,30 +164,30 @@ function Draw_stave(target_div, clef, signature, notes, duration) {
     context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
 
     var stave = new VF.Stave(10, 40, 800);
-    if (signature != null) { 
+    if (signature != null) {
         stave.addTimeSignature(signature);
     }
+
+    stave.addClef(clef);
 
     stave.setContext(context).draw();
 
     var stave_notes = []
-    for(i = 0; i < notes.length; i++)
-    {
+    for (i = 0; i < notes.length; i++) {
         note = notes[i];
 
-        if(note == BARNote) {
+        if (note == BARNote) {
             stave_notes.push(new Vex.Flow.BarNote());
         }
         else {
             stave_note = new VF.StaveNote({
                 clef: clef,
-                key: note.keys,
+                keys: note.keys,
                 duration: duration,
             });
 
-            if(note.accidentals != null) {
-                for(j = 0; j < note.accidentals.length; j++)
-                {
+            if (note.accidentals != null) {
+                for (j = 0; j < note.accidentals.length; j++) {
                     stave_note.addAccidental(note.accidentals[j].index, new VF.Accidental(note.accidentals[j].value))
                 }
             }
@@ -183,6 +196,61 @@ function Draw_stave(target_div, clef, signature, notes, duration) {
         }
     }
 
+    // var stave_notes = [
+    //     new VF.StaveNote({
+    //         clef: "treble",
+    //         keys: ["d/4", "e/4"],
+    //         duration: "w"
+    //     })
+    //         .addAccidental(1, new VF.Accidental("b")),
+
+    //     // start new measure
+    //     new Vex.Flow.BarNote(),
+
+
+    //     new VF.StaveNote({
+    //         clef: "treble",
+    //         keys: ["g/4", "f/5"],
+    //         duration: "w"
+    //     })
+    //         .addAccidental(1, new VF.Accidental("#")),
+
+    //     new Vex.Flow.BarNote(),
+
+    //     new VF.StaveNote({
+    //         clef: "treble",
+    //         keys: ["d/4", "b/4"],
+    //         duration: "w"
+    //     })
+    //         .addAccidental(1, new VF.Accidental("#")),
+
+    //     new Vex.Flow.BarNote(),
+
+    //     new VF.StaveNote({
+    //         clef: "treble",
+    //         keys: ["d/4", "e/4"],
+    //         duration: "w"
+    //     })
+    //         .addAccidental(0, new VF.Accidental("#")),
+
+    //     new Vex.Flow.BarNote(),
+
+    //     new VF.StaveNote({
+    //         clef: "treble",
+    //         keys: ["a/4", "g/5"],
+    //         duration: "w"
+    //     })
+    //         .addAccidental(1, new VF.Accidental("b")),
+
+    //     new Vex.Flow.BarNote(),
+
+    //     new VF.StaveNote({
+    //         clef: "treble",
+    //         keys: ["c/4", "e/4"],
+    //         duration: "w"
+    //     })
+    // ];
+
     voice = new VF.Voice({
         num_beats: 4, // TODO: make this a parameter
         beat_value: 4
@@ -190,9 +258,9 @@ function Draw_stave(target_div, clef, signature, notes, duration) {
 
     var voices = [voice];
 
-    var formatter = new VF.Formatter().joinVoices(volices).format(voices, 800);
+    var formatter = new VF.Formatter().joinVoices(voices).format(voices, 800);
 
-    voices.forEach(function(v) {
+    voices.forEach(function (v) {
         v.draw(context, stave);
     })
 }
@@ -208,5 +276,5 @@ function write_doc() {
     //     element.appendTo('body');
     // });
 
-    
+
 }

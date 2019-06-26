@@ -45,3 +45,19 @@ test('Test randomMm returns right counts (2,3)', () => {
 
   expect(data).toEqual(expect.arrayContaining(expcected_major));
 })
+
+// describe('teorian_note_to_key converts from', () => {
+//   it('', () => {});
+// });
+
+describe('teorian_note_to_key converts from', () => {
+  it('a5 to {a, _, 5}', () => {
+    expected = {'letter': 'a', 'accidental': '', 'octave': 5}
+    expect(teorian_note_to_key("a5")).toEqual(expected);
+  });
+  
+  it('a#5 to {a, #, 5}', () => {
+    expected = {'letter': 'a', 'accidental': '#', 'octave': 5}
+    expect(teorian_note_to_key("a#5")).toEqual(expected);
+  });
+})

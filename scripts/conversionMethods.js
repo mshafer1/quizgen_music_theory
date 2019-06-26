@@ -1,4 +1,4 @@
-const BaseClef = 'base';
+const BassClef = 'bass';
 const TrebleClef = 'treble';
 const Major = 'Major';
 const Minor = 'Minor';
@@ -35,10 +35,32 @@ function teorian_note_to_vexflow_note(note_str) {
     return result;
 }
 
-function random_clef() {
-    result = Math.floor(Math.random() * 2); // 0 or 1, 0 denotes Base Clef
+function teorian_note_to_key(note_str) {
+    letter = note_str[0];
+    octave = Number(note_str[note_str.length-1])
+    accidental = ''
+    if(note_str.length == 3) {
+        accidental = note_str[1];
+    }
+    return new Key(letter, octave, accidental);
+}
 
-    return (result) ? TrebleClef : BaseClef;
+function keys_to_note(keys) {
+    var result = new Note(Array(), Array());
+    for(var i = 0; i < keys.length; i++) {
+        var key = keys[i];
+        result.keys.push(key.letter + '/' + key.octave);
+        if(key.accidental != '') {
+            result.accidentals.push(new Accidental(i, key.accidental));
+        }
+    }
+    return result;
+}
+
+function random_clef() {
+    result = Math.floor(Math.random() * 2); // 0 or 1, 0 denotes Bass Clef
+
+    return (result) ? TrebleClef : BassClef;
 }
 
 function random_major_minor(nMajor, nminor) {
