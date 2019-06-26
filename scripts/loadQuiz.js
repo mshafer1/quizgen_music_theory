@@ -5,11 +5,9 @@ const intervaltype = 'interval';
 const scaleRaw = 'ScaleLable';
 const mScalesKey = 'mScales';
 const MScalesKey = 'MScales';
-const BaseClef = 'base';
-const TrebleClef = 'treble';
+
 const QuizID = 'ID';
-const Major = 'Major';
-const Minor = 'Minor';
+
 const mStartingNotes = 'mPitches[]';
 const MStartingNotes = 'MPitches[]';
 const BARNote = {}; // create an object
@@ -17,29 +15,6 @@ const BARNote = {}; // create an object
 title = '';
 prompt = '';
 VF = Vex.Flow;
-
-class Key {
-    constructor(letter, octave, accidental) {
-        this.letter = letter;
-        this.octave = octave;
-        this.accidental = accidental;
-    }
-}
-
-class Note {
-    constructor(keys, accidentals) {
-        this.keys = keys;
-        this.accidentals = accidentals;
-    }
-}
-
-class Accidental {
-    constructor(index, value) {
-        this.index = index;
-        this.value = value;
-    }
-}
-
 
 function init() {
     get_data = load_get();
@@ -62,21 +37,6 @@ function init() {
     }
 }
 
-function random_clef() {
-    result = Math.floor(Math.random() * 2); // 0 or 1, 0 denotes Base Clef
-
-    return (result) ? TrebleClef : BaseClef;
-}
-
-function random_major_minor(nMajor, nminor) {
-    total = nMajor + nminor;
-    pick = Array(total);
-    for (i = 0; i < total; i++) {
-        pick[i] = (i < nMajor) ? Major : Minor;
-    }
-    result = shuffle(pick);
-    return result;
-}
 
 function note_to_key(note) {
     letter = note[0];
@@ -152,15 +112,6 @@ function handle_lable_scale(data) {
         staves.push(stave);
     }
     write_doc();
-}
-
-function teorian_note_to_vexflow_note(note_str) {
-    console.log(note_str);
-    result = note_str.substring(0, note_str.length-1);
-    result += '/';
-    result += note_str[note_str.length-1];
-
-    return result;
 }
 
 function gen_scale(mM, starting_note) {
@@ -254,27 +205,4 @@ function write_doc() {
     // });
 
     
-}
-
-/* REGION: helpers */
-
-// originally from https://stackoverflow.com/a/2450976
-function shuffle(array) {
-    var result = array.slice();
-    var currentIndex = result.length, temporaryValue, randomIndex;
-
-    // While there remain elements to shuffle...
-    while (0 !== currentIndex) {
-
-        // Pick a remaining element...
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex -= 1;
-
-        // And swap it with the current element.
-        temporaryValue = result[currentIndex];
-        result[currentIndex] = result[randomIndex];
-        result[randomIndex] = temporaryValue;
-    }
-
-    return result;
 }
