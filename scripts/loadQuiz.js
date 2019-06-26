@@ -107,9 +107,13 @@ function handle_lable_scale(data) {
             starting_note = mNOtes.pop();
         }
 
-        Draw_stave(stave, clef, null, gen_scale(mMscales[i], starting_note), 'w');
+        document.body.appendChild(stave);
 
-        staves.push(stave);
+        scale = gen_scale(mMscales[i], starting_note);
+
+        Draw_stave(stave, clef, null, [keys_to_note(scale)], 'w');
+
+        // staves.push(stave);
     }
     write_doc();
 }
@@ -126,10 +130,10 @@ function gen_scale(mM, starting_note) {
 
     for(i = 0; i < notes.length; i++)
     {
-        result = result.concat(teorian_note_to_vexflow_note(String(notes[i])));
+        result = result.concat(teorian_note_to_key(String(notes[i])));
     }
 
-    result.concat(teorian_note_to_vexflow_note(note.name() + note.accidental() + (note.octave() + 1)));
+    result.concat(teorian_note_to_key(note.name() + note.accidental() + (note.octave() + 1)));
 
     return result;
 }
