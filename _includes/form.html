@@ -1,0 +1,31 @@
+<form action="/quiz.html" method="GET" target="_blank">
+    <div class="striped-w3">
+        <input type="hidden" value="" name="ID" id="_ID"/>
+        <script>
+            $('#_ID').val(Math.floor(Math.random() * 10000 + 1000));
+        </script>
+        {% for input in include.inputs %}
+            {% if input[1]=>type == "hidden" %}
+                {% include basic_input.html %}
+            {% else %}
+                <div class="w3-row-padding w3-margin-top w3-margin w3-padding">
+                    <div class="w3-col s2">
+                        <label for="{{ input[0] }}">{{ input[0] }}: </label>
+                    </div>
+                    <div class="w3-col s2">
+                        {% if input[1]=>type == "multi" %}
+                            {% assign name = input[1]=>name %}
+                            {% assign values = input[1]=>values %}
+                            {% include multi_input.html values=values name=name %}
+                        {% else %}
+                            {% include basic_input.html %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+        <div class="w3-row-padding w3-margin-top w3-margin w3-padding">
+            <input type="submit" class="w3-btn w3-black" value="Generate"/>
+        </div>
+    </div>
+</form>

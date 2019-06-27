@@ -1,22 +1,20 @@
 <div class="w3-bar w3-black">
-    <a href="#" class="w3-bar-item w3-button">Home</a>
+    <a href="/" class="w3-bar-item w3-button">Home</a>
     
     <a href="javascript:void(0)" class="w3-bar-item w3-button w3-right w3-hide-medium w3-hide-large" onclick="showNav()">&#9776;</a>
     
-    {% capture page_list %}
-    
-    <a href="#" class="w3-bar-item w3-mobile w3-button">Interval</a>
-    
-    {% endcapture %}
+            {% capture page_list %}
+            {% for page in site.quizes %}<a href="{{ page.url }}" class="w3-bar-item w3-mobile w3-button">{{ page.title }}</a>{% endfor %}
+            {% endcapture %}
 
     <span class="w3-right w3-mobile js-collapse-nav w3-hide-small">
             <div class="w3-dropdown-hover w3-black" onmouseover="showSmallNav(true)" onmouseout="showSmallNav(false)">
-                <button class="w3-button w3-black ">New Quiz</button>
-                <div class="w3-dropdown-content w3-card-4 w3-hide-small">
-                    {{ page_list }}
+                <button class="w3-button w3-black ">New Quiz <i class="fas fa-caret-right"></i></button>
+                <div class="w3-dropdown-content w3-card-4 w3-hide-small w3-bar-block">
+                        {{ page_list }}
                 </div>
-                <div class="w3-hide js-page-list w3-hide-large">
-                    {{ page_list }}
+                <div class="w3-hide js-page-list w3-hide-large w3-bar-block w3-mobile">
+                        {{ page_list }}
                 </div>
             </div>
         <span class="w3-bar-item w3-padding w3-hide-small">&nbsp;</span>

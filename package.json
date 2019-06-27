@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {"document-ready": "^2.0.2",
+    "jest": "^24.8.0",
+    "vexflow": "^1.2.89",
+    "fs": "0.0.1-security"
+  }
+}
