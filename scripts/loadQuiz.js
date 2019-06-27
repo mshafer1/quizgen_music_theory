@@ -17,7 +17,7 @@ prompt = '';
 VF = Vex.Flow;
 
 function init() {
-    get_data = load_get();
+    var get_data = load_get();
 
     if (!(qType in get_data)) {
         alert("Invalid request for quiz!");
@@ -39,8 +39,9 @@ function init() {
 
 
 function note_to_key(note) {
-    letter = note[0];
-    accidental = '';
+    var letter = note[0];
+    var accidental = '';
+    var number = 0;
     if (letter.length == 2) {
         number = Number(note[1]);
     } else {
@@ -48,30 +49,7 @@ function note_to_key(note) {
         number = Number(note[2]);
     }
 
-    return Key(letter, number, accidental);
-}
-
-function shuffled_starting_notes(n, notes) {
-    result = shuffle(notes);
-    if (n < notes.length) {
-        result = result.slice(0, n);
-    }
-    else if (n == notes.length) {
-        // NOOP
-    }
-    else { // n > notes.length
-        multiplier = n / notes.length;
-        multiplier_whole = Math.floor(multiplier);
-        multiplier_remainder = n - (notes.length * multiplier_whole);
-
-        for (i = 1; i < multiplier_whole; i++) {
-            result.concat(shuffle(notes));
-        }
-
-        result.concat(shuffle(notes).slice(0, multiplier_remainder));
-    }
-
-    return result;
+    return new Key(letter, number, accidental);
 }
 
 // TODO: extend to include labling for extra options like "natural minor", "melodic minor", "harmonic minor"
@@ -89,8 +67,8 @@ function handle_lable_scale(data) {
 
     staves = [];
 
-    mNotes = [];
-    MNotes = [];
+    var mNotes = [];
+    var MNotes = [];
 
     if(mStartingNotes in data) {
         mNotes = shuffled_starting_notes(mScales, data[mStartingNotes]);
@@ -99,8 +77,8 @@ function handle_lable_scale(data) {
         MNotes = shuffled_starting_notes(MScales, data[MStartingNotes]);
     }
 
-    mMscales = random_major_minor(MScales, mScales);
-    for (i = 0; i < mMscales.length; i++) {
+    var mMscales = random_major_minor(MScales, mScales);
+    for (var i = 0; i < mMscales.length; i++) {
         clef = random_clef();
         console.log(`Clef: ${clef}`);
         console.log(mMscales[i]);
@@ -111,29 +89,36 @@ function handle_lable_scale(data) {
         if (mMscales[i] == Major) {
             starting_note = MNotes.pop();
         } else { // Minor
-            starting_note = mNOtes.pop();
+            starting_note = mNotes.pop();
         }
 
-        document.body.appendChild(stave);
 
         scale = gen_scale(mMscales[i], starting_note);
 
         var notes = [];
-        for(var i = 0; i < scale.length; i++) {
-            var key = scale[i];
+        for(var j = 0; j < scale.length; j++) {
+            var key = scale[j];
             notes.push(keys_to_note([key]))
         }
         // var notes = [keys_to_note(scale)];
 
-        Draw_stave(stave, clef, null, notes, 'w');
+        Draw_stave(stave, clef, null, notes, 'w', false);
 
-        // staves.push(stave);
+        var question = new_stave('Q' + i);
+        var label = document.createElement('h3');
+        label.innerHTML = '' + (i+1) + ': ' + starting_note.toUpperCase() + ' ' + mMscales[i];
+        question.appendChild(label)
+        question.appendChild(stave);
+
+        // document.body.appendChild(stave);
+
+        staves.push(question);
     }
     write_doc();
 }
 
 function gen_scale(mM, starting_note) {
-    result = Array();
+    var result = Array();
     var note = teoria.note(starting_note);
 
     if (mM == Major) {
@@ -142,7 +127,7 @@ function gen_scale(mM, starting_note) {
         notes = note.scale('aeolian').notes();
     }
 
-    for (i = 0; i < notes.length; i++) {
+    for (var i = 0; i < notes.length; i++) {
         result.push(teorian_note_to_key(String(notes[i])));
     }
 
@@ -157,9 +142,9 @@ function new_stave(id) {
     return result;
 }
 
-function Draw_stave(target_div, clef, signature, notes, duration) {
+function Draw_stave(target_div, clef, signature, notes, duration, show_accidentals=true) {
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
-    renderer.resize(1000, 500);
+    renderer.resize(1000, 200);
     var context = renderer.getContext();
     context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
 
@@ -173,7 +158,7 @@ function Draw_stave(target_div, clef, signature, notes, duration) {
     stave.setContext(context).draw();
 
     var stave_notes = []
-    for (i = 0; i < notes.length; i++) {
+    for (var i = 0; i < notes.length; i++) {
         note = notes[i];
 
         if (note == BARNote) {
@@ -186,7 +171,7 @@ function Draw_stave(target_div, clef, signature, notes, duration) {
                 duration: duration,
             });
 
-            if (note.accidentals != null) {
+            if (show_accidentals && note.accidentals != null) {
                 for (j = 0; j < note.accidentals.length; j++) {
                     stave_note.addAccidental(note.accidentals[j].index, new VF.Accidental(note.accidentals[j].value))
                 }
@@ -195,61 +180,6 @@ function Draw_stave(target_div, clef, signature, notes, duration) {
             stave_notes.push(stave_note);
         }
     }
-
-    // var stave_notes = [
-    //     new VF.StaveNote({
-    //         clef: "treble",
-    //         keys: ["d/4", "e/4"],
-    //         duration: "w"
-    //     })
-    //         .addAccidental(1, new VF.Accidental("b")),
-
-    //     // start new measure
-    //     new Vex.Flow.BarNote(),
-
-
-    //     new VF.StaveNote({
-    //         clef: "treble",
-    //         keys: ["g/4", "f/5"],
-    //         duration: "w"
-    //     })
-    //         .addAccidental(1, new VF.Accidental("#")),
-
-    //     new Vex.Flow.BarNote(),
-
-    //     new VF.StaveNote({
-    //         clef: "treble",
-    //         keys: ["d/4", "b/4"],
-    //         duration: "w"
-    //     })
-    //         .addAccidental(1, new VF.Accidental("#")),
-
-    //     new Vex.Flow.BarNote(),
-
-    //     new VF.StaveNote({
-    //         clef: "treble",
-    //         keys: ["d/4", "e/4"],
-    //         duration: "w"
-    //     })
-    //         .addAccidental(0, new VF.Accidental("#")),
-
-    //     new Vex.Flow.BarNote(),
-
-    //     new VF.StaveNote({
-    //         clef: "treble",
-    //         keys: ["a/4", "g/5"],
-    //         duration: "w"
-    //     })
-    //         .addAccidental(1, new VF.Accidental("b")),
-
-    //     new Vex.Flow.BarNote(),
-
-    //     new VF.StaveNote({
-    //         clef: "treble",
-    //         keys: ["c/4", "e/4"],
-    //         duration: "w"
-    //     })
-    // ];
 
     voice = new VF.Voice({
         num_beats: 4, // TODO: make this a parameter
@@ -276,5 +206,9 @@ function write_doc() {
     //     element.appendTo('body');
     // });
 
+    for(var i = 0; i < staves.length; i++) {
+        var stave = staves[i];
+        document.body.appendChild(stave);
+    }
 
 }
