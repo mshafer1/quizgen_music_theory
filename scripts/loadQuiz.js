@@ -77,7 +77,7 @@ function handle_lable_scale(data) {
         MNotes = shuffled_starting_notes(MScales, data[MStartingNotes]);
     }
 
-    var mMscales = random_major_minor(MScales, mScales);
+    var mMscales = random_major_minor(MNotes.length, mNotes.length);
     for (var i = 0; i < mMscales.length; i++) {
         clef = random_clef();
         console.log(`Clef: ${clef}`);
