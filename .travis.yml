@@ -14,5 +14,5 @@ before_install:
 install:
 - npm install dev
 script:
-- npm test
-- npm run coveralls
+- npm run coverage
+after_success: 'npm run coveralls'

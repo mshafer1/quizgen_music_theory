@@ -1,7 +1,8 @@
 {
   "scripts": {
     "test": "jest",
-    "coveralls": "jest --collect-coverage && cat ./coverage/lcov.info | coveralls"
+    "coverage": "jest --collect-coverage",
+    "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls"
   },
   "devDependencies": {
     "coveralls": "^3.0.4",

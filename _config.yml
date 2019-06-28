@@ -1,5 +1,5 @@
 destination: _site
-exclude: ['node_modules', 'jest.config.js', 'package.json', 'package-lock.json']
+exclude: ['node_modules', 'jest.config.js', 'package.json', 'package-lock.json', 'coverage']
 
 plugins:
   - jekyll-tidy
