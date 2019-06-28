@@ -1,5 +1,6 @@
 var vm = require("vm");
 var fs = require("fs");
+require(__dirname + '/../conversionMethods.js');
 
 var data = fs.readFileSync(__dirname + '/../conversionMethods.js');
 // const script = new vm.Script(data);
