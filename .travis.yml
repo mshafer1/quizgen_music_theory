@@ -15,4 +15,3 @@ install:
 - npm install dev
 script:
 - npm run coverage
-after_success: 'npm run coveralls'
