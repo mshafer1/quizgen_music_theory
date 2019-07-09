@@ -1,0 +1,54 @@
+---
+type: Intervals Identifying
+
+inputs:
+  'qType':
+    type: hidden
+    default: IntervalID
+    name: qType
+  '# of Intervals':
+    type: number
+    default: 4
+    name: NIntervals
+  'Base pitches':
+    type: multi
+    name: 'BasePitches[]'
+    values:
+    - a
+    - b
+    - c
+    - d
+    - e
+    - f
+    - g
+  'Intervals':
+    type: multi
+    name: 'Intervals[]'
+    values:
+      "Augmented unison": "A1"
+      "Minor second": "m2"
+      "Major second": "M2"
+      "Augmented second": "A2"
+      "Minor third": "m3"
+      "Major third": "M3"
+      "Augmented third": "A3"
+      "Diminished third": "d3"
+      "Diminished fourth": "d4"
+      "Perfect fourth": "P4"
+      "Augmented fourth": "A4"
+      "Diminished fifth": "d4"
+      "Perfect fifth": "P5"
+      "Augmented fifth": "A5"
+      "Minor sixth": "m6"
+      "Major sixth": "M6"
+      "Diminished sixth": "d6"
+      "Augmented sixth": "A6"
+      "Minor seventh": "m7"
+      "Major seventh": "M7"
+      "Diminished seventh": "d7"
+      "Augmented seventh": "A7"
+      "Perfect octave": "P8"
+      "Diminished octave": "d8"
+---
+
+{% include form.html inputs=page.inputs %}

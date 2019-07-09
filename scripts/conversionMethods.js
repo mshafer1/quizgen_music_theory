@@ -26,6 +26,21 @@ class Accidental {
     }
 }
 
+function note_to_key(note) {
+    var letter = note[0];
+    var accidental = '';
+    var number = 0;
+    if (letter.length == 2) {
+        number = Number(note[1]);
+    } else {
+        accidental = note[1];
+        number = Number(note[2]);
+    }
+
+    return new Key(letter, number, accidental);
+}
+
+
 function teorian_note_to_vexflow_note(note_str) {
     // console.log(note_str);
     var result = note_str.substring(0, note_str.length - 1);
@@ -63,10 +78,18 @@ function random_clef() {
     return (result) ? TrebleClef : BassClef;
 }
 
+function shuffled_clefs(n) {
+    var result = Array(n);
+    for(var i = 0; i < n; i++) {
+        result[i] = ((i+1) % 2)? TrebleClef : BassClef;
+    }
+    return result;
+}
+
 function random_major_minor(nMajor, nminor) {
     var total = nMajor + nminor;
     var pick = Array(total);
-    for (i = 0; i < total; i++) {
+    for (var i = 0; i < total; i++) {
         pick[i] = (i < nMajor) ? Major : Minor;
     }
     var result = shuffle(pick);
@@ -96,7 +119,7 @@ function shuffle(array) {
     return result;
 }
 
-function shuffled_starting_notes(n, notes) {
+function shuffled_slice(n, notes) {
     var result = shuffle(notes);
 
     

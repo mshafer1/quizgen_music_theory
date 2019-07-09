@@ -2,15 +2,22 @@ $(window).load(init);
 
 const qType = 'qType';
 const intervaltype = 'interval';
-const scaleRaw = 'ScaleLable';
 const mScalesKey = 'mScales';
 const MScalesKey = 'MScales';
+
+const scaleRaw = 'ScaleLable';
+const intervalRaw = 'IntervalID';
 
 const QuizID = 'ID';
 
 const mStartingNotes = 'mPitches[]';
 const MStartingNotes = 'MPitches[]';
+const StartingNotes = 'BasePitches[]';
+const NIntervals = 'NIntervals';
+const Intervals = 'Intervals[]';
 const BARNote = {}; // create an object
+
+const STAVE_SIZE = 800;
 
 title = '';
 prompt = '';
@@ -28,8 +35,11 @@ function init() {
         Math.seedrandom(Number(get_data[QuizID]));
     }
 
-    if (get_data[qType] == scaleRaw) {
+    if (get_data[qType] == scaleRaw && MScalesKey in get_data && mScalesKey in get_data && mStartingNotes in get_data && MStartingNotes in get_data) {
         handle_lable_scale(get_data);
+    }
+    else if (get_data[qType] == intervalRaw && NIntervals in get_data && Intervals in get_data && StartingNotes in get_data) {
+        handle_lable_interval(get_data);
     }
     else {
         alert("Invalid request for quiz!");
@@ -37,19 +47,63 @@ function init() {
     }
 }
 
+function handle_lable_interval(data) {
+    title = 'Timed Interval Quize, ID';
+    prompt = 'Identify the following intervals (include number and quality)';
 
-function note_to_key(note) {
-    var letter = note[0];
-    var accidental = '';
-    var number = 0;
-    if (letter.length == 2) {
-        number = Number(note[1]);
-    } else {
-        accidental = note[1];
-        number = Number(note[2]);
+    var n_intervals = data[NIntervals];
+
+    var clefs = shuffled_clefs(Math.ceil(n_intervals / 6));
+    console.log(clefs);
+
+    var intervals = shuffled_slice(n_intervals, data[Intervals])
+    var starting_notes = shuffled_slice(n_intervals, data[StartingNotes])
+
+    staves = []
+
+    var clef = null;
+    var n_clefs = Math.ceil(n_intervals / 6);
+    for (var i = 0; i < n_clefs; i++) { 
+        stave = new_stave('Stave' + i);
+        answer_row = gen_answer_row(((i+1)*6 < n_intervals)?6:n_intervals-(i)*6, STAVE_SIZE);
+
+        clef = clefs[i];
+        console.log("new stave");
+        
+        var notes = []
+
+        for(var j = 0; j < 6 && i*6+j < n_intervals; j++) {
+            var interval_index = i*6 + j;
+            var starting_note = starting_notes[interval_index] + ((clef == TrebleClef)?'4':'3');
+            var interval = intervals[interval_index];
+            var keys = gen_interval(starting_note, interval);
+            console.log("interval: " + interval);
+            console.log("Keys: " + JSON.stringify(keys));
+            notes.push(keys_to_note(keys));
+
+            if(j < 5 && interval_index < n_intervals - 1) {
+                notes.push(BARNote);
+            }
+        }
+        console.log("Stave: " + JSON.stringify(stave));
+        console.log("Clef: " + clef);
+        
+        console.log("Notes: " + JSON.stringify(notes));
+        Draw_stave(stave, clef, null, notes, 'w');
+        
+        
+        question = new_stave("Stave" + i);
+        var label = document.createElement('h3');
+        label.innerHTML = '' + (i + 1) + ': ';
+        question.appendChild(label);
+
+        question.appendChild(stave);
+        question.appendChild(answer_row);
+
+        staves.push(question);
     }
 
-    return new Key(letter, number, accidental);
+    write_doc();
 }
 
 // TODO: extend to include labling for extra options like "natural minor", "melodic minor", "harmonic minor"
@@ -70,11 +124,11 @@ function handle_lable_scale(data) {
     var mNotes = [];
     var MNotes = [];
 
-    if(mStartingNotes in data) {
-        mNotes = shuffled_starting_notes(mScales, data[mStartingNotes]);
+    if (mStartingNotes in data) {
+        mNotes = shuffled_slice(mScales, data[mStartingNotes]);
     }
-    if(MStartingNotes in data) {
-        MNotes = shuffled_starting_notes(MScales, data[MStartingNotes]);
+    if (MStartingNotes in data) {
+        MNotes = shuffled_slice(MScales, data[MStartingNotes]);
     }
 
     var mMscales = random_major_minor(MNotes.length, mNotes.length);
@@ -96,7 +150,7 @@ function handle_lable_scale(data) {
         scale = gen_scale(mMscales[i], starting_note);
 
         var notes = [];
-        for(var j = 0; j < scale.length; j++) {
+        for (var j = 0; j < scale.length; j++) {
             var key = scale[j];
             notes.push(keys_to_note([key]))
         }
@@ -106,7 +160,7 @@ function handle_lable_scale(data) {
 
         var question = new_stave('Q' + i);
         var label = document.createElement('h3');
-        label.innerHTML = '' + (i+1) + ': ' + starting_note.toUpperCase() + ' ' + mMscales[i];
+        label.innerHTML = '' + (i + 1) + ': ' + starting_note.toUpperCase() + ' ' + mMscales[i];
         question.appendChild(label)
         question.appendChild(stave);
 
@@ -115,6 +169,51 @@ function handle_lable_scale(data) {
         staves.push(question);
     }
     write_doc();
+}
+
+function gen_answer_row(n_answers, width) {
+    var result = document.createElement('div');
+    result.style.paddingLeft = '15px';
+
+    var part_width = width / n_answers;
+    var padding = 15;
+    var answer_width = part_width - 2*padding;
+
+    for(var i = 0; i < n_answers; i++) {
+        for(var j = 0; j < 3; j++) {
+            var part = document.createElement('div');
+            result.appendChild(part);
+
+            if(j == 1)  {
+                part.classList.add("answer-inline");
+                part.style.width = answer_width + 'px';
+                // part.innerHTML = "<hr/>";
+            } else {
+                part.classList.add("blank-inline");
+                part.innerHTML = '';
+                part.style.width = padding + 'px';
+            }
+            
+        }
+    }
+    
+    return result;
+}
+
+function gen_interval(starting_note, interval) {
+    var result = Array();
+    var note = teoria.note(starting_note);
+
+    result.push(teorian_note_to_key(String(note)));
+    console.log(String(note));
+    console.log("Interval: " + interval);
+
+    var upper_note = note.interval(interval)
+    console.log(String(upper_note))
+
+    result.push(teorian_note_to_key(String(upper_note)));
+
+    return result;
 }
 
 function gen_scale(mM, starting_note) {
@@ -136,19 +235,19 @@ function gen_scale(mM, starting_note) {
     return result;
 }
 
-function new_stave(id) {
+function new_stave(id = '') {
     result = document.createElement("div");
     result.id = id;
     return result;
 }
 
-function Draw_stave(target_div, clef, signature, notes, duration, show_accidentals=true) {
+function Draw_stave(target_div, clef, signature, notes, duration, show_accidentals = true) {
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
-    renderer.resize(1000, 200);
+    renderer.resize(STAVE_SIZE + 200, 200);
     var context = renderer.getContext();
     context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
 
-    var stave = new VF.Stave(10, 40, 800);
+    var stave = new VF.Stave(10, 40, STAVE_SIZE);
     if (signature != null) {
         stave.addTimeSignature(signature);
     }
@@ -188,7 +287,7 @@ function Draw_stave(target_div, clef, signature, notes, duration, show_accidenta
 
     var voices = [voice];
 
-    var formatter = new VF.Formatter().joinVoices(voices).format(voices, 800);
+    var formatter = new VF.Formatter().joinVoices(voices).format(voices, STAVE_SIZE);
 
     voices.forEach(function (v) {
         v.draw(context, stave);
@@ -201,12 +300,7 @@ function write_doc() {
 
     $(`<p>${prompt}</p>`).appendTo('body');
 
-    // staves.forEach(element => {
-    //     console.log(element);
-    //     element.appendTo('body');
-    // });
-
-    for(var i = 0; i < staves.length; i++) {
+    for (var i = 0; i < staves.length; i++) {
         var stave = staves[i];
         document.body.appendChild(stave);
     }

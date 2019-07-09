@@ -2,7 +2,7 @@
     <div class="striped-w3">
         <input type="hidden" value="" name="ID" id="_ID"/>
         <script>
-            $('#_ID').val(Math.floor(Math.random() * 10000 + 1000));
+            $('#_ID').val(Math.floor(Math.random() * 90000 + 1000));
         </script>
         {% for input in include.inputs %}
             {% if input[1]=>type == "hidden" %}
