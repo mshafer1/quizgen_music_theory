@@ -1,3 +1,6 @@
+---
+---
+
 div.w3-dropdown-hover:hover .fa-caret-right {
     -ms-filter:"progid:DXImageTransform.Microsoft.BasicImage(rotation=1)";
     transform:rotate(90deg)
@@ -23,4 +26,28 @@ div.answer-inline {
     border-bottom: 1px solid black;
     color: black;
     width: 30px;
+}
+
+{% include key.css key_name="black_key" key_width=site.key_width key_height=site.black_height color=444 fade_color=555 hover_color="010101" %}
+
+{% include key.css key_name="white_key" key_width=site.key_width key_height=site.white_height color="dadaca" fade_color="cacaba" hover_color="f0f0a0" checked_color="a0a0b0" %}
+
+
+.white_key {
+	z-index: 0;
+}
+
+.black_key {
+	z-index: 1;
+}
+
+.keyboardPart {
+	display: inline-block;
+}
+
+.center {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
 }

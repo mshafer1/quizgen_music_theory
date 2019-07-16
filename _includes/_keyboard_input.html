@@ -1,0 +1,69 @@
+{% comment %}
+expected:
+ index
+
+{% endcomment %}
+
+
+{% assign hide = 'True' %}
+
+{% assign low_keyboard = site.low_keyboard %}
+{% assign high_keyboard = site.high_keyboard %}
+{% assign default_keyboard = 4 %}
+
+{% assign key_names = "C,D,E,F,G,A,B" | split: "," %}
+{% assign alt_keys = "C#,D#,F#,G#,A#" | split: "," %}
+
+<script>
+    this_keyboard = new Keyboard({{ include.index }})
+    keyboards.push(this_keyboard);
+</script>
+
+<div id="keyboard{{ include.index }}">
+    <div style="display: inline-block">
+        {% for n in (low_keyboard..high_keyboard) %}
+        <div id="part-{{ include.index }}-{{ n }}" class="keyboardPart" style="position: relative; {% if n != 4 and hide == 'True' %}display: none;{% endif %}">
+            {% for key_name in key_names %}
+                {% assign key_n = n %}
+                {% if key_name == 'A' or key_name == 'B' %}
+                    {% assign key_n = n | plus: 1 %}
+                {% endif %}
+                <div class="white_key">
+                    <input type="checkbox" value="{{ key_name }}{{ key_n }}" name="{{ include.name }}" id="{{ key_name }}{{ include.index }}-{{ key_n }}"></input>
+                    <label for="{{ key_name }}{{ include.index }}-{{ key_n }}">{% if key_name == 'C' %}<span class="w3-display-bottommiddle">C{{ key_n }}</span>{% endif %}</label>
+                </div>
+            {% endfor %}
+
+            <div style="position: absolute; left: 0px; top: 0px; z-index: 1; ">
+                {% for key_name in alt_keys %}
+                    {% assign left=0 %}
+                    {% if key_name == 'C#' %}
+                        {% assign left=0.5 %}
+                    {% elsif key_name == 'F#' %}
+                        {% assign left=1.0 %}
+                    {% endif %}
+
+                    {% assign key_n = n %}
+                    {% if key_name == 'A#' %}
+                        {% assign key_n = n | plus: 1 %}
+                    {% endif %}
+
+                    <div class="black_key" style="margin-left: {{ left | times: site.key_width }}px;">
+                        <input type="checkbox" value="{{ key_name }}{{ key_n }}" name="{{ include.name }}" id="{{ key_name }}{{ include.index }}-{{ key_n }}"></input>
+                        <label for="{{ key_name }}{{ include.index }}-{{ key_n }}">{% if key_name == 'C' %}C{{ key_n }}{% endif %}</label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+        <div class="center">
+                <div style="display: inline-block" >
+                        <button class="w3-button w3-black" type="button" onclick="reverse({{ include.index }})">&lt;-</button>
+                        <button class="w3-button w3-black" type="button" onclick="advance({{ include.index }})">-&gt;</button>
+                </div>
+            </div>
+    </div>
+
+</div>
+
+<div>&nbsp;</div>

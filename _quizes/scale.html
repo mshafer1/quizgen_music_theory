@@ -11,30 +11,15 @@ inputs:
     default: 4
     name: MScales
   'Major scale tonic pitches':
-    type: multi
+    type: keyboard
     name: 'MPitches[]'
-    values:
-    - a
-    - b
-    - c
-    - d
-    - e
-    - f
-    - g
   '# of Minor Scales':
     type: number
     default: 4
     name: mScales
   'Minor scale tonic pitches':
-    type: multi
+    type: keyboard
     name: 'mPitches[]'
-    values:
-    - a
-    - b
-    - c
-    - e
-    - f
-    - g
 ---
 
 {% include form.html inputs=page.inputs %}

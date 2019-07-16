@@ -13,6 +13,8 @@ const QuizID = 'ID';
 const mStartingNotes = 'mPitches[]';
 const MStartingNotes = 'MPitches[]';
 const StartingNotes = 'BasePitches[]';
+const StartingBassNotes = 'BassBasePitches[]';
+const StartingTrebleNotes = 'TrebleBasePitches[]';
 const NIntervals = 'NIntervals';
 const Intervals = 'Intervals[]';
 const BARNote = {}; // create an object
@@ -35,10 +37,10 @@ function init() {
         Math.seedrandom(Number(get_data[QuizID]));
     }
 
-    if (get_data[qType] == scaleRaw && MScalesKey in get_data && mScalesKey in get_data && mStartingNotes in get_data && MStartingNotes in get_data) {
+    if (get_data[qType] == scaleRaw && MScalesKey in get_data && mScalesKey in get_data && (mStartingNotes in get_data || MStartingNotes in get_data)) {
         handle_lable_scale(get_data);
     }
-    else if (get_data[qType] == intervalRaw && NIntervals in get_data && Intervals in get_data && StartingNotes in get_data) {
+    else if (get_data[qType] == intervalRaw && NIntervals in get_data && Intervals in get_data && (StartingBassNotes in get_data || StartingTrebleNotes in get_data)) {
         handle_lable_interval(get_data);
     }
     else {
@@ -53,38 +55,60 @@ function handle_lable_interval(data) {
 
     var n_intervals = data[NIntervals];
 
-    var clefs = shuffled_clefs(Math.ceil(n_intervals / 6));
+    var bass_starting_notes = shuffled_slice(Math.ceil(n_intervals / 2), data[StartingBassNotes])
+    var treble_starting_notes = shuffled_slice(Math.ceil(n_intervals / 2), data[StartingTrebleNotes])
+    var row_size = Math.min(6, treble_starting_notes.length, bass_starting_notes.length);
+
+    var clefs = shuffled_clefs(Math.ceil(n_intervals / row_size));
     console.log(clefs);
 
     var intervals = shuffled_slice(n_intervals, data[Intervals])
-    var starting_notes = shuffled_slice(n_intervals, data[StartingNotes])
+   
 
     staves = []
 
     var clef = null;
-    var n_clefs = Math.ceil(n_intervals / 6);
+    var n_clefs = Math.ceil(n_intervals / row_size);
     for (var i = 0; i < n_clefs; i++) { 
         stave = new_stave('Stave' + i);
-        answer_row = gen_answer_row(((i+1)*6 < n_intervals)?6:n_intervals-(i)*6, STAVE_SIZE);
+        answer_row = gen_answer_row(((i+1)*row_size < n_intervals)?row_size:n_intervals-(i)*row_size, STAVE_SIZE);
 
         clef = clefs[i];
         console.log("new stave");
         
         var notes = []
 
-        for(var j = 0; j < 6 && i*6+j < n_intervals; j++) {
-            var interval_index = i*6 + j;
-            var starting_note = starting_notes[interval_index] + ((clef == TrebleClef)?'4':'3');
+        // var end_clef = false;
+
+        
+
+        for(var j = 0; j < row_size && i*row_size+j < n_intervals; j++) {
+            var interval_index = i*row_size + j;
+
+            if(clef == BassClef) {
+                var starting_note = bass_starting_notes.pop();
+            }
+            else {
+                var starting_note = treble_starting_notes.pop();
+            }
+
+            // var starting_note = starting_notes[interval_index];
             var interval = intervals[interval_index];
             var keys = gen_interval(starting_note, interval);
             console.log("interval: " + interval);
             console.log("Keys: " + JSON.stringify(keys));
             notes.push(keys_to_note(keys));
 
-            if(j < 5 && interval_index < n_intervals - 1) {
+            // if(bass_starting_notes.length == 0 || treble_starting_notes.length == 0) {
+            //     end_clef = true;
+            //     continue;
+            // }
+
+            if(j < row_size-1 && interval_index < n_intervals - 1) {
                 notes.push(BARNote);
             }
         }
+
         console.log("Stave: " + JSON.stringify(stave));
         console.log("Clef: " + clef);
         
@@ -104,6 +128,19 @@ function handle_lable_interval(data) {
     }
 
     write_doc();
+}
+
+function scale_clef(starting_note, original_clef) {
+    var note = teoria.note(starting_note);
+    var index = note.key();
+
+    if (index <= 32) {
+        return BassClef;
+    } else if(index >= 40) {
+        return TrebleClef;
+    } else {
+        return original_clef;
+    }
 }
 
 // TODO: extend to include labling for extra options like "natural minor", "melodic minor", "harmonic minor"
@@ -146,6 +183,7 @@ function handle_lable_scale(data) {
             starting_note = mNotes.pop();
         }
 
+        clef = scale_clef(starting_note, clef);
 
         scale = gen_scale(mMscales[i], starting_note);
 
@@ -160,7 +198,7 @@ function handle_lable_scale(data) {
 
         var question = new_stave('Q' + i);
         var label = document.createElement('h3');
-        label.innerHTML = '' + (i + 1) + ': ' + starting_note.toUpperCase() + ' ' + mMscales[i];
+        label.innerHTML = '' + (i + 1) + ': ' + starting_note.substring(0, starting_note.length-1).toUpperCase() + ' ' + mMscales[i];
         question.appendChild(label)
         question.appendChild(stave);
 

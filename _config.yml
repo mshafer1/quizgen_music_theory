@@ -14,3 +14,15 @@ defaults:
       type: "quizes"
     values:
       layout: quiz
+
+key_width: 32
+
+white_height: 190
+
+black_height: 125
+
+default_keyboard: 4
+
+low_keyboard: 2
+
+high_keyboard: 6

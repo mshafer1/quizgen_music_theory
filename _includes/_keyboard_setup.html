@@ -1,0 +1,84 @@
+<script>
+    var keyboards = [];
+
+    var KEYBOARD_WIDTH = {{ site.key_width | times: 7 }};
+
+    class Keyboard {
+        constructor(index) {
+            this.index = index;
+            this.lowest_n = {{ site.default_keyboard }};
+            this.highest_n = {{ site.default_keyboard }};
+        }
+
+        resize() {
+            console.log("Resize keyboard: " + this.index);
+
+            var host = $('#keyboard' + this.index);
+            var width = host.width();
+
+            var max_number = Math.max(1, Math.floor((width - 150) / KEYBOARD_WIDTH));
+            // console.log(max_number);
+
+            this.lowest_n = Math.max(this.highest_n - max_number + 1, 2);
+            this.highest_n = Math.min(this.lowest_n + max_number - 1, 6);
+
+
+            for (var i = {{ site.low_keyboard }}; i <= {{ site.high_keyboard }}; i++) {
+                var part = $('#part-' + this.index + '-' + i);
+                var show = i >= this.lowest_n && i <= this.highest_n;
+                // console.log(part);
+                // console.log(" show: " + show);
+                part.visible(show);
+            }
+        }
+
+        advance() {
+            // console.log("Advance");
+
+            if (this.highest_n == {{ site.high_keyboard }}) {
+                return; // can't advance past showing 6
+            }
+
+            $('#part-' + this.index + '-' + this.lowest_n).hide();
+
+            this.highest_n += 1;
+            this.lowest_n += 1;
+
+            $('#part-' + this.index + '-' + this.lowest_n).show();
+            $('#part-' + this.index + '-' + this.highest_n).show();
+        }
+
+        reverse() {
+            // console.log("reverse");
+
+            if (this.lowest_n == {{ site.low_keyboard }}) {
+                return; // can't lower past showing 2
+            }
+
+            $('#part-' + this.index + '-' + this.highest_n).hide();
+
+            this.highest_n -= 1;
+            this.lowest_n -= 1;
+
+            $('#part-' + this.index + '-' + this.lowest_n).show();
+            $('#part-' + this.index + '-' + this.highest_n).show();
+        }
+    }
+
+    function advance(index) {
+        keyboards[index].advance();
+    }
+
+    function reverse(index) {
+        keyboards[index].reverse();
+    }
+
+    function resize() {
+        keyboards.forEach(function (keyboard) {
+            keyboard.resize();
+        })
+    }
+
+    $(window).resize(resize);
+    $(window).ready(resize);
+</script>

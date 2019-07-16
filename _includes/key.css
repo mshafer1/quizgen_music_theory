@@ -1,0 +1,88 @@
+{% comment %}
+
+Expected:
+key_name
+key_width
+key_height
+color
+hover_color
+{% endcomment %}
+
+
+.{{ include.key_name }} {
+	width: {{ include.key_width }}px;
+    height: {{ include.key_height }}px;
+    display: inline-block;
+    /* border color */
+	background: #000000;
+
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfff4', endColorstr='#b3bead',GradientType=0 );
+	margin: 20px auto;
+
+
+	-webkit-box-shadow: inset 0px 4px 4px white, 0px 4px 5px rgba(0,0,0,0.5);
+	-moz-box-shadow: inset 0px 4px 4px white, 0px 4px 5px rgba(0,0,0,0.5);
+	box-shadow: inset 0px 4px 4px white, 0px 4px 5px rgba(0,0,0,0.5);
+
+	-webkit-box-shadow: inset 0px 4px 4px white, 0px 4px 5px rgba(0,0,0,0.5);
+	-moz-box-shadow: inset 0px 4px 4px white, 0px 4px 5px rgba(0,0,0,0.5);
+	box-shadow: inset 0px 4px 4px white, 0px 4px 5px rgba(0,0,0,0.5);
+	position: relative;
+}
+
+.{{ include.key_name }} label {
+	cursor: pointer;
+	position: absolute;
+	width: {{ include.key_width | minus: 2 }}px;
+	height: {{ include.key_height | minus:1 }}px;
+
+	left: 1px;
+	top: 0px;
+
+	background: -webkit-linear-gradient(top, #{{ include.color }} 0%, #{{ include.fade_color }} 100%);
+	background: -moz-linear-gradient(top, #{{ include.color }} 0%, #{{ include.fade_color }} 100%);
+	background: -o-linear-gradient(top, #{{ include.color }} 0%, #{{ include.fade_color }} 100%);
+	background: -ms-linear-gradient(top, #{{ include.color }} 0%, #{{ include.fade_color }} 100%);
+	background: linear-gradient(top, #{{ include.color }} 0%, #{{ include.fade_color }} 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#{{ include.color }}', endColorstr='#{{ include.fade_color }}',GradientType=0 );
+}
+
+.{{ include.key_name }} label:after {
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	filter: alpha(opacity=0);
+	opacity: 0;
+	content: '';
+	position: absolute;
+	width: {{ include.key_width | minus: 2 }}px;
+	height: {{ include.key_height | minus:1 }}px;
+	background: #{{ include.hover_color }};
+
+    /* check color */
+	background: -webkit-linear-gradient(top, #{{ include.fade_color }} 0%, #{{ include.hover_color }} 100%);
+	background: -moz-linear-gradient(top, #{{ include.fade_color }} 0%, #{{ include.hover_color }} 100%);
+	background: -o-linear-gradient(top, #{{ include.fade_color }} 0%, #{{ include.hover_color }} 100%);
+	background: -ms-linear-gradient(top, #{{ include.fade_color }} 0%, #{{ include.hover_color }} 100%);
+	background: linear-gradient(top, #{{ include.fade_color }} 0%, #{{ include.hover_color }} 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#{{ include.fade_color }}', endColorstr='#{{ include.hover_color }}',GradientType=0 );
+
+
+	top: 0px;
+	left: 1px;
+
+}
+
+.{{ include.key_name }} label:hover::after {
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+	filter: alpha(opacity=30);
+	opacity: 0.3;
+}
+
+.{{ include.key_name }} input[type=checkbox]:checked + label:after {
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+	filter: alpha(opacity=100);
+	opacity: 0.5;
+}
+
+.{{ include.key_name }} > input[type=checkbox] {
+	visibility: hidden;
+}

@@ -4,6 +4,7 @@
         <script>
             $('#_ID').val(Math.floor(Math.random() * 90000 + 1000));
         </script>
+        {% assign count=0 %}
         {% for input in include.inputs %}
             {% if input[1]=>type == "hidden" %}
                 {% include basic_input.html %}
@@ -12,12 +13,18 @@
                     <div class="w3-col s2">
                         <label for="{{ input[0] }}">{{ input[0] }}: </label>
                     </div>
-                    <div class="w3-col s2">
                         {% if input[1]=>type == "multi" %}
+                    <div class="w3-col s2">
                             {% assign name = input[1]=>name %}
                             {% assign values = input[1]=>values %}
                             {% include multi_input.html values=values name=name %}
+                        {% elsif input[1]=>type == "keyboard" %}
+                    <div class="w3-col m10 s12">
+                            {% assign name = input[1]=>name %}
+                            {% include _keyboard_input.html index=count name=name %}
+                            {% assign count=count | plus: 1 %}
                         {% else %}
+                    <div class="w3-col s2">
                             {% include basic_input.html %}
                         {% endif %}
                     </div>
