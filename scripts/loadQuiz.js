@@ -117,6 +117,8 @@ function handle_lable_interval(data) {
         
         
         question = new_stave("Stave" + i);
+        question.classList.add("nosplit");
+
         var label = document.createElement('h3');
         label.innerHTML = '' + (i + 1) + ': ';
         question.appendChild(label);
@@ -196,13 +198,14 @@ function handle_lable_scale(data) {
 
         Draw_stave(stave, clef, null, notes, 'w', false);
 
-        var question = new_stave('Q' + i);
+        var question = new_stave('Q' + i,);
+        question.classList.add('nosplit');
+
         var label = document.createElement('h3');
         label.innerHTML = '' + (i + 1) + ': ' + starting_note.substring(0, starting_note.length-1).toUpperCase() + ' ' + mMscales[i];
+        
         question.appendChild(label)
         question.appendChild(stave);
-
-        // document.body.appendChild(stave);
 
         staves.push(question);
     }
