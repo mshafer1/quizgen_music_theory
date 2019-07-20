@@ -1,5 +1,6 @@
 var vm = require("vm");
 var fs = require("fs");
+require(__dirname + '/../conversionMethods.js');
 
 var data = fs.readFileSync(__dirname + '/../conversionMethods.js');
 // const script = new vm.Script(data);
@@ -68,7 +69,7 @@ describe('Shuffle starting notes', () => {
   it('returns starting slice if n < options.length', () => {
     var n = 3;
     var expected_size = n;
-    var result = shuffled_starting_notes(n, input);
+    var result = shuffled_slice(n, input);
 
     expect(result.length).toEqual(expected_size);
   });
@@ -76,7 +77,7 @@ describe('Shuffle starting notes', () => {
   it('returns full slice if n = options.length', () => {
     var n = input.length;
     var expected_size = n;
-    var result = shuffled_starting_notes(n, input);
+    var result = shuffled_slice(n, input);
 
     expect(result.length).toEqual(expected_size);
     expect(result).toEqual(expect.arrayContaining(input));
@@ -86,7 +87,7 @@ describe('Shuffle starting notes', () => {
     var n = input.length * 2;
     var expected_size = n;
     var expected_result = input.concat(input);
-    var result = shuffled_starting_notes(n, input);
+    var result = shuffled_slice(n, input);
 
     expect(result.length).toEqual(expected_size);
     expect(result).toEqual(expect.arrayContaining(expected_result));
@@ -97,7 +98,7 @@ describe('Shuffle starting notes', () => {
     var expected_size = 0;
     var result = []
 
-    var result = shuffled_starting_notes(n, []);
+    var result = shuffled_slice(n, []);
 
     expect(result.length).toEqual(expected_size);
     done()

@@ -1,5 +1,19 @@
-<div style="border: 1px black solid;">
-    {% for value in include.values %}
-        <input type="checkbox" value="{{ value }}" name="{{ include.name }}" id="{{ include.name }}_{{ value }}"/><label for="{{ include.name }}_{{ value }}"> {{ value }} </label><br/>
-    {% endfor %}
+<div style="border: 1px black solid;" class="striped-w3-darker">
+    {% if include.values.first.first %}
+        {% comment %}hash{% endcomment %}
+        {% for value in include.values %}
+            {% assign lable=value[0] %}
+            {% assign value2=value[1] %}
+
+            {% include _check_box.html value=value2 label=lable name=include.name %}
+        {% endfor %}
+    {% else %}
+        {% comment %}array{% endcomment %}
+        {% for value in include.values %}
+
+        {% include _check_box.html value=value label=value name=include.name %}
+            
+        {% endfor %}
+    {% endif %}
+    
 </div>
