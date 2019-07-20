@@ -51,3 +51,20 @@ div.answer-inline {
 	margin-right: auto;
 	text-align: center;
 }
+
+.nosplit {
+    page-break-inside: avoid;
+}
+
+.nobreak {
+    page-break-before: avoid;
+    break-before: avoid;
+
+}
+
+.notAfter {
+    break-before: page;
+    page-break-before: auto;
+    page-break-after: avoid;
+    break-after: avoid;
+}

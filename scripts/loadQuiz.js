@@ -55,8 +55,8 @@ function handle_lable_interval(data) {
 
     var n_intervals = data[NIntervals];
 
-    var bass_starting_notes = shuffled_slice(Math.ceil(n_intervals / 2), data[StartingBassNotes])
-    var treble_starting_notes = shuffled_slice(Math.ceil(n_intervals / 2), data[StartingTrebleNotes])
+    var bass_starting_notes = shuffled_slice(n_intervals, data[StartingBassNotes])
+    var treble_starting_notes = shuffled_slice(n_intervals, data[StartingTrebleNotes])
     var row_size = Math.min(6, treble_starting_notes.length, bass_starting_notes.length);
 
     var clefs = shuffled_clefs(Math.ceil(n_intervals / row_size));
