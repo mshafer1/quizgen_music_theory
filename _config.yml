@@ -19,7 +19,8 @@ key_width: 32
 
 white_height: 190
 
-black_height: 125
+# split black_keys to distinguish # and b option, total height = 126
+black_height: 63
 
 default_keyboard: 4
 

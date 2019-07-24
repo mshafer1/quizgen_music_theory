@@ -26,6 +26,13 @@ class Accidental {
     }
 }
 
+class Interval {
+    constructor(starting_note, interval) {
+        this.starting_note = starting_note;
+        this.interval = interval;
+    }
+}
+
 function note_to_key(note) {
     var letter = note[0];
     var accidental = '';
@@ -145,5 +152,31 @@ function shuffled_slice(n, notes) {
         result = result.concat(shuffle(notes).slice(0, multiplier_remainder));
     }
 
+    return result;
+}
+
+function shuffled_intervals(n, starting_notes, intervals) {
+    var notes = shuffled_slice(n, starting_notes);
+    var spaced_intervals = shuffled_slice(n, intervals);
+    var result = []
+    for(var i = 0; i < notes.length; i++) {
+        var note = notes[i];
+        var interval = spaced_intervals[i];
+        result.push(new Interval(note, interval));
+    }
+    return result;
+}
+
+function shuffled_interval_slices(n, starting_notes, intervals) {
+    var intervals = shuffled_intervals(n, starting_notes, intervals);
+    var result = [];
+    for(var i = 0; i < Math.ceil(n / 6); i++) {
+        var slice = [];
+        for(var j = 0; j < 6 && i*6 + j < n; j++) {
+            interval = intervals[i*6 + j];
+            slice.push(interval);
+        }
+        result.push(slice);
+    }
     return result;
 }

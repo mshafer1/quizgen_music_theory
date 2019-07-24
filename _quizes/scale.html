@@ -13,13 +13,27 @@ inputs:
   'Major scale tonic pitches':
     type: keyboard
     name: 'MPitches[]'
-  '# of Minor Scales':
+  '# of Natural Minor Scales':
     type: number
     default: 4
     name: mScales
-  'Minor scale tonic pitches':
+  'Natural Minor scale tonic pitches':
     type: keyboard
     name: 'mPitches[]'
+  '# of Harmonic Minor Scales':
+    type: number
+    default: 4
+    name: mScales
+  'Harmonic Minor scale tonic pitches':
+    type: keyboard
+    name: 'hmPitches[]' # handle the smae as melodic
+  '# of Melodic Minor Scales':
+    type: number
+    default: 4
+    name: mmScales
+  'Melodic Minor scale tonic pitches':
+    type: keyboard
+    name: 'mmPitches[]'
 ---
 
 {% include form.html inputs=page.inputs %}

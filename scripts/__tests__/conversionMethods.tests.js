@@ -104,3 +104,101 @@ describe('Shuffle starting notes', () => {
     done()
   });
 })
+
+describe('Shuffled interval', () => {
+  it('returns 4 pairs for n=4 of starting_notes with intervals', () => {
+    var n = 4;
+    var expected_size = n;
+    var starting_notes = ['A4', 'B2'];
+    var intervals = ['m7'];
+    var mock_interval = function(starting_note, interval) {return {interval:interval,  starting_note:starting_note}; }
+
+    var expected_result_sorted = [ mock_interval('A4', 'm7'),  mock_interval('B2', 'm7'), mock_interval('A4', 'm7'),  mock_interval('B2', 'm7')]
+
+    var result = shuffled_intervals(n, starting_notes, intervals);
+
+    expect(result.length).toEqual(expected_size);
+    expect(result).toEqual(expect.arrayContaining(expected_result_sorted));
+  });
+
+  it('returns 6 pairs for n=6 starting_notes with intervals', () => {
+    var n = 6;
+    var expected_size = n;
+    var starting_notes = ['A4', 'B2'];
+    var intervals = ['m7'];
+    var mock_interval = function(starting_note, interval) {return {interval:interval,  starting_note:starting_note}; }
+
+    var expected_result_sorted = [ mock_interval('A4', 'm7'),  mock_interval('B2', 'm7'), mock_interval('A4', 'm7'),  mock_interval('B2', 'm7')]
+
+    var result = shuffled_intervals(n, starting_notes, intervals);
+
+    expect(result.length).toEqual(expected_size);
+    expect(result).toEqual(expect.arrayContaining(expected_result_sorted));
+  })
+})
+
+describe('Shuffled interval slice', () => {
+  it('returns 1 slice for < 6 pairs of starting_notes with intervals', () => {
+    var n = 5;
+    var expected_size = 1;
+    var starting_notes = ['A4', 'B2'];
+    var intervals = ['m7'];
+
+    var result = shuffled_interval_slices(n, starting_notes, intervals);
+
+    expect(result.length).toEqual(expected_size);
+  });
+  it('returns 1 slice for =6 pairs of starting_notes with intervals', () => {
+    var n = 6;
+    var expected_size = 1;
+    var starting_notes = ['A4', 'B2'];
+    var intervals = ['m7'];
+
+    var result = shuffled_interval_slices(n, starting_notes, intervals);
+
+    expect(result.length).toEqual(expected_size);
+  });
+  it('returns 2 slices for >6 pairs of starting_notes with intervals', () => {
+    var n = 7;
+    var expected_size = 2;
+    var starting_notes = ['A4', 'B2'];
+    var intervals = ['m7'];
+
+    var result = shuffled_interval_slices(n, starting_notes, intervals);
+
+    expect(result.length).toEqual(expected_size);
+  });
+
+  it('returns 2 slices for <12 pairs of starting_notes with intervals', () => {
+    var n = 11;
+    var expected_size = 2;
+    var starting_notes = ['A4', 'B2'];
+    var intervals = ['m7'];
+
+    var result = shuffled_interval_slices(n, starting_notes, intervals);
+
+    expect(result.length).toEqual(expected_size);
+  });
+
+  it('returns 2 slices for =12 pairs of starting_notes with intervals', () => {
+    var n = 12;
+    var expected_size = 2;
+    var starting_notes = ['A4', 'B2'];
+    var intervals = ['m7'];
+
+    var result = shuffled_interval_slices(n, starting_notes, intervals);
+
+    expect(result.length).toEqual(expected_size);
+  });
+
+  it('returns 3 slices for >12 pairs of starting_notes with intervals', () => {
+    var n = 13;
+    var expected_size = 3;
+    var starting_notes = ['A4', 'B2'];
+    var intervals = ['m7'];
+
+    var result = shuffled_interval_slices(n, starting_notes, intervals);
+
+    expect(result.length).toEqual(expected_size);
+  });
+})

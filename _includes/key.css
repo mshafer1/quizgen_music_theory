@@ -13,20 +13,11 @@ hover_color
 	width: {{ include.key_width }}px;
     height: {{ include.key_height }}px;
     display: inline-block;
-    /* border color */
-	background: #000000;
+
 
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfff4', endColorstr='#b3bead',GradientType=0 );
 	margin: 20px auto;
 
-
-	-webkit-box-shadow: inset 0px 4px 4px white, 0px 4px 5px rgba(0,0,0,0.5);
-	-moz-box-shadow: inset 0px 4px 4px white, 0px 4px 5px rgba(0,0,0,0.5);
-	box-shadow: inset 0px 4px 4px white, 0px 4px 5px rgba(0,0,0,0.5);
-
-	-webkit-box-shadow: inset 0px 4px 4px white, 0px 4px 5px rgba(0,0,0,0.5);
-	-moz-box-shadow: inset 0px 4px 4px white, 0px 4px 5px rgba(0,0,0,0.5);
-	box-shadow: inset 0px 4px 4px white, 0px 4px 5px rgba(0,0,0,0.5);
 	position: relative;
 }
 

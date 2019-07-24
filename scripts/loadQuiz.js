@@ -50,51 +50,47 @@ function init() {
 }
 
 function handle_lable_interval(data) {
-    title = 'Timed Interval Quize, ID';
+    title = 'Timed Interval Quiz, ID';
     prompt = 'Identify the following intervals (include number and quality)';
 
     var n_intervals = data[NIntervals];
 
-    var bass_starting_notes = shuffled_slice(n_intervals, data[StartingBassNotes])
-    var treble_starting_notes = shuffled_slice(n_intervals, data[StartingTrebleNotes])
-    var row_size = Math.min(6, treble_starting_notes.length, bass_starting_notes.length);
+    var bass_starting_notes = (StartingBassNotes in data)? data[StartingBassNotes]: [];
+    var treble_starting_notes = (StartingTrebleNotes in data)? data[StartingTrebleNotes]: [];
 
-    var clefs = shuffled_clefs(Math.ceil(n_intervals / row_size));
-    console.log(clefs);
 
-    var intervals = shuffled_slice(n_intervals, data[Intervals])
+
+
+    var intervals = data[Intervals];
+    var n_rows = Math.ceil(n_intervals / 12);
+    var bass_intervals = shuffled_interval_slices(Math.floor(n_intervals / 2), bass_starting_notes, intervals);
+    var treble_intervals = shuffled_interval_slices(Math.ceil(n_intervals / 2), treble_starting_notes, intervals);
    
 
     staves = []
 
     var clef = null;
-    var n_clefs = Math.ceil(n_intervals / row_size);
-    for (var i = 0; i < n_clefs; i++) { 
-        stave = new_stave('Stave' + i);
-        answer_row = gen_answer_row(((i+1)*row_size < n_intervals)?row_size:n_intervals-(i)*row_size, STAVE_SIZE);
+    
+    console.log("n_rows: " + n_rows);
 
-        clef = clefs[i];
+    for (var i = 0; i < n_rows*2; i++) { 
+        stave = new_stave('Stave' + i);
+
+        clef = (i%2)?BassClef:TrebleClef;
         console.log("new stave");
         
         var notes = []
 
         // var end_clef = false;
+        var index = Math.floor(i/2);
+        var row = (i%2)?bass_intervals[index]:treble_intervals[index];
+        answer_row = gen_answer_row(row.length, STAVE_SIZE);
 
-        
 
-        for(var j = 0; j < row_size && i*row_size+j < n_intervals; j++) {
-            var interval_index = i*row_size + j;
+        for(var j = 0; j < row.length; j++) {
+            var interval = row[j];
 
-            if(clef == BassClef) {
-                var starting_note = bass_starting_notes.pop();
-            }
-            else {
-                var starting_note = treble_starting_notes.pop();
-            }
-
-            // var starting_note = starting_notes[interval_index];
-            var interval = intervals[interval_index];
-            var keys = gen_interval(starting_note, interval);
+            var keys = gen_interval(interval.starting_note, interval.interval);
             console.log("interval: " + interval);
             console.log("Keys: " + JSON.stringify(keys));
             notes.push(keys_to_note(keys));
@@ -104,9 +100,11 @@ function handle_lable_interval(data) {
             //     continue;
             // }
 
-            if(j < row_size-1 && interval_index < n_intervals - 1) {
+            if(j < row.length-1) {
                 notes.push(BARNote);
             }
+            console.log("Notes: ")
+            console.log(notes);
         }
 
         console.log("Stave: " + JSON.stringify(stave));
