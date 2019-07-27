@@ -1,4 +1,5 @@
 const BassClef = 'bass';
+const AltoClef = 'alto';
 const TrebleClef = 'treble';
 const Major = 'Major';
 const Minor = 'Minor';

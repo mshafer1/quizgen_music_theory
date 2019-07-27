@@ -1,0 +1,32 @@
+---
+type: Notes Identifying
+
+inputs:
+  'qType':
+    type: hidden
+    default: NoteID
+    name: qType
+  '# of Treble Clef notes':
+    type: number
+    default: 0
+    name: NTreble
+  'Treble Notes':
+    type: keyboard
+    name: 'TrebleNotes[]'
+  '# of Alto Clef notes':
+    type: number
+    default: 0
+    name: NAlto
+  'Alto Notes':
+    type: keyboard
+    name: 'AltoNotes[]'
+  '# of Bass Clef notes':
+    type: number
+    default: 0
+    name: NBass
+  'Bass Notes':
+    type: keyboard
+    name: 'BassNotes[]'
+---
+
+{% include form.html inputs=page.inputs %}

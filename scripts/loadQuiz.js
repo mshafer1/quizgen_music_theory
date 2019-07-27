@@ -7,6 +7,7 @@ const MScalesKey = 'MScales';
 
 const scaleRaw = 'ScaleLable';
 const intervalRaw = 'IntervalID';
+const noteID = 'NoteID';
 
 const QuizID = 'ID';
 
@@ -18,6 +19,8 @@ const StartingTrebleNotes = 'TrebleBasePitches[]';
 const NIntervals = 'NIntervals';
 const Intervals = 'Intervals[]';
 const BARNote = {}; // create an object
+
+const DefaultRowSize = 6;
 
 const STAVE_SIZE = 800;
 
@@ -43,10 +46,58 @@ function init() {
     else if (get_data[qType] == intervalRaw && NIntervals in get_data && Intervals in get_data && (StartingBassNotes in get_data || StartingTrebleNotes in get_data)) {
         handle_lable_interval(get_data);
     }
+    else if(get_data[qType] == noteID) {
+        handle_note_id(get_data);
+    }
     else {
         alert("Invalid request for quiz!");
         return;
     }
+}
+
+function handle_note_id(data) {
+    title = "Timer Note Quiz, ID";
+    prompt = "Identify the following notes";
+
+    var clefs = [TrebleClef, AltoClef, BassClef]
+    var i = 0;
+    clefs.forEach(function (clef) {
+        console.log(clef);
+        var clefLabel = clef.replace(/^\w/, c => c.toUpperCase());
+
+        var n = data['N' + clefLabel] || 0;
+        
+        var raw_notes = data[clefLabel + 'Notes[]'] || [];
+
+        var notes = shuffled_slice(n, raw_notes);
+
+        console.log("Notes: " + JSON.stringify(notes));
+
+        var nClef = Math.ceil(notes / DefaultRowSize);
+
+        for(var j = 0; j < nClef; j++) {
+
+            for(var k = 0; k < DefaultRowSize && j*DefaultRowSize + k < notes; k++) {
+                // create stave
+                var stave = new_stave('Stave' + i + ':' + (j*DefaultRowSize + k));
+                console.log("new stave");
+
+                // add notes
+                
+
+                // setup question
+
+                // add to staves
+                
+            }
+
+        }
+
+        stave = new_stave('Stave' + i);
+
+
+        i++;
+    })
 }
 
 function handle_lable_interval(data) {
