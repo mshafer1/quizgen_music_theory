@@ -24,32 +24,48 @@ test('Test teorian_note_to_vexflow_note a#5 => a#/5', () => {
   expect(teorian_note_to_vexflow_note('a#5')).toEqual('a#/5');
 });
 
+describe('Test randomMm', () => {
+  it('Test randomMm returns right counts (1,0,0,0)', () => {
+    data = random_major_minor(1, 0, 0, 0);
+    expect(data).not.toContain('Minor');
+    expect(data).toContain('Major');
+  })
 
-test('Test randomMm returns right counts (0,1)', () => {
-  data = random_major_minor(0, 1);
-  expect(data).toContain('Minor');
-  expect(data).not.toContain('Major');
-})
+  it('Test randomMm returns right counts (0,1,0,0)', () => {
+    data = random_major_minor(0, 1, 0, 0);
+    expect(data).toContain('Minor');
+    expect(data).not.toContain('Major');
+  })
 
-test('Test randomMm returns right counts (1,0)', () => {
-  data = random_major_minor(1, 0);
-  expect(data).not.toContain('Minor');
-  expect(data).toContain('Major');
-})
+  it('Test randomMm returns right counts (0,0,1,0)', () => {
+    data = random_major_minor(0, 0, 1, 0);
+    expect(data).not.toContain('Major');
+    expect(data).not.toContain('Minor');
+    expect(data).toContain('Harmonic Minor');
+  })
 
-test('Test randomMm returns right counts (2,3)', () => {
-  expected_minor = ['Minor', 'Minor'];
-  expcected_major = ['Major', 'Major', 'Major'];
+  it('Test randomMm returns right counts (0,0,0,1)', () => {
+    data = random_major_minor(0, 0, 0, 1);
+    expect(data).not.toContain('Major');
+    expect(data).not.toContain('Minor');
+    expect(data).not.toContain('Harmonic Minor');
+    expect(data).toContain('Melodic Minor');
+  })
 
-  data = random_major_minor(2, 3)
-  expect(data).toEqual(expect.arrayContaining(expected_minor));
 
-  expect(data).toEqual(expect.arrayContaining(expcected_major));
-})
+  it('Test randomMm returns right counts (2,3,4,5)', () => {
+    expected_minor = ['Minor', 'Minor'];
+    expected_major = ['Major', 'Major', 'Major'];
+    expected_harmonic = Array(4).fill('Harmonic Minor');
+    expected_melodic = Array(5).fill('Melodic Minor');
 
-// describe('teorian_note_to_key converts from', () => {
-//   it('', () => {});
-// });
+    data = random_major_minor(2, 3, 4, 5)
+    expect(data).toEqual(expect.arrayContaining(expected_major));
+    expect(data).toEqual(expect.arrayContaining(expected_minor));
+    expect(data).toEqual(expect.arrayContaining(expected_harmonic));
+    expect(data).toEqual(expect.arrayContaining(expected_melodic));
+  })
+});
 
 describe('teorian_note_to_key converts from', () => {
   it('a5 to {a, _, 5}', () => {
@@ -111,9 +127,9 @@ describe('Shuffled interval', () => {
     var expected_size = n;
     var starting_notes = ['A4', 'B2'];
     var intervals = ['m7'];
-    var mock_interval = function(starting_note, interval) {return {interval:interval,  starting_note:starting_note}; }
+    var mock_interval = function (starting_note, interval) { return { interval: interval, starting_note: starting_note }; }
 
-    var expected_result_sorted = [ mock_interval('A4', 'm7'),  mock_interval('B2', 'm7'), mock_interval('A4', 'm7'),  mock_interval('B2', 'm7')]
+    var expected_result_sorted = [mock_interval('A4', 'm7'), mock_interval('B2', 'm7'), mock_interval('A4', 'm7'), mock_interval('B2', 'm7')]
 
     var result = shuffled_intervals(n, starting_notes, intervals);
 
@@ -126,9 +142,9 @@ describe('Shuffled interval', () => {
     var expected_size = n;
     var starting_notes = ['A4', 'B2'];
     var intervals = ['m7'];
-    var mock_interval = function(starting_note, interval) {return {interval:interval,  starting_note:starting_note}; }
+    var mock_interval = function (starting_note, interval) { return { interval: interval, starting_note: starting_note }; }
 
-    var expected_result_sorted = [ mock_interval('A4', 'm7'),  mock_interval('B2', 'm7'), mock_interval('A4', 'm7'),  mock_interval('B2', 'm7')]
+    var expected_result_sorted = [mock_interval('A4', 'm7'), mock_interval('B2', 'm7'), mock_interval('A4', 'm7'), mock_interval('B2', 'm7')]
 
     var result = shuffled_intervals(n, starting_notes, intervals);
 
