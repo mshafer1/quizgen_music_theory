@@ -170,12 +170,18 @@ function shuffled_intervals(n, starting_notes, intervals) {
 
 function shuffled_interval_slices(n, starting_notes, intervals) {
     var intervals = shuffled_intervals(n, starting_notes, intervals);
+    var result = slice_array(6, intervals);
+    return result;
+}
+
+function slice_array(n, array) {
+    var size = array.length;
     var result = [];
-    for(var i = 0; i < Math.ceil(n / 6); i++) {
+    for(var i = 0; i < Math.ceil(size / n); i++) {
         var slice = [];
-        for(var j = 0; j < 6 && i*6 + j < n; j++) {
-            interval = intervals[i*6 + j];
-            slice.push(interval);
+        for(var j = 0; j < n && i*n + j < array.length; j++) {
+            var part = array[i*n + j];
+            slice.push(part);
         }
         result.push(slice);
     }

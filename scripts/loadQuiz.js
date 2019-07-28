@@ -46,7 +46,7 @@ function init() {
     else if (get_data[qType] == intervalRaw && NIntervals in get_data && Intervals in get_data && (StartingBassNotes in get_data || StartingTrebleNotes in get_data)) {
         handle_lable_interval(get_data);
     }
-    else if(get_data[qType] == noteID) {
+    else if (get_data[qType] == noteID) {
         handle_note_id(get_data);
     }
     else {
@@ -56,48 +56,69 @@ function init() {
 }
 
 function handle_note_id(data) {
-    title = "Timer Note Quiz, ID";
+    title = "Timed Note Quiz, ID";
     prompt = "Identify the following notes";
 
     var clefs = [TrebleClef, AltoClef, BassClef]
     var i = 0;
+    staves = [];
+
     clefs.forEach(function (clef) {
         console.log(clef);
         var clefLabel = clef.replace(/^\w/, c => c.toUpperCase());
 
         var n = data['N' + clefLabel] || 0;
-        
+
         var raw_notes = data[clefLabel + 'Notes[]'] || [];
 
-        var notes = shuffled_slice(n, raw_notes);
+        // var notes = shuffled_slice(n, raw_notes);
 
         console.log("Notes: " + JSON.stringify(notes));
 
-        var nClef = Math.ceil(notes / DefaultRowSize);
+        var notes = shuffled_slice(n, raw_notes);
 
-        for(var j = 0; j < nClef; j++) {
+        var slices = slice_array(DefaultRowSize, notes);
+        var nStaff = slices.length;
 
-            for(var k = 0; k < DefaultRowSize && j*DefaultRowSize + k < notes; k++) {
-                // create stave
-                var stave = new_stave('Stave' + i + ':' + (j*DefaultRowSize + k));
-                console.log("new stave");
+        for (var j = 0; j < nStaff; j++) {
+            var slice = slices[j];
+            console.log(JSON.stringify(slice));
 
-                // add notes
-                
+            // create stave
+            var stave = new_stave('Stave' + i + ':' + (j * DefaultRowSize + k));
+            console.log("new stave");
 
-                // setup question
-
-                // add to staves
-                
+            // add notes
+            var notes = [];
+            for (var k = 0; k < slice.length; k++) {
+                var key = slice[k];
+                console.log(JSON.stringify(key));
+                notes.push(keys_to_note([teorian_note_to_key(key)]))
             }
+            console.log(JSON.stringify(notes));
 
+            Draw_stave(stave, clef, null, notes, 'w');
+
+            // setup question
+            var question = new_stave('Q' + i);
+            question.classList.add('nosplit');
+
+            var label = document.createElement('h3');
+            label.innerHTML = '' + (i + 1) + ': ';
+
+            var answer_row = gen_answer_row(slice.length, STAVE_SIZE);
+
+            question.appendChild(label)
+            question.appendChild(stave);
+            question.appendChild(answer_row);
+
+            // add to staves
+            staves.push(question);
+
+            i++;
         }
-
-        stave = new_stave('Stave' + i);
-
-
-        i++;
     })
+    write_doc()
 }
 
 function handle_lable_interval(data) {
@@ -106,39 +127,36 @@ function handle_lable_interval(data) {
 
     var n_intervals = data[NIntervals];
 
-    var bass_starting_notes = (StartingBassNotes in data)? data[StartingBassNotes]: [];
-    var treble_starting_notes = (StartingTrebleNotes in data)? data[StartingTrebleNotes]: [];
-
-
-
+    var bass_starting_notes = (StartingBassNotes in data) ? data[StartingBassNotes] : [];
+    var treble_starting_notes = (StartingTrebleNotes in data) ? data[StartingTrebleNotes] : [];
 
     var intervals = data[Intervals];
     var n_rows = Math.ceil(n_intervals / 12);
     var bass_intervals = shuffled_interval_slices(Math.floor(n_intervals / 2), bass_starting_notes, intervals);
     var treble_intervals = shuffled_interval_slices(Math.ceil(n_intervals / 2), treble_starting_notes, intervals);
-   
+
 
     staves = []
 
     var clef = null;
-    
+
     console.log("n_rows: " + n_rows);
 
-    for (var i = 0; i < n_rows*2; i++) { 
+    for (var i = 0; i < n_rows * 2; i++) {
         stave = new_stave('Stave' + i);
 
-        clef = (i%2)?BassClef:TrebleClef;
+        clef = (i % 2) ? BassClef : TrebleClef;
         console.log("new stave");
-        
+
         var notes = []
 
         // var end_clef = false;
-        var index = Math.floor(i/2);
-        var row = (i%2)?bass_intervals[index]:treble_intervals[index];
+        var index = Math.floor(i / 2);
+        var row = (i % 2) ? bass_intervals[index] : treble_intervals[index];
         answer_row = gen_answer_row(row.length, STAVE_SIZE);
 
 
-        for(var j = 0; j < row.length; j++) {
+        for (var j = 0; j < row.length; j++) {
             var interval = row[j];
 
             var keys = gen_interval(interval.starting_note, interval.interval);
@@ -151,7 +169,7 @@ function handle_lable_interval(data) {
             //     continue;
             // }
 
-            if(j < row.length-1) {
+            if (j < row.length - 1) {
                 notes.push(BARNote);
             }
             console.log("Notes: ")
@@ -160,11 +178,11 @@ function handle_lable_interval(data) {
 
         console.log("Stave: " + JSON.stringify(stave));
         console.log("Clef: " + clef);
-        
+
         console.log("Notes: " + JSON.stringify(notes));
         Draw_stave(stave, clef, null, notes, 'w');
-        
-        
+
+
         question = new_stave("Stave" + i);
         question.classList.add("nosplit");
 
@@ -187,7 +205,7 @@ function scale_clef(starting_note, original_clef) {
 
     if (index <= 32) {
         return BassClef;
-    } else if(index >= 40) {
+    } else if (index >= 40) {
         return TrebleClef;
     } else {
         return original_clef;
@@ -247,12 +265,12 @@ function handle_lable_scale(data) {
 
         Draw_stave(stave, clef, null, notes, 'w', false);
 
-        var question = new_stave('Q' + i,);
+        var question = new_stave('Q' + i);
         question.classList.add('nosplit');
 
         var label = document.createElement('h3');
-        label.innerHTML = '' + (i + 1) + ': ' + starting_note.substring(0, starting_note.length-1).toUpperCase() + ' ' + mMscales[i];
-        
+        label.innerHTML = '' + (i + 1) + ': ' + starting_note.substring(0, starting_note.length - 1).toUpperCase() + ' ' + mMscales[i];
+
         question.appendChild(label)
         question.appendChild(stave);
 
@@ -267,14 +285,14 @@ function gen_answer_row(n_answers, width) {
 
     var part_width = width / n_answers;
     var padding = 15;
-    var answer_width = part_width - 2*padding;
+    var answer_width = part_width - 2 * padding;
 
-    for(var i = 0; i < n_answers; i++) {
-        for(var j = 0; j < 3; j++) {
+    for (var i = 0; i < n_answers; i++) {
+        for (var j = 0; j < 3; j++) {
             var part = document.createElement('div');
             result.appendChild(part);
 
-            if(j == 1)  {
+            if (j == 1) {
                 part.classList.add("answer-inline");
                 part.style.width = answer_width + 'px';
                 // part.innerHTML = "<hr/>";
@@ -283,10 +301,10 @@ function gen_answer_row(n_answers, width) {
                 part.innerHTML = '';
                 part.style.width = padding + 'px';
             }
-            
+
         }
     }
-    
+
     return result;
 }
 

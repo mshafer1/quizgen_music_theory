@@ -202,3 +202,55 @@ describe('Shuffled interval slice', () => {
     expect(result.length).toEqual(expected_size);
   });
 })
+
+describe('slice_array', () => {
+  it('Returns 1 slice for array < size', () => {
+    var array = [1, 2, 3];
+    var size = 6;
+    var expected_size = 1;
+
+    var slices = slice_array(size, array);
+
+    expect(slices.length).toEqual(expected_size);
+  });
+
+  it('Returns 1 slice for array = size', () => {
+    var array = [1, 2, 3, 4, 5, 6];
+    var size = 6;
+    var expected_size = 1;
+
+    var slices = slice_array(size, array);
+
+    expect(slices.length).toEqual(expected_size);
+  });
+
+  it('Returns 2 slices for array > size', () => {
+    var array = [1, 2, 3, 4, 5, 6, 7];
+    var size = 6;
+    var expected_size = 2;
+
+    var slices = slice_array(size, array);
+
+    expect(slices.length).toEqual(expected_size);
+  });
+
+  it('Returns a first slice of size {size} if array > size', () => {
+    var array = [1, 2, 3, 4, 5, 6, 7];
+    var size = 6;
+    var expected_size = 6;
+
+    var slices = slice_array(size, array);
+
+    expect(slices[0].length).toEqual(expected_size);
+  });
+
+  it('Returns a second slice of size 1 if array > size (by one)', () => {
+    var array = [1, 2, 3, 4, 5, 6, 7];
+    var size = 6;
+    var expected_size = 1;
+
+    var slices = slice_array(size, array);
+
+    expect(slices[1].length).toEqual(expected_size);
+  });
+})
