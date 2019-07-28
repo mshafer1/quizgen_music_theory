@@ -4,8 +4,10 @@ const qType = 'qType';
 const intervaltype = 'interval';
 const mScalesKey = 'mScales';
 const MScalesKey = 'MScales';
+const hmScalesKey = 'hmScales';
+const mmScalesKey = 'mmScales';
 
-const scaleRaw = 'ScaleLable';
+const scaleRaw = 'ScaleLabel';
 const intervalRaw = 'IntervalID';
 const noteID = 'NoteID';
 
@@ -13,6 +15,9 @@ const QuizID = 'ID';
 
 const mStartingNotes = 'mPitches[]';
 const MStartingNotes = 'MPitches[]';
+const hmStartingNotes = 'hmPitches[]';
+const mmStartingNotes = 'mmPitches[]';
+
 const StartingNotes = 'BasePitches[]';
 const StartingBassNotes = 'BassBasePitches[]';
 const StartingTrebleNotes = 'TrebleBasePitches[]';
@@ -40,11 +45,15 @@ function init() {
         Math.seedrandom(Number(get_data[QuizID]));
     }
 
-    if (get_data[qType] == scaleRaw && MScalesKey in get_data && mScalesKey in get_data && (mStartingNotes in get_data || MStartingNotes in get_data)) {
-        handle_lable_scale(get_data);
+    if (get_data[qType] == scaleRaw && (
+        (mScalesKey in get_data && mStartingNotes in get_data) ||
+        (MScalesKey in get_data && MStartingNotes in get_data) ||
+        (hmScalesKey in get_data && hmStartingNotes in get_data) ||
+        (mmScalesKey in get_data && mmStartingNotes in get_data)) ) {
+        handle_label_scale(get_data);
     }
     else if (get_data[qType] == intervalRaw && NIntervals in get_data && Intervals in get_data && (StartingBassNotes in get_data || StartingTrebleNotes in get_data)) {
-        handle_lable_interval(get_data);
+        handle_label_interval(get_data);
     }
     else if (get_data[qType] == noteID) {
         handle_note_id(get_data);
@@ -121,7 +130,7 @@ function handle_note_id(data) {
     write_doc()
 }
 
-function handle_lable_interval(data) {
+function handle_label_interval(data) {
     title = 'Timed Interval Quiz, ID';
     prompt = 'Identify the following intervals (include number and quality)';
 
@@ -213,11 +222,13 @@ function scale_clef(starting_note, original_clef) {
 }
 
 // TODO: extend to include labling for extra options like "natural minor", "melodic minor", "harmonic minor"
-function handle_lable_scale(data) {
+function handle_label_scale(data) {
     title = 'Timed Scale Quiz (Major and minor)';
     prompt = 'Create the requested scale by filling in the appropriate accidentals.';
-    MScales = data[MScalesKey];
-    mScales = data[mScalesKey];
+    MScales = data[MScalesKey] || 0;
+    mScales = data[mScalesKey] || 0;
+    hmScales = data[hmScalesKey] || 0;
+    mmScales = data[mmScalesKey] || 0;
 
     console.log(`MScales: ${MScales}`);
     console.log(`mScales: ${mScales}`);
@@ -227,34 +238,41 @@ function handle_lable_scale(data) {
 
     staves = [];
 
-    var mNotes = [];
-    var MNotes = [];
+    var mNotes = data[mStartingNotes] || [];
+    mNotes = shuffled_slice(mScales, mNotes);
 
-    if (mStartingNotes in data) {
-        mNotes = shuffled_slice(mScales, data[mStartingNotes]);
-    }
-    if (MStartingNotes in data) {
-        MNotes = shuffled_slice(MScales, data[MStartingNotes]);
-    }
+    var MNotes = data[MStartingNotes] || [];
+    MNotes = shuffled_slice(MScales, MNotes);
 
-    var mMscales = random_major_minor(MNotes.length, mNotes.length);
+    var hmNotes = data[hmStartingNotes] || [];
+    hmNotes = shuffled_slice(hmScales, hmNotes);
+
+    var mmNotes = data[mmStartingNotes] || [];
+    mmNotes = shuffled_slice(mmScales, mmNotes);
+
+    var mMscales = random_major_minor(MNotes.length, mNotes.length, hmNotes.length, mmNotes.length);
     for (var i = 0; i < mMscales.length; i++) {
         clef = random_clef();
         console.log(`Clef: ${clef}`);
-        console.log(mMscales[i]);
+        var mMscale = mMscales[i];
+        console.log(mMscale);
 
         stave = new_stave('Stave' + i);
 
         // pop starting note off of end of corresponding list
-        if (mMscales[i] == Major) {
+        if (mMscale == Major) {
             starting_note = MNotes.pop();
+        } else if (mMscale == HarmonicMinor) {
+            starting_note = hmNotes.pop();
+        } else if (mMscale == MelodicMinor) {
+            starting_note = mmNotes.pop();
         } else { // Minor
             starting_note = mNotes.pop();
         }
 
         clef = scale_clef(starting_note, clef);
 
-        scale = gen_scale(mMscales[i], starting_note);
+        scale = gen_scale(mMscale, starting_note);
 
         var notes = [];
         for (var j = 0; j < scale.length; j++) {
@@ -329,9 +347,9 @@ function gen_scale(mM, starting_note) {
     var note = teoria.note(starting_note);
 
     if (mM == Major) {
-        notes = note.scale('ionian').notes();
+        var notes = note.scale('ionian').notes();
     } else { // minor
-        notes = note.scale('aeolian').notes();
+        var notes = note.scale('aeolian').notes();
     }
 
     for (var i = 0; i < notes.length; i++) {
@@ -339,6 +357,13 @@ function gen_scale(mM, starting_note) {
     }
 
     result.push(teorian_note_to_key(note.name() + note.accidental() + (note.octave() + 1)));
+
+    if (mM == MelodicMinor) {
+        var reversed = notes.reverse();
+        for(var i = 0; i < reversed.length; i++) {
+            result.push(teorian_note_to_key(String(reversed[i])));
+        }
+    }
 
     return result;
 }

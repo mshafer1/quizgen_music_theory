@@ -3,6 +3,8 @@ const AltoClef = 'alto';
 const TrebleClef = 'treble';
 const Major = 'Major';
 const Minor = 'Minor';
+const HarmonicMinor = 'Harmonic Minor';
+const MelodicMinor = 'Melodic Minor';
 
 
 class Key {
@@ -94,11 +96,22 @@ function shuffled_clefs(n) {
     return result;
 }
 
-function random_major_minor(nMajor, nminor) {
-    var total = nMajor + nminor;
+function random_major_minor(nMajor, nminor, nhminor, nmminor) {
+    var total = nMajor + nminor + nhminor + nmminor;
     var pick = Array(total);
     for (var i = 0; i < total; i++) {
-        pick[i] = (i < nMajor) ? Major : Minor;
+        if(i < nMajor) {
+            pick[i] = Major;
+        }
+        else if (i < nMajor + nminor) {
+            pick[i] = Minor;
+        }
+        else if(i < nMajor + nminor + nhminor) {
+            pick[i] = HarmonicMinor;
+        } 
+        else {
+            pick[i] = MelodicMinor;
+        }
     }
     var result = shuffle(pick);
     return result;

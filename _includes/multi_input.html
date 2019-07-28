@@ -2,10 +2,10 @@
     {% if include.values.first.first %}
         {% comment %}hash{% endcomment %}
         {% for value in include.values %}
-            {% assign lable=value[0] %}
+            {% assign label=value[0] %}
             {% assign value2=value[1] %}
 
-            {% include _check_box.html value=value2 label=lable name=include.name %}
+            {% include _check_box.html value=value2 label=label name=include.name %}
         {% endfor %}
     {% else %}
         {% comment %}array{% endcomment %}

@@ -4,7 +4,7 @@
     <a href="javascript:void(0)" class="w3-bar-item w3-button w3-right w3-hide-medium w3-hide-large" onclick="showNav()">&#9776;</a>
     
             {% capture page_list %}
-            {% for page in site.quizes %}<a href="{{ page.url }}" class="w3-bar-item w3-mobile w3-button">{{ page.title }}</a>{% endfor %}
+            {% for page in site.quizes %}<a href="{{ page.url }}" class="w3-bar-item w3-mobile w3-button">{{ page.type }}</a>{% endfor %}
             {% endcapture %}
 
     <span class="w3-right w3-mobile js-collapse-nav w3-hide-small">
