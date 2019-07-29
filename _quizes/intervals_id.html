@@ -8,6 +8,7 @@ inputs:
     name: qType
   'Intervals':
     type: nestedmulti
+    children:
     -
       '# of Intervals':
         type: number
@@ -44,7 +45,7 @@ inputs:
           "Augmented seventh": "A7"
           "Perfect octave": "P8"
           "Diminished octave": "d8"
-      -
+    -
         'Base pitches':
           type: keyboard
           name: 'BasePitches{}[]'
