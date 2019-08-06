@@ -10,24 +10,7 @@
                 {% include basic_input.html %}
             {% else %}
                 <div class="w3-row-padding w3-margin-top w3-margin w3-padding">
-                    <div class="w3-col s2">
-                        <label for="{{ input[0] }}">{{ input[0] }}: </label>
-                    </div>
-                        {% if input[1]=>type == "multi" %}
-                    <div class="w3-col s2">
-                            {% assign name = input[1]=>name %}
-                            {% assign values = input[1]=>values %}
-                            {% include multi_input.html values=values name=name %}
-                        {% elsif input[1]=>type == "keyboard" %}
-                    <div class="w3-col m10 s12">
-                            {% assign name = input[1]=>name %}
-                            {% include _keyboard_input.html index=count name=name %}
-                            {% assign count=count | plus: 1 %}
-                        {% else %}
-                    <div class="w3-col s2">
-                            {% include basic_input.html %}
-                        {% endif %}
-                    </div>
+                    {% include input_selector inputs=input count=count %}
                 </div>
             {% endif %}
         {% endfor %}

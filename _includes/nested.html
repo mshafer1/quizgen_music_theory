@@ -1,0 +1,18 @@
+{% assign children=include.children %}
+{% assign count=include.count %}
+
+<div class="w3-row w3-margin-top w3-margin w3-container" style="padding: 0px;">
+{% for input in children %}
+    {% if input[1]=>type == "hidden" %}
+        <!-- basic input -->
+        {% include basic_input.html %}
+    {% else %}
+        <div class="w3-col s{{ input[1]=>width }}">
+            <div class="w3-row w3-container">
+            <!-- input {{ input }} -->
+            {% include input_selector input=input count=count width='s8' lable_width='s4' padding='padding: 0px!important;' %}
+            </div>
+       </div>
+    {% endif %}
+{% endfor %}
+</div>

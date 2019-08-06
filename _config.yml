@@ -27,3 +27,5 @@ default_keyboard: 4
 low_keyboard: 2
 
 high_keyboard: 6
+
+_empty_array: []

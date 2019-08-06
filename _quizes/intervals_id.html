@@ -1,55 +1,109 @@
 ---
 type: Intervals Identifying
 
-inputs:
-  'qType':
-    type: hidden
-    default: IntervalID
-    name: qType
-  'Intervals':
-    type: nestedmulti
-    children:
-    -
-      '# of Intervals':
-        type: number
-        default: 4
-        name: 'NIntervals{}'
-        width: 2
-    -
-      'Interval':
-        type: select
-        name: 'Interval{}[]'
-        width: 1
-        values:
-          "Augmented unison": "A1"
-          "Minor second": "m2"
-          "Major second": "M2"
-          "Augmented second": "A2"
-          "Minor third": "m3"
-          "Major third": "M3"
-          "Augmented third": "A3"
-          "Diminished third": "d3"
-          "Diminished fourth": "d4"
-          "Perfect fourth": "P4"
-          "Augmented fourth": "A4"
-          "Diminished fifth": "d4"
-          "Perfect fifth": "P5"
-          "Augmented fifth": "A5"
-          "Minor sixth": "m6"
-          "Major sixth": "M6"
-          "Diminished sixth": "d6"
-          "Augmented sixth": "A6"
-          "Minor seventh": "m7"
-          "Major seventh": "M7"
-          "Diminished seventh": "d7"
-          "Augmented seventh": "A7"
-          "Perfect octave": "P8"
-          "Diminished octave": "d8"
-    -
-        'Base pitches':
-          type: keyboard
-          name: 'BasePitches{}[]'
-          width: 8
+
+quizType:
+  type: hidden
+  default: IntervalID
+  name: qType
+
+children:
+  '# of Intervals':
+    type: number
+    default: 4
+    name: 'NIntervals${n}'
+    width: 3
+
+  'Interval':
+    type: select
+    name: 'Interval${n}[]'
+    width: 3
+    values:
+      "Augmented unison": "A1"
+      "Minor second": "m2"
+      "Major second": "M2"
+      "Augmented second": "A2"
+      "Minor third": "m3"
+      "Major third": "M3"
+      "Augmented third": "A3"
+      "Diminished third": "d3"
+      "Diminished fourth": "d4"
+      "Perfect fourth": "P4"
+      "Augmented fourth": "A4"
+      "Diminished fifth": "d4"
+      "Perfect fifth": "P5"
+      "Augmented fifth": "A5"
+      "Minor sixth": "m6"
+      "Major sixth": "M6"
+      "Diminished sixth": "d6"
+      "Augmented sixth": "A6"
+      "Minor seventh": "m7"
+      "Major seventh": "M7"
+      "Diminished seventh": "d7"
+      "Augmented seventh": "A7"
+      "Perfect octave": "P8"
+      "Diminished octave": "d8"
+
+  'Base pitches':
+    type: keyboard_template
+    name: 'BasePitches${n}[]'
+    width: 5
+  
+  'X':
+    type: button
+    onclick: onclick="delete_row(${n})"
+    width: 1
+
 ---
 
-{% include form.html inputs=page.inputs %}
+<script>
+  var index = 0;
+  function genRow(n) {
+    {% include _keyboard_script.js index='n' %}
+
+    return `{% include nested.html children=page.children %}`
+  }
+
+  function add_row() {
+    row = $(`<div id="Row_${index}"></div>`)
+    row.html(genRow(index));
+    index += 1;
+    $('#stack').append(row);
+  }
+
+  function delete_row(n) {
+    $('#Row_' + n).remove();
+  }
+
+  funciton pre_submit() {
+    // compile list of valid IDs into hidden input then submit.
+  }
+</script>
+
+<form action="/quiz.html" method="GET" target="_blank" onsubmit="pre_submit();">
+  <div class="striped-w3">
+      <input type="hidden" value="" name="ID" id="_ID"/>
+      <script>
+          $('#_ID').val(Math.floor(Math.random() * 90000 + 1000));
+      </script>
+      {% assign count=0 %}
+
+      {% assign input=site._empty_array | push: 'qType' | push: page.quizType %}
+      {% include basic_input.html %}
+      
+      <div id="stack">
+      </div>
+
+      <script>
+        add_row();
+      </script>
+
+      <div class="w3-row-padding center">
+        <button type="button" class="w3-btn w3-black" onclick="add_row()">+</button>
+      </div>
+
+      <div class="w3-row-padding w3-margin-top w3-margin w3-padding">
+          <input type="submit" class="w3-btn w3-black" value="Generate"/>
+      </div>
+  </div>
+</form>

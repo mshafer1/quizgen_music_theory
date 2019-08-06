@@ -14,10 +14,6 @@ expected:
 {% assign key_names = "C,D,E,F,G,A,B" | split: "," %}
 {% assign alt_keys = "C,D,F,G,A" | split: "," %}
 
-<script>
-    this_keyboard = new Keyboard({{ include.index }})
-    keyboards.push(this_keyboard);
-</script>
 
 <div id="keyboard{{ include.index }}">
     <div style="display: inline-block">

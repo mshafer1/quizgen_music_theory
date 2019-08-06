@@ -1,0 +1,58 @@
+{% assign input=include.input %}
+{% assign count=include.count %}
+{% assign width=include.width %}
+{% assign lable_width=include.lable_width %}
+{% assign padding=include.padding %}
+
+{% if lable_width %}
+{% else %}
+    {% assign lable_width='s2' %}
+{% endif %}
+
+{% if width %}
+<!-- got a width {{ width }} -->
+{% else %}
+    {% if input[1]=>type == "multi" %}
+        {% assign width='s2' %}
+    {% elsif input[1]=>type == "keyboard" %}
+        {% assign width='m10 s12 %}
+    {% else %}
+        {% assign width='s2' %}
+    {% endif %}
+
+    <!-- assigned a width {{ width }} -->
+{% endif %}
+
+{% if input[1]=>type == "button" %}
+{% else %}
+<div class="w3-col w3-container {{ lable_width }}"style="{{ padding }}>
+    <label for="{{ input[1]=>name }}">{{ input[0] }}: </label>
+</div>
+{% endif %}
+<div class="w3-col w3-container {{ width }}" style="{{ padding }}">
+    {% if input[1]=>type == "multi" %}
+        {% assign name = input[1]=>name %}
+        {% assign values = input[1]=>values %}
+        {% include multi_input.html values=values name=name %}
+    {% elsif input[1]=>type == "keyboard" %}
+        {% assign name = input[1]=>name %}
+        <script>
+            {%include _keyboard_script.js index=count %}
+        </script>
+        {% include _keyboard_input.html index=count name=name %}
+        {% assign count=count | plus: 1 %}
+    {% elsif input[1]=>type == "keyboard_template" %}
+        {% assign name = input[1]=>name %}
+        {% include _keyboard_input.html index='${n}' name=name %}
+    {% elsif input[1]=>type == "select" %}
+        <select>
+        {% for value in input[1]=>values %}
+             <option value="{{ value[1] }}">{{ value[0] }}</option>
+        {% endfor %}
+        </select>
+    {% elsif input[1]=>type == "button" %}
+        <button {{input[1]=>onclick}} type="button" class="w3-btn w3-black">{{input[0]}}</button>
+    {% else %}
+        {% include basic_input.html %}
+    {% endif %}
+</div>
