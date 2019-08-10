@@ -45,7 +45,7 @@
         {% assign name = input[1]=>name %}
         {% include _keyboard_input.html index='${n}' name=name %}
     {% elsif input[1]=>type == "select" %}
-        <select>
+        <select name="{{ input[1]=>name }}" >
         {% for value in input[1]=>values %}
              <option value="{{ value[1] }}">{{ value[0] }}</option>
         {% endfor %}
