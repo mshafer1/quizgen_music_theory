@@ -8,6 +8,12 @@ quizType:
   name: qType
 
 children:
+  'index':
+    type: hidden
+    name: 'index${n}'
+    default: '${n}'
+    class: 'js-index'
+
   '# of Intervals':
     type: number
     default: 4
@@ -76,11 +82,33 @@ children:
   }
 
   function pre_submit() {
+    // check if #indexes already exists, and if so, delet it
+    $('#indexes').remove();
+
     // compile list of valid IDs into hidden input then submit.
+
+    var ids = [];
+    $(".js-index").each(function() {
+        ids.push($(this).val());
+    });
+
+    var form = $('form');
+    
+    var input = $('<input>').attr({
+      type: 'hidden',
+      id: 'indexes',
+      name: 'indexes',
+      value: ids,
+    })
+
+    form.append(input);
+
+    console.log(ids);
+    return true;
   }
 </script>
 
-<form action="/quiz.html" method="GET" target="_blank" onsubmit="pre_submit();">
+<form action="/quiz.html" method="GET" target="_blank" onsubmit=" return pre_submit()">
   <div class="striped-w3">
       <input type="hidden" value="" name="ID" id="_ID"/>
       <script>

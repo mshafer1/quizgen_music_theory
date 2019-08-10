@@ -33,8 +33,63 @@ title = '';
 prompt = '';
 VF = Vex.Flow;
 
+function try_parse_interval_data(get_data, out_data) {
+    // NIntervals in get_data && Intervals in get_data && (StartingBassNotes in get_data || StartingTrebleNotes in get_data)
+    var result = false;
+
+    if(get_data[qType] != intervalRaw) {
+        return result;
+    }
+
+    if (!('indexes' in get_data)) {
+        return result;
+    }
+
+    var indeces = get_data['indexes']
+
+    console.log(typeof(indeces));
+    console.log("Indexes: " + indeces);
+
+    if (typeof(indeces) != 'number' && indeces.indexOf(',') != -1) {
+        indeces = indeces.split(',');
+    }
+    else {
+        indeces = [indeces];
+    }
+
+    console.log("Indeces: ");
+    console.log(indeces);
+
+    
+    for(var i = 0; i < indeces.length; i++) {
+        var index = indeces[i]
+        out_data[index] = {};
+
+        data_keys = {NIntervals: `NIntervals${i}`, BasePitches: `BasePitches${i}[]`};
+        for (var key in data_keys) {
+            var key_ = data_keys[key];
+            
+            console.log("Looking for: " + key_);
+
+            if (!(key_ in get_data)) {
+                return result;
+            }
+
+            out_data[index][key] = get_data[key_];
+        }
+    }
+
+    console.log("Out Data: ")
+    console.log(out_data);
+
+    return true;
+}
+
 function init() {
     var get_data = load_get();
+    console.log(get_data);
+
+    out = {};
 
     if (!(qType in get_data)) {
         alert("Invalid request for quiz!");
@@ -52,8 +107,8 @@ function init() {
         (mmScalesKey in get_data && mmStartingNotes in get_data)) ) {
         handle_label_scale(get_data);
     }
-    else if (get_data[qType] == intervalRaw && NIntervals in get_data && Intervals in get_data && (StartingBassNotes in get_data || StartingTrebleNotes in get_data)) {
-        handle_label_interval(get_data);
+    else if (try_parse_interval_data(get_data, out)) {
+        handle_label_interval(out);
     }
     else if (get_data[qType] == noteID) {
         handle_note_id(get_data);
