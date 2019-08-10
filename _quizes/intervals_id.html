@@ -10,7 +10,6 @@ quizType:
 children:
   'index':
     type: hidden
-    name: 'index${n}'
     default: '${n}'
     class: 'js-index'
 
@@ -18,7 +17,16 @@ children:
     type: number
     default: 4
     name: 'NIntervals${n}'
-    width: 3
+    width: 2
+  
+  'Clef':
+    type: select
+    name: 'Clef${n}'
+    width: 2
+    values:
+      "Treble": "Treble"
+      "Alto": "Alto"
+      "Bass": "Bass"
 
   'Interval':
     type: select
@@ -53,7 +61,7 @@ children:
   'Base pitches':
     type: keyboard_template
     name: 'BasePitches${n}[]'
-    width: 5
+    width: 4
   
   'X':
     type: button

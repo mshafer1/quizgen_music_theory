@@ -65,7 +65,7 @@ function try_parse_interval_data(get_data, out_data) {
         var index = indeces[i]
         out_data[index] = {};
 
-        data_keys = {NIntervals: `NIntervals${i}`, BasePitches: `BasePitches${i}[]`, Interval: `Interval${i}`};
+        data_keys = {NIntervals: `NIntervals${i}`, BasePitches: `BasePitches${i}[]`, Interval: `Interval${i}`, Clef: `Clef${i}`};
         for (var key in data_keys) {
             var key_ = data_keys[key];
             
