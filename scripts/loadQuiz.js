@@ -28,6 +28,7 @@ const BARNote = {}; // create an object
 const DefaultRowSize = 6;
 
 const STAVE_SIZE = 800;
+const STAVE_HEIGHT = 150;
 
 title = '';
 prompt = '';
@@ -189,77 +190,94 @@ function handle_label_interval(data) {
     title = 'Timed Interval Quiz, ID';
     prompt = 'Identify the following intervals (include number and quality)';
 
-    var n_intervals = data[NIntervals];
+    var compiled_data = [];
+    for (var key in data) {
+        var clef = data[key].Clef;
+        var interval = data[key].Interval;
+        var base_pitches = data[key].BasePitches;
 
-    var bass_starting_notes = (StartingBassNotes in data) ? data[StartingBassNotes] : [];
-    var treble_starting_notes = (StartingTrebleNotes in data) ? data[StartingTrebleNotes] : [];
+        var info = base_pitches.map(function(base_pitch){
+            return new IntervalInfo(base_pitch, interval, clef);
+        });
 
-    var intervals = data[Intervals];
-    var n_rows = Math.ceil(n_intervals / 12);
-    var bass_intervals = shuffled_interval_slices(Math.floor(n_intervals / 2), bass_starting_notes, intervals);
-    var treble_intervals = shuffled_interval_slices(Math.ceil(n_intervals / 2), treble_starting_notes, intervals);
+        var part = shuffled_slice(data[key].NIntervals, info);
+        compiled_data = compiled_data.concat(part);
+    }
 
+    console.log("Compiled data: ", compiled_data)
+
+
+    // var bass_intervals = shuffle(compiled_data.filter(function (item) { return item.clef == BassClef }));
+    // var alto_intervals = shuffle(compiled_data.filter(function (item) { return item.clef == AltoClef }));
+    // var treble_intervals = shuffle(compiled_data.filter(function (item) { return item.clef == TrebleClef }));
+    
+    // console.log("Treble Intervals: ", treble_intervals);
+    // console.log("Alto Intervals: ", alto_intervals);
+    // console.log("Bass Intervals: ", bass_intervals);
+    
 
     staves = []
 
     var clef = null;
 
-    console.log("n_rows: " + n_rows);
+    var clef_order = [TrebleClef, AltoClef, BassClef];
 
-    for (var i = 0; i < n_rows * 2; i++) {
-        stave = new_stave('Stave' + i);
+    var i = 0;
 
-        clef = (i % 2) ? BassClef : TrebleClef;
-        console.log("new stave");
+    clef_order.forEach(function (clef) {
+        console.log(clef);
+        var clef_intervals = shuffle(compiled_data.filter(function (item) { return item.clef == clef }));
+        console.log(clef + " Intervals: ", clef_intervals);
 
-        var notes = []
+        var slices = slice_array(6, clef_intervals);
 
-        // var end_clef = false;
-        var index = Math.floor(i / 2);
-        var row = (i % 2) ? bass_intervals[index] : treble_intervals[index];
-        answer_row = gen_answer_row(row.length, STAVE_SIZE);
+        console.log("Slices: ", slices);
 
+        for(var j = 0; j < slices.length; j++) {
+            var slice = slices[j];
+       
+            stave = new_stave('Stave' + i);
+            console.log("new stave");
 
-        for (var j = 0; j < row.length; j++) {
-            var interval = row[j];
+            var notes = []
 
-            var keys = gen_interval(interval.starting_note, interval.interval);
-            console.log("interval: " + interval);
-            console.log("Keys: " + JSON.stringify(keys));
-            notes.push(keys_to_note(keys));
+            answer_row = gen_answer_row(slice.length, STAVE_SIZE);
 
-            // if(bass_starting_notes.length == 0 || treble_starting_notes.length == 0) {
-            //     end_clef = true;
-            //     continue;
-            // }
+            console.log("Slice: ", slice);
 
-            if (j < row.length - 1) {
-                notes.push(BARNote);
-            }
-            console.log("Notes: ")
-            console.log(notes);
+            slice.forEach(function (interval) {
+                console.log('Interval: ', interval);
+                console.log("Interval starting note: ", interval.starting_note);
+                console.log("Interval interval: ", interval.interval);
+                var keys = gen_interval(interval.starting_note, interval.interval);
+                console.log("Keys: " , keys);
+                
+                console.log("Keys: " + JSON.stringify(keys));
+                notes.push(keys_to_note(keys));
+            });
+
+            console.log("Notes: " + JSON.stringify(notes));
+            Draw_stave(stave, clef, null, notes, 'w');
+
+            question = new_stave("Stave" + i);
+            question.classList.add("nosplit");
+
+            var label = document.createElement('h3');
+            label.innerHTML = '' + (i + 1) + ': ';
+            question.appendChild(label);
+
+            question.appendChild(stave);
+            stave.classList.add('no-above-padding');
+
+            question.appendChild(answer_row);
+            question.appendChild(document.createElement('br'));
+            question.appendChild(document.createElement('br'));
+
+            staves.push(question);
+
+            i++;
         }
-
-        console.log("Stave: " + JSON.stringify(stave));
-        console.log("Clef: " + clef);
-
-        console.log("Notes: " + JSON.stringify(notes));
-        Draw_stave(stave, clef, null, notes, 'w');
-
-
-        question = new_stave("Stave" + i);
-        question.classList.add("nosplit");
-
-        var label = document.createElement('h3');
-        label.innerHTML = '' + (i + 1) + ': ';
-        question.appendChild(label);
-
-        question.appendChild(stave);
-        question.appendChild(answer_row);
-
-        staves.push(question);
-    }
-
+    });
     write_doc();
 }
 
@@ -431,7 +449,7 @@ function new_stave(id = '') {
 
 function Draw_stave(target_div, clef, signature, notes, duration, show_accidentals = true) {
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
-    renderer.resize(STAVE_SIZE + 200, 200);
+    renderer.resize(STAVE_SIZE + 200, STAVE_HEIGHT);
     var context = renderer.getContext();
     context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
 

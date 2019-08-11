@@ -36,6 +36,14 @@ class Interval {
     }
 }
 
+class IntervalInfo {
+    constructor(starting_note, interval, clef) {
+        this.starting_note = starting_note;
+        this.interval = interval;
+        this.clef = clef;
+    }
+}
+
 function note_to_key(note) {
     var letter = note[0];
     var accidental = '';
