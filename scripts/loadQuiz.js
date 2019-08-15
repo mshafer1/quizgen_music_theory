@@ -27,7 +27,7 @@ const BARNote = {}; // create an object
 
 const DefaultRowSize = 6;
 
-const STAVE_SIZE = 800;
+const STAVE_SIZE = 900;
 const STAVE_HEIGHT = 150;
 
 title = '';
