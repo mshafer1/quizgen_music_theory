@@ -26,6 +26,7 @@ hover_color
 	position: absolute;
 	width: {{ include.key_width | minus: 2 }}px;
 	height: {{ include.key_height | minus:1 }}px;
+	{% if include.font_color %}color: #{{ include.font_color }};{% endif %}
 
 	left: 1px;
 	top: 0px;

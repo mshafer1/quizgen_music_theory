@@ -32,7 +32,7 @@ div.answer-inline {
     width: 30px;
 }
 
-{% include key.css key_name="black_key" key_width=site.key_width key_height=site.black_height color=444 fade_color=555 hover_color="010101" %}
+{% include key.css key_name="black_key" key_width=site.key_width key_height=site.black_height color=444 fade_color="0a0a0a" hover_color="afafaf" font_color="9090a0" %}
 
 {% include key.css key_name="white_key" key_width=site.key_width key_height=site.white_height color="dadaca" fade_color="cacaba" hover_color="f0f0a0" checked_color="a0a0b0" %}
 
