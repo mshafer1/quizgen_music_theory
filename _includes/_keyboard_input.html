@@ -22,12 +22,9 @@ expected:
         <div id="part-{{ include.index }}-{{ n }}" class="keyboardPart" style="position: relative; {% if n != 4 and hide == 'True' %}display: none;{% endif %}">
             {% for key_name in key_names %}
                 {% assign key_n = n %}
-                {% if key_name == 'A' or key_name == 'B' %}
-                    {% assign key_n = n | plus: 1 %}
-                {% endif %}
                 <div class="white_key">
                     <input type="checkbox" value="{{ key_name }}{{ key_n }}" name="{{ include.name }}" id="{{ key_name }}{{ include.index }}-{{ key_n }}"></input>
-                    <label for="{{ key_name }}{{ include.index }}-{{ key_n }}">{% if key_name == 'C' %}<span class="w3-display-bottommiddle">C{{ key_n }}</span>{% endif %}</label>
+                    <label for="{{ key_name }}{{ include.index }}-{{ key_n }}" title="{{ key_name }}{{ key_n }}">{% if key_name == 'C' %}<span class="w3-display-bottommiddle">C{{ key_n }}</span>{% endif %}</label>
                 </div>
             {% endfor %}
 
@@ -40,10 +37,9 @@ expected:
                         {% assign left=1.0 %}
                     {% endif %}
 
+
                     {% assign key_n = n %}
-                    {% if key_name == 'A' %}
-                        {% assign key_n = n | plus: 1 %}
-                    {% endif %}
+
 
                     {% assign next_key = next_keys[forloop.index] %}
                     <!-- {{ key_name }}# -->
@@ -52,14 +48,12 @@ expected:
                     <div class="black_key" style="margin-left: {{ left | times: site.key_width }}px; position: relative;">
                         <div style="display:block; height:{{ site.black_height }}px; position:relative; background: #000;">
                             <input type="checkbox" value="{{ key_name }}#{{ key_n }}" name="{{ include.name }}" id="{{ key_name }}#{{ include.index }}-{{ key_n }}"></input>
-                            <label for="{{ key_name }}#{{ include.index }}-{{ key_n }}"><span class="w3-display-middle">#</span></label>
+                            <label for="{{ key_name }}#{{ include.index }}-{{ key_n }}" title="{{ key_name }}{{ key_n }}#"><span class="w3-display-middle">#</span></label>
                         </div>
-                        {% if next_key == 'A' %}
-                            {% assign key_n = n | plus: 1 %}
-                        {% endif %}
+
                         <div style="display:block; height:{{ site.black_height }}px; position:relative; top: -1px; background: #000;">
                             <input type="checkbox" value="{{ next_key }}b{{ key_n }}" name="{{ include.name }}" id="{{ next_key }}b{{ include.index }}-{{ key_n }}"></input>
-                            <label for="{{ next_key }}b{{ include.index }}-{{ key_n }}"><span class="w3-display-middle">&#9837;</span></label>
+                            <label for="{{ next_key }}b{{ include.index }}-{{ key_n }}" title="{{ next_key }}{{ key_n }}&#9837;"><span class="w3-display-middle">&#9837;</span></label>
                         </div>
                     </div>
                {% endfor %}
