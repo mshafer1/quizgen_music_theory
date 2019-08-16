@@ -44,19 +44,23 @@ class IntervalInfo {
     }
 }
 
-function note_to_key(note) {
-    var letter = note[0];
-    var accidental = '';
-    var number = 0;
-    if (letter.length == 2) {
-        number = Number(note[1]);
-    } else {
-        accidental = note[1];
-        number = Number(note[2]);
-    }
+// function note_to_key(note) {
+//     var letter = note[0];
+//     var accidental = '';
+//     var number = 0;
+//     console.log(note.length);
+//     if (note.length == 2) {
+//         number = Number(note[1]);
+//     } else if(note.length == 4) {
+//         accidental = note.substring(1,3);
+//         number = Number(note[3]);
+//     } else {
+//         accidental = note[1];
+//         number = Number(note[2]);
+//     }
 
-    return new Key(letter, number, accidental);
-}
+//     return new Key(letter, number, accidental);
+// }
 
 
 function teorian_note_to_vexflow_note(note_str) {
@@ -68,23 +72,29 @@ function teorian_note_to_vexflow_note(note_str) {
     return result;
 }
 
-function teorian_note_to_key(note_str) {
+function teorian_note_to_key(note_str, keep_accidentals=true) {
     var letter = note_str[0];
     var octave = Number(note_str[note_str.length - 1])
     var accidental = ''
-    if (note_str.length == 3) {
+    if (note_str.length == 3 && keep_accidentals) {
         accidental = note_str[1];
+    } else if(note_str.length == 4 && keep_accidentals) {
+        accidental = note_str.substring(1,3);
     }
     return new Key(letter, octave, accidental);
 }
 
-function keys_to_note(keys) {
+function keys_to_note(keys, keep_accidentals=true) {
     var result = new Note(Array(), Array());
     for (var i = 0; i < keys.length; i++) {
         var key = keys[i];
         result.keys.push(key.letter + '/' + key.octave);
-        if (key.accidental != '') {
-            result.accidentals.push(new Accidental(i, key.accidental));
+        if (key.accidental != '' && keep_accidentals) {
+            var accidental = key.accidental;
+            if (accidental == 'x') { // teoria uses x, VexFlow uses ##
+                accidental = '##'
+            }
+            result.accidentals.push(new Accidental(i, accidental));
         }
     }
     return result;

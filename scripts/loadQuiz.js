@@ -25,11 +25,13 @@ const NIntervals = 'NIntervals';
 const Intervals = 'Intervals[]';
 const BARNote = {}; // create an object
 
-const DefaultRowSize = 6;
 
-const STAVE_SIZE = 800;
 const STAVE_HEIGHT = 150;
 
+const NOTES_PER_LINE = 'NPerLine';
+
+staveSize = 900;
+rowSize = 6;
 title = '';
 prompt = '';
 VF = Vex.Flow;
@@ -64,9 +66,9 @@ function try_parse_interval_data(get_data, out_data) {
     
     for(var i = 0; i < indeces.length; i++) {
         var index = indeces[i]
-        out_data[index] = {};
+        out_data[i] = {};
 
-        data_keys = {NIntervals: `NIntervals${i}`, BasePitches: `BasePitches${i}[]`, Interval: `Interval${i}`, Clef: `Clef${i}`};
+        data_keys = {NIntervals: `NIntervals${index}`, BasePitches: `BasePitches${index}[]`, Interval: `Interval${index}`, Clef: `Clef${index}`};
         for (var key in data_keys) {
             var key_ = data_keys[key];
             
@@ -76,7 +78,7 @@ function try_parse_interval_data(get_data, out_data) {
                 return result;
             }
 
-            out_data[index][key] = get_data[key_];
+            out_data[i][key] = get_data[key_];
         }
     }
 
@@ -97,6 +99,9 @@ function init() {
         return;
     }
 
+    if(NOTES_PER_LINE in get_data) {
+        rowSize = Number(get_data[NOTES_PER_LINE]);
+    }
     if (QuizID in get_data) {
         Math.seedrandom(Number(get_data[QuizID]));
     }
@@ -142,17 +147,20 @@ function handle_note_id(data) {
 
         var notes = shuffled_slice(n, raw_notes);
 
-        var slices = slice_array(DefaultRowSize, notes);
-        var nStaff = slices.length;
+        var slices = slice_array(rowSize, notes);
+
+        staveSize = Math.max(staveSize, (slices.length > 0)?(slices[0].length * 100):0);
+        console.log("StaveSize: ", staveSize);
+
+        var nStaff = slices.length
 
         for (var j = 0; j < nStaff; j++) {
             var slice = slices[j];
             console.log(JSON.stringify(slice));
 
             // create stave
-            var stave = new_stave('Stave' + i + ':' + (j * DefaultRowSize + k));
+            var stave = new_stave('Stave' + i + ':' + (j * rowSize + k));
             console.log("new stave");
-
             // add notes
             var notes = [];
             for (var k = 0; k < slice.length; k++) {
@@ -171,7 +179,7 @@ function handle_note_id(data) {
             var label = document.createElement('h3');
             label.innerHTML = '' + (i + 1) + ': ';
 
-            var answer_row = gen_answer_row(slice.length, STAVE_SIZE);
+            var answer_row = gen_answer_row(slice.length, staveSize);
 
             question.appendChild(label)
             question.appendChild(stave);
@@ -229,7 +237,7 @@ function handle_label_interval(data) {
         var clef_intervals = shuffle(compiled_data.filter(function (item) { return item.clef == clef }));
         console.log(clef + " Intervals: ", clef_intervals);
 
-        var slices = slice_array(6, clef_intervals);
+        var slices = slice_array(rowSize, clef_intervals);
 
         console.log("Slices: ", slices);
 
@@ -241,7 +249,7 @@ function handle_label_interval(data) {
 
             var notes = []
 
-            answer_row = gen_answer_row(slice.length, STAVE_SIZE);
+            answer_row = gen_answer_row(slice.length, staveSize);
 
             console.log("Slice: ", slice);
 
@@ -285,16 +293,18 @@ function scale_clef(starting_note, original_clef) {
     var note = teoria.note(starting_note);
     var index = note.key();
 
-    if (index <= 32) {
+    var ab3 = teoria.note("Ab3").key();
+    var g2 = teoria.note("G2").key();
+
+    if (index <= g2) {
         return BassClef;
-    } else if (index >= 40) {
+    } else if (index >= ab3) {
         return TrebleClef;
     } else {
         return original_clef;
     }
 }
 
-// TODO: extend to include labling for extra options like "natural minor", "melodic minor", "harmonic minor"
 function handle_label_scale(data) {
     title = 'Timed Scale Quiz (Major and minor)';
     prompt = 'Create the requested scale by filling in the appropriate accidentals.';
@@ -354,13 +364,27 @@ function handle_label_scale(data) {
         }
         // var notes = [keys_to_note(scale)];
 
-        Draw_stave(stave, clef, null, notes, 'w', false);
+        Draw_stave(stave, clef, null, notes, 'w', true);
 
         var question = new_stave('Q' + i);
         question.classList.add('nosplit');
 
         var label = document.createElement('h3');
-        label.innerHTML = '' + (i + 1) + ': ' + starting_note.substring(0, starting_note.length - 1).toUpperCase() + ' ' + mMscales[i];
+
+        var teoira_note = new teoria.note(starting_note);
+        console.log('Teoria Note: ', teoira_note);
+        var start_note = teorian_note_to_key(String(teoira_note));
+        console.log('Start Note: ', start_note);
+        var accidental = '';
+        if (start_note.accidental == 'b') {
+            accidental = '&#9837;';
+        } else if(start_note.accidental == '#') {
+            accidental = '#';
+        }
+        console.log('Start_Note: ', start_note);
+        console.log('Start_Note.letter: ', start_note.letter);
+
+        label.innerHTML = '' + (i + 1) + ': ' + start_note.letter.toUpperCase() + accidental + ' ' + mMscales[i];
 
         question.appendChild(label)
         question.appendChild(stave);
@@ -426,15 +450,15 @@ function gen_scale(mM, starting_note) {
     }
 
     for (var i = 0; i < notes.length; i++) {
-        result.push(teorian_note_to_key(String(notes[i])));
+        result.push(teorian_note_to_key(String(notes[i]), keep_accidental=i==0));
     }
 
-    result.push(teorian_note_to_key(note.name() + note.accidental() + (note.octave() + 1)));
+    result.push(teorian_note_to_key(note.name() + note.accidental() + (note.octave() + 1), keep_accidental=true));
 
     if (mM == MelodicMinor) {
         var reversed = notes.reverse();
         for(var i = 0; i < reversed.length; i++) {
-            result.push(teorian_note_to_key(String(reversed[i])));
+            result.push(teorian_note_to_key(String(reversed[i]), keep_accidental=i+1==reversed.length));
         }
     }
 
@@ -449,11 +473,11 @@ function new_stave(id = '') {
 
 function Draw_stave(target_div, clef, signature, notes, duration, show_accidentals = true) {
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
-    renderer.resize(STAVE_SIZE + 200, STAVE_HEIGHT);
+    renderer.resize(staveSize + 200, STAVE_HEIGHT);
     var context = renderer.getContext();
     context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
 
-    var stave = new VF.Stave(10, 40, STAVE_SIZE);
+    var stave = new VF.Stave(10, 40, staveSize);
     if (signature != null) {
         stave.addTimeSignature(signature);
     }
@@ -493,7 +517,7 @@ function Draw_stave(target_div, clef, signature, notes, duration, show_accidenta
 
     var voices = [voice];
 
-    var formatter = new VF.Formatter().joinVoices(voices).format(voices, STAVE_SIZE);
+    var formatter = new VF.Formatter().joinVoices(voices).format(voices, staveSize);
 
     voices.forEach(function (v) {
         v.draw(context, stave);

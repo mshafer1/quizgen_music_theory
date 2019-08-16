@@ -77,6 +77,16 @@ describe('teorian_note_to_key converts from', () => {
     expected = { 'letter': 'a', 'accidental': '#', 'octave': 5 }
     expect(teorian_note_to_key("a#5")).toEqual(expected);
   });
+
+  it('ax5 to {a, x, 5}', () => {
+    expected = { 'letter': 'a', 'accidental': 'x', 'octave': 5 }
+    expect(teorian_note_to_key("ax5")).toEqual(expected);
+  });
+
+  it('abb5 to {a, bb, 5}', () => {
+    expected = { 'letter': 'a', 'accidental': 'bb', 'octave': 5 }
+    expect(teorian_note_to_key("abb5")).toEqual(expected);
+  });
 })
 
 describe('Shuffle starting notes', () => {
