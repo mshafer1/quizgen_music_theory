@@ -74,3 +74,9 @@ div.answer-inline {
     page-break-after: avoid;
     break-after: avoid;
 }
+
+@media print {
+    .print-hide {
+        display: none!important;
+    }
+}
