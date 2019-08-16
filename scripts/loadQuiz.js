@@ -279,8 +279,52 @@ function handle_triad_id(data) {
         var slices = slice_array(rowSize, clef_triads);
         staveSize = Math.max(staveSize, (slices.length > 0)?(slices[0].length * 100):0);
 
-        
+        for(var j = 0; j < slices.length; j++) {
+            var slice = slices[j];
+       
+            stave = new_stave('Stave' + i);
+            console.log("new stave");
+
+            var notes = []
+
+            answer_row = gen_answer_row(slice.length, staveSize);
+
+            console.log("Slice: ", slice);
+
+            slice.forEach(function (interval) {
+                console.log('Interval: ', interval);
+                console.log("Interval starting note: ", interval.starting_note);
+                console.log("Interval interval: ", interval.interval);
+                var keys = get_triad(interval.starting_note, interval.interval);
+                console.log("Keys: " , keys);
+                
+                console.log("Keys: " + JSON.stringify(keys));
+                notes.push(keys_to_note(keys));
+            });
+
+            console.log("Notes: " + JSON.stringify(notes));
+            Draw_stave(stave, clef, null, notes, 'w');
+
+            question = new_stave("Stave" + i);
+            question.classList.add("nosplit");
+
+            var label = document.createElement('h3');
+            label.innerHTML = '' + (i + 1) + ': ';
+            question.appendChild(label);
+
+            question.appendChild(stave);
+            stave.classList.add('no-above-padding');
+
+            question.appendChild(answer_row);
+            question.appendChild(document.createElement('br'));
+            question.appendChild(document.createElement('br'));
+
+            staves.push(question);
+
+            i++;
+        }
     });
+    write_doc();
 }
 
 function handle_label_interval(data) {
@@ -514,6 +558,19 @@ function gen_interval(starting_note, interval) {
     console.log(String(upper_note))
 
     result.push(teorian_note_to_key(String(upper_note)));
+
+    return result;
+}
+
+function get_triad(starting_note, triad) {
+    var result = Array();
+    var note = teoria.note(starting_note);
+
+    var chord = note.chord(triad).notes();
+
+    chord.forEach(function (note) {
+        result.push(teorian_note_to_key(String(note)));
+    });
 
     return result;
 }
