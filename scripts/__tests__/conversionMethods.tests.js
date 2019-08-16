@@ -1,51 +1,47 @@
 var vm = require("vm");
 var fs = require("fs");
-require(__dirname + '/../conversionMethods.js');
 
-var data = fs.readFileSync(__dirname + '/../conversionMethods.js');
-// const script = new vm.Script(data);
-// utils = script.runInThisContext();
-eval(data + '');
+const conversionMethods = require('../conversionMethods.js');
 
 test('Test teorian_note_to_vexflow_note a4 => a/4', () => {
-  expect(teorian_note_to_vexflow_note('a4')).toEqual('a/4');
+  expect(conversionMethods.teorian_note_to_vexflow_note('a4')).toEqual('a/4');
 });
 
 
 test('Test teorian_note_to_vexflow_note a5 => a/5', () => {
-  expect(teorian_note_to_vexflow_note('a5')).toEqual('a/5');
+  expect(conversionMethods.teorian_note_to_vexflow_note('a5')).toEqual('a/5');
 });
 
 test('Test teorian_note_to_vexflow_note ab5 => ab/5', () => {
-  expect(teorian_note_to_vexflow_note('ab5')).toEqual('ab/5');
+  expect(conversionMethods.teorian_note_to_vexflow_note('ab5')).toEqual('ab/5');
 });
 
 test('Test teorian_note_to_vexflow_note a#5 => a#/5', () => {
-  expect(teorian_note_to_vexflow_note('a#5')).toEqual('a#/5');
+  expect(conversionMethods.teorian_note_to_vexflow_note('a#5')).toEqual('a#/5');
 });
 
 describe('Test randomMm', () => {
   it('Test randomMm returns right counts (1,0,0,0)', () => {
-    data = random_major_minor(1, 0, 0, 0);
+    data = conversionMethods.random_major_minor(1, 0, 0, 0);
     expect(data).not.toContain('Minor');
     expect(data).toContain('Major');
   })
 
   it('Test randomMm returns right counts (0,1,0,0)', () => {
-    data = random_major_minor(0, 1, 0, 0);
+    data = conversionMethods.random_major_minor(0, 1, 0, 0);
     expect(data).toContain('Minor');
     expect(data).not.toContain('Major');
   })
 
   it('Test randomMm returns right counts (0,0,1,0)', () => {
-    data = random_major_minor(0, 0, 1, 0);
+    data = conversionMethods.random_major_minor(0, 0, 1, 0);
     expect(data).not.toContain('Major');
     expect(data).not.toContain('Minor');
     expect(data).toContain('Harmonic Minor');
   })
 
   it('Test randomMm returns right counts (0,0,0,1)', () => {
-    data = random_major_minor(0, 0, 0, 1);
+    data = conversionMethods.random_major_minor(0, 0, 0, 1);
     expect(data).not.toContain('Major');
     expect(data).not.toContain('Minor');
     expect(data).not.toContain('Harmonic Minor');
@@ -59,7 +55,7 @@ describe('Test randomMm', () => {
     expected_harmonic = Array(4).fill('Harmonic Minor');
     expected_melodic = Array(5).fill('Melodic Minor');
 
-    data = random_major_minor(2, 3, 4, 5)
+    data = conversionMethods.random_major_minor(2, 3, 4, 5)
     expect(data).toEqual(expect.arrayContaining(expected_major));
     expect(data).toEqual(expect.arrayContaining(expected_minor));
     expect(data).toEqual(expect.arrayContaining(expected_harmonic));
@@ -70,22 +66,22 @@ describe('Test randomMm', () => {
 describe('teorian_note_to_key converts from', () => {
   it('a5 to {a, _, 5}', () => {
     expected = { 'letter': 'a', 'accidental': '', 'octave': 5 }
-    expect(teorian_note_to_key("a5")).toEqual(expected);
+    expect(conversionMethods.teorian_note_to_key("a5")).toEqual(expected);
   });
 
   it('a#5 to {a, #, 5}', () => {
     expected = { 'letter': 'a', 'accidental': '#', 'octave': 5 }
-    expect(teorian_note_to_key("a#5")).toEqual(expected);
+    expect(conversionMethods.teorian_note_to_key("a#5")).toEqual(expected);
   });
 
   it('ax5 to {a, x, 5}', () => {
     expected = { 'letter': 'a', 'accidental': 'x', 'octave': 5 }
-    expect(teorian_note_to_key("ax5")).toEqual(expected);
+    expect(conversionMethods.teorian_note_to_key("ax5")).toEqual(expected);
   });
 
   it('abb5 to {a, bb, 5}', () => {
     expected = { 'letter': 'a', 'accidental': 'bb', 'octave': 5 }
-    expect(teorian_note_to_key("abb5")).toEqual(expected);
+    expect(conversionMethods.teorian_note_to_key("abb5")).toEqual(expected);
   });
 })
 
@@ -95,7 +91,8 @@ describe('Shuffle starting notes', () => {
   it('returns starting slice if n < options.length', () => {
     var n = 3;
     var expected_size = n;
-    var result = shuffled_slice(n, input);
+    
+    var result = conversionMethods.shuffled_slice(n, input);
 
     expect(result.length).toEqual(expected_size);
   });
@@ -103,7 +100,8 @@ describe('Shuffle starting notes', () => {
   it('returns full slice if n = options.length', () => {
     var n = input.length;
     var expected_size = n;
-    var result = shuffled_slice(n, input);
+    
+    var result = conversionMethods.shuffled_slice(n, input);
 
     expect(result.length).toEqual(expected_size);
     expect(result).toEqual(expect.arrayContaining(input));
@@ -113,7 +111,8 @@ describe('Shuffle starting notes', () => {
     var n = input.length * 2;
     var expected_size = n;
     var expected_result = input.concat(input);
-    var result = shuffled_slice(n, input);
+    
+    var result = conversionMethods.shuffled_slice(n, input);
 
     expect(result.length).toEqual(expected_size);
     expect(result).toEqual(expect.arrayContaining(expected_result));
@@ -124,7 +123,7 @@ describe('Shuffle starting notes', () => {
     var expected_size = 0;
     var result = []
 
-    var result = shuffled_slice(n, []);
+    var result = conversionMethods.shuffled_slice(n, []);
 
     expect(result.length).toEqual(expected_size);
     done()
@@ -141,7 +140,7 @@ describe('Shuffled interval', () => {
 
     var expected_result_sorted = [mock_interval('A4', 'm7'), mock_interval('B2', 'm7'), mock_interval('A4', 'm7'), mock_interval('B2', 'm7')]
 
-    var result = shuffled_intervals(n, starting_notes, intervals);
+    var result = conversionMethods.shuffled_intervals(n, starting_notes, intervals);
 
     expect(result.length).toEqual(expected_size);
     expect(result).toEqual(expect.arrayContaining(expected_result_sorted));
@@ -156,7 +155,7 @@ describe('Shuffled interval', () => {
 
     var expected_result_sorted = [mock_interval('A4', 'm7'), mock_interval('B2', 'm7'), mock_interval('A4', 'm7'), mock_interval('B2', 'm7')]
 
-    var result = shuffled_intervals(n, starting_notes, intervals);
+    var result = conversionMethods.shuffled_intervals(n, starting_notes, intervals);
 
     expect(result.length).toEqual(expected_size);
     expect(result).toEqual(expect.arrayContaining(expected_result_sorted));
@@ -170,7 +169,7 @@ describe('Shuffled interval slice', () => {
     var starting_notes = ['A4', 'B2'];
     var intervals = ['m7'];
 
-    var result = shuffled_interval_slices(n, starting_notes, intervals);
+    var result = conversionMethods.shuffled_interval_slices(n, starting_notes, intervals);
 
     expect(result.length).toEqual(expected_size);
   });
@@ -180,7 +179,7 @@ describe('Shuffled interval slice', () => {
     var starting_notes = ['A4', 'B2'];
     var intervals = ['m7'];
 
-    var result = shuffled_interval_slices(n, starting_notes, intervals);
+    var result = conversionMethods.shuffled_interval_slices(n, starting_notes, intervals);
 
     expect(result.length).toEqual(expected_size);
   });
@@ -190,7 +189,7 @@ describe('Shuffled interval slice', () => {
     var starting_notes = ['A4', 'B2'];
     var intervals = ['m7'];
 
-    var result = shuffled_interval_slices(n, starting_notes, intervals);
+    var result = conversionMethods.shuffled_interval_slices(n, starting_notes, intervals);
 
     expect(result.length).toEqual(expected_size);
   });
@@ -201,7 +200,7 @@ describe('Shuffled interval slice', () => {
     var starting_notes = ['A4', 'B2'];
     var intervals = ['m7'];
 
-    var result = shuffled_interval_slices(n, starting_notes, intervals);
+    var result = conversionMethods.shuffled_interval_slices(n, starting_notes, intervals);
 
     expect(result.length).toEqual(expected_size);
   });
@@ -212,7 +211,7 @@ describe('Shuffled interval slice', () => {
     var starting_notes = ['A4', 'B2'];
     var intervals = ['m7'];
 
-    var result = shuffled_interval_slices(n, starting_notes, intervals);
+    var result = conversionMethods.shuffled_interval_slices(n, starting_notes, intervals);
 
     expect(result.length).toEqual(expected_size);
   });
@@ -223,7 +222,7 @@ describe('Shuffled interval slice', () => {
     var starting_notes = ['A4', 'B2'];
     var intervals = ['m7'];
 
-    var result = shuffled_interval_slices(n, starting_notes, intervals);
+    var result = conversionMethods.shuffled_interval_slices(n, starting_notes, intervals);
 
     expect(result.length).toEqual(expected_size);
   });
@@ -235,7 +234,7 @@ describe('slice_array', () => {
     var size = 6;
     var expected_size = 1;
 
-    var slices = slice_array(size, array);
+    var slices = conversionMethods.slice_array(size, array);
 
     expect(slices.length).toEqual(expected_size);
   });
@@ -245,7 +244,7 @@ describe('slice_array', () => {
     var size = 6;
     var expected_size = 1;
 
-    var slices = slice_array(size, array);
+    var slices = conversionMethods.slice_array(size, array);
 
     expect(slices.length).toEqual(expected_size);
   });
@@ -255,7 +254,7 @@ describe('slice_array', () => {
     var size = 6;
     var expected_size = 2;
 
-    var slices = slice_array(size, array);
+    var slices = conversionMethods.slice_array(size, array);
 
     expect(slices.length).toEqual(expected_size);
   });
@@ -265,7 +264,7 @@ describe('slice_array', () => {
     var size = 6;
     var expected_size = 6;
 
-    var slices = slice_array(size, array);
+    var slices = conversionMethods.slice_array(size, array);
 
     expect(slices[0].length).toEqual(expected_size);
   });
@@ -275,7 +274,7 @@ describe('slice_array', () => {
     var size = 6;
     var expected_size = 1;
 
-    var slices = slice_array(size, array);
+    var slices = conversionMethods.slice_array(size, array);
 
     expect(slices[1].length).toEqual(expected_size);
   });

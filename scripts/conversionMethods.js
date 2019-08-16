@@ -44,25 +44,6 @@ class IntervalInfo {
     }
 }
 
-// function note_to_key(note) {
-//     var letter = note[0];
-//     var accidental = '';
-//     var number = 0;
-//     console.log(note.length);
-//     if (note.length == 2) {
-//         number = Number(note[1]);
-//     } else if(note.length == 4) {
-//         accidental = note.substring(1,3);
-//         number = Number(note[3]);
-//     } else {
-//         accidental = note[1];
-//         number = Number(note[2]);
-//     }
-
-//     return new Key(letter, number, accidental);
-// }
-
-
 function teorian_note_to_vexflow_note(note_str) {
     // console.log(note_str);
     var result = note_str.substring(0, note_str.length - 1);
@@ -72,19 +53,19 @@ function teorian_note_to_vexflow_note(note_str) {
     return result;
 }
 
-function teorian_note_to_key(note_str, keep_accidentals=true) {
+function teorian_note_to_key(note_str, keep_accidentals = true) {
     var letter = note_str[0];
     var octave = Number(note_str[note_str.length - 1])
     var accidental = ''
     if (note_str.length == 3 && keep_accidentals) {
         accidental = note_str[1];
-    } else if(note_str.length == 4 && keep_accidentals) {
-        accidental = note_str.substring(1,3);
+    } else if (note_str.length == 4 && keep_accidentals) {
+        accidental = note_str.substring(1, 3);
     }
     return new Key(letter, octave, accidental);
 }
 
-function keys_to_note(keys, keep_accidentals=true) {
+function keys_to_note(keys, keep_accidentals = true) {
     var result = new Note(Array(), Array());
     for (var i = 0; i < keys.length; i++) {
         var key = keys[i];
@@ -108,8 +89,8 @@ function random_clef() {
 
 function shuffled_clefs(n) {
     var result = Array(n);
-    for(var i = 0; i < n; i++) {
-        result[i] = ((i+1) % 2)? TrebleClef : BassClef;
+    for (var i = 0; i < n; i++) {
+        result[i] = ((i + 1) % 2) ? TrebleClef : BassClef;
     }
     return result;
 }
@@ -118,15 +99,15 @@ function random_major_minor(nMajor, nminor, nhminor, nmminor) {
     var total = nMajor + nminor + nhminor + nmminor;
     var pick = Array(total);
     for (var i = 0; i < total; i++) {
-        if(i < nMajor) {
+        if (i < nMajor) {
             pick[i] = Major;
         }
         else if (i < nMajor + nminor) {
             pick[i] = Minor;
         }
-        else if(i < nMajor + nminor + nhminor) {
+        else if (i < nMajor + nminor + nhminor) {
             pick[i] = HarmonicMinor;
-        } 
+        }
         else {
             pick[i] = MelodicMinor;
         }
@@ -161,7 +142,7 @@ function shuffle(array) {
 function shuffled_slice(n, notes) {
     var result = shuffle(notes);
 
-    
+
     if (n < notes.length) {
         result = result.slice(0, n);
     }
@@ -191,7 +172,7 @@ function shuffled_intervals(n, starting_notes, intervals) {
     var notes = shuffled_slice(n, starting_notes);
     var spaced_intervals = shuffled_slice(n, intervals);
     var result = []
-    for(var i = 0; i < notes.length; i++) {
+    for (var i = 0; i < notes.length; i++) {
         var note = notes[i];
         var interval = spaced_intervals[i];
         result.push(new Interval(note, interval));
@@ -208,13 +189,34 @@ function shuffled_interval_slices(n, starting_notes, intervals) {
 function slice_array(n, array) {
     var size = array.length;
     var result = [];
-    for(var i = 0; i < Math.ceil(size / n); i++) {
+    for (var i = 0; i < Math.ceil(size / n); i++) {
         var slice = [];
-        for(var j = 0; j < n && i*n + j < array.length; j++) {
-            var part = array[i*n + j];
+        for (var j = 0; j < n && i * n + j < array.length; j++) {
+            var part = array[i * n + j];
             slice.push(part);
         }
         result.push(slice);
     }
     return result;
+}
+
+
+try {
+    var exports = module.exports = {};
+    // from https://stackoverflow.com/a/11279639
+
+    exports.Key = Key;
+    exports.slice_array = slice_array;
+    exports.shuffled_interval_slices = shuffled_interval_slices;
+    exports.shuffled_intervals = shuffled_intervals;
+    exports.shuffled_slice = shuffled_slice;
+    exports.shuffle = shuffle;
+    exports.random_major_minor = random_major_minor;
+    exports.shuffled_clefs = shuffled_clefs;
+    exports.random_clef = random_clef;
+    exports.keys_to_note = keys_to_note;
+    exports.teorian_note_to_key = teorian_note_to_key;
+    exports.teorian_note_to_vexflow_note = teorian_note_to_vexflow_note;
+} catch (error) {
+    // pass
 }
