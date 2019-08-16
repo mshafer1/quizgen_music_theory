@@ -49,9 +49,9 @@ module.exports = {
   // errorOnDeprecated: false,
 
   // Force coverage collection from ignored files using an array of glob patterns
-  "collectCoverageFrom": [
-    "scripts/*.js"
-  ],
+  // "collectCoverageFrom": [
+  //   "scripts/*.js"
+  // ],
 
   // A path to a module which exports an async function that is triggered once before all test suites
   // globalSetup: null,
