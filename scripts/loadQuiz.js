@@ -10,6 +10,7 @@ const mmScalesKey = 'mmScales';
 const scaleRaw = 'ScaleLabel';
 const intervalRaw = 'IntervalID';
 const noteID = 'NoteID';
+const triadIDRaw = 'TriadID';
 
 const QuizID = 'ID';
 
@@ -36,19 +37,8 @@ title = '';
 prompt = '';
 VF = Vex.Flow;
 
-function try_parse_interval_data(get_data, out_data) {
-    // NIntervals in get_data && Intervals in get_data && (StartingBassNotes in get_data || StartingTrebleNotes in get_data)
-    var result = false;
-
-    if(get_data[qType] != intervalRaw) {
-        return result;
-    }
-
-    if (!('indexes' in get_data)) {
-        return result;
-    }
-
-    var indeces = get_data['indexes']
+function get_indeces(dict) {
+    var indeces = dict['indexes']
 
     console.log(typeof(indeces));
     console.log("Indexes: " + indeces);
@@ -63,12 +53,67 @@ function try_parse_interval_data(get_data, out_data) {
     console.log("Indeces: ");
     console.log(indeces);
 
+    return indeces;
+}
+
+function try_parse_interval_data(get_data, out_data) {
+    // NIntervals in get_data && Intervals in get_data && (StartingBassNotes in get_data || StartingTrebleNotes in get_data)
+    var result = false;
+
+    if(get_data[qType] != intervalRaw) {
+        return result;
+    }
+
+    if (!('indexes' in get_data)) {
+        return result;
+    }
+
+    var indeces = get_indeces(get_data);
+
     
     for(var i = 0; i < indeces.length; i++) {
         var index = indeces[i]
         out_data[i] = {};
 
         data_keys = {NIntervals: `NIntervals${index}`, BasePitches: `BasePitches${index}[]`, Interval: `Interval${index}`, Clef: `Clef${index}`};
+        for (var key in data_keys) {
+            var key_ = data_keys[key];
+            
+            console.log("Looking for: " + key_);
+
+            if (!(key_ in get_data)) {
+                return result;
+            }
+
+            out_data[i][key] = get_data[key_];
+        }
+    }
+
+    console.log("Out Data: ")
+    console.log(out_data);
+
+    return true;
+}
+
+function try_parse_triad_id_data(get_data, out_data) {
+    // NTriad in get_data && Intervals in get_data && (StartingBassNotes in get_data || StartingTrebleNotes in get_data)
+    var result = false;
+
+    if(get_data[qType] != triadIDRaw) {
+        return result;
+    }
+
+    if (!('indexes' in get_data)) {
+        return result;
+    }
+
+    var indeces = get_indeces(get_data);
+    
+    for(var i = 0; i < indeces.length; i++) {
+        var index = indeces[i]
+        out_data[i] = {};
+
+        data_keys = {NTriads: `NTriads${index}`, BasePitches: `BasePitches${index}[]`, Triad: `Triad${index}`, Clef: `Clef${index}`};
         for (var key in data_keys) {
             var key_ = data_keys[key];
             
@@ -118,6 +163,9 @@ function init() {
     }
     else if (get_data[qType] == noteID) {
         handle_note_id(get_data);
+    }
+    else if (try_parse_triad_id_data(get_data, out)) {
+        handle_triad_id(out);
     }
     else {
         alert("Invalid request for quiz!");
@@ -194,6 +242,91 @@ function handle_note_id(data) {
     write_doc()
 }
 
+function handle_triad_id(data) {
+    title = "Timed Triad Quiz, ID";
+    prompt = "Identify each triad with lead sheet symbols indicating root and quality.";
+
+    var compiled_data = [];
+    for (var key in data) {
+        // console.log("Data: ", data);
+        var clef = data[key].Clef;
+        var triad = data[key].Triad;
+        var base_pitches = data[key].BasePitches;
+
+        var info = base_pitches.map(function(base_pitch){
+            return new IntervalInfo(base_pitch, triad, clef);
+        });
+
+        var part = shuffled_slice(data[key].NTriads, info);
+        compiled_data = compiled_data.concat(part);
+    }
+
+    // console.log("Compiled data: ", compiled_data)
+
+    staves = []
+
+    var clef = null;
+
+    var clef_order = [TrebleClef, AltoClef, BassClef];
+
+    var i = 0;
+
+    clef_order.forEach(function (clef) {
+        console.log(clef);
+        var clef_triads = shuffle(compiled_data.filter(function (item) { return item.clef == clef }));
+        console.log(clef + " Triads: ", clef_triads);
+
+        var slices = slice_array(rowSize, clef_triads);
+        staveSize = Math.max(staveSize, (slices.length > 0)?(slices[0].length * 100):0);
+
+        for(var j = 0; j < slices.length; j++) {
+            var slice = slices[j];
+       
+            stave = new_stave('Stave' + i);
+            console.log("new stave");
+
+            var notes = []
+
+            answer_row = gen_answer_row(slice.length, staveSize);
+
+            console.log("Slice: ", slice);
+
+            slice.forEach(function (interval) {
+                console.log('Interval: ', interval);
+                console.log("Interval starting note: ", interval.starting_note);
+                console.log("Interval interval: ", interval.interval);
+                var keys = get_triad(interval.starting_note, interval.interval);
+                console.log("Keys: " , keys);
+                
+                console.log("Keys: " + JSON.stringify(keys));
+                notes.push(keys_to_note(keys));
+            });
+
+            console.log("Notes: " + JSON.stringify(notes));
+            Draw_stave(stave, clef, null, notes, 'w');
+
+            question = new_stave("Stave" + i);
+            question.classList.add("nosplit");
+
+            var label = document.createElement('h3');
+            label.innerHTML = '' + (i + 1) + ': ';
+            question.appendChild(label);
+
+            question.appendChild(stave);
+            stave.classList.add('no-above-padding');
+
+            question.appendChild(answer_row);
+            question.appendChild(document.createElement('br'));
+            question.appendChild(document.createElement('br'));
+
+            staves.push(question);
+
+            i++;
+        }
+    });
+    write_doc();
+}
+
 function handle_label_interval(data) {
     title = 'Timed Interval Quiz, ID';
     prompt = 'Identify the following intervals (include number and quality)';
@@ -213,16 +346,6 @@ function handle_label_interval(data) {
     }
 
     console.log("Compiled data: ", compiled_data)
-
-
-    // var bass_intervals = shuffle(compiled_data.filter(function (item) { return item.clef == BassClef }));
-    // var alto_intervals = shuffle(compiled_data.filter(function (item) { return item.clef == AltoClef }));
-    // var treble_intervals = shuffle(compiled_data.filter(function (item) { return item.clef == TrebleClef }));
-    
-    // console.log("Treble Intervals: ", treble_intervals);
-    // console.log("Alto Intervals: ", alto_intervals);
-    // console.log("Bass Intervals: ", bass_intervals);
-    
 
     staves = []
 
@@ -435,6 +558,19 @@ function gen_interval(starting_note, interval) {
     console.log(String(upper_note))
 
     result.push(teorian_note_to_key(String(upper_note)));
+
+    return result;
+}
+
+function get_triad(starting_note, triad) {
+    var result = Array();
+    var note = teoria.note(starting_note);
+
+    var chord = note.chord(triad).notes();
+
+    chord.forEach(function (note) {
+        result.push(teorian_note_to_key(String(note)));
+    });
 
     return result;
 }
