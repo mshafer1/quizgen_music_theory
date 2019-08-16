@@ -11,7 +11,7 @@ div.w3-dropdown-hover:hover .fa-caret-right {
 }
 
 div.striped-w3 > div:nth-child(odd) {
-    background-color:#646464;
+    background-color:lightgray;
     color: black;
 }
 
