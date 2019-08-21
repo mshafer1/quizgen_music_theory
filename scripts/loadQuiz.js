@@ -126,33 +126,39 @@ function init() {
         (MScalesKey in get_data && MStartingNotes in get_data) ||
         (hmScalesKey in get_data && hmStartingNotes in get_data) ||
         (mmScalesKey in get_data && mmStartingNotes in get_data)) ) {
+
+        title = 'Timed Scale Quiz (Major and minor)';
+        prompt = 'Create the requested scale by filling in the appropriate accidentals.';
+
         handle_label_scale(get_data);
     }
     else if (try_parse_interval_data(get_data, out)) {
         title = 'Timed Interval Quiz, ID';
         prompt = 'Identify the following intervals (include number and quality)';
 
-        handle_clef_grouped_data(out, 'Interval', gen_interval);
+        handle_clef_grouped_data(out, 'Interval', gen_interval, show_question_label=false);
     }
     else if (get_data[qType] == noteID) {
-        handle_note_id(get_data);
+        title = "Timed Note Quiz, ID";
+        prompt = "Identify the following notes";
+
+        handle_note_id(get_data, show_question_label=false);
     }
     else if (try_parse_triad_id_data(get_data, out)) {
         title = "Timed Triad Quiz, ID";
         prompt = "Identify each triad with lead sheet symbols indicating root and quality.";
     
-        handle_clef_grouped_data(out, 'Triad', get_triad);
+        handle_clef_grouped_data(out, 'Triad', get_triad, show_question_label=false);
     }
     else {
         alert("Invalid request for quiz!");
         return;
     }
+
+    write_doc();
 }
 
-function handle_note_id(data) {
-    title = "Timed Note Quiz, ID";
-    prompt = "Identify the following notes";
-
+function handle_note_id(data, show_question_label=true) {
     var clefs = [TrebleClef, AltoClef, BassClef]
     var i = 0;
     staves = [];
@@ -200,12 +206,14 @@ function handle_note_id(data) {
             var question = new_stave('Q' + i);
             question.classList.add('nosplit');
 
-            var label = document.createElement('h3');
-            label.innerHTML = '' + (i + 1) + ': ';
+            if (show_question_label) {
+                var label = document.createElement('h3');
+                label.innerHTML = '' + (i + 1) + ': ';
+                question.appendChild(label);    
+            }
 
             var answer_row = gen_answer_row(slice.length, staveSize);
 
-            question.appendChild(label)
             question.appendChild(stave);
             question.appendChild(answer_row);
 
@@ -214,11 +222,10 @@ function handle_note_id(data) {
 
             i++;
         }
-    })
-    write_doc()
+    });
 }
 
-function handle_clef_grouped_data(data, data_key, get_part) {
+function handle_clef_grouped_data(data, data_key, get_part, show_question_label=true) {
     var compiled_data = [];
     for (var key in data) {
         var clef = data[key].Clef;
@@ -265,12 +272,12 @@ function handle_clef_grouped_data(data, data_key, get_part) {
 
             console.log("Slice: ", slice);
 
-            slice.forEach(function (interval) {
-                console.log('Interval: ', interval);
-                console.log("Interval starting note: ", interval.starting_note);
-                console.log("Interval interval: ", interval.interval);
+            slice.forEach(function (part) {
+                console.log('Part: ', part);
+                console.log("Part starting note: ", part.starting_note);
+                console.log("Part info: ", part.interval);
 
-                var keys = get_part(interval.starting_note, interval.interval);
+                var keys = get_part(part.starting_note, part.interval);
 
                 console.log("Keys: " , keys);
                 
@@ -284,9 +291,11 @@ function handle_clef_grouped_data(data, data_key, get_part) {
             question = new_stave("Stave" + i);
             question.classList.add("nosplit");
 
-            var label = document.createElement('h3');
-            label.innerHTML = '' + (i + 1) + ': ';
-            question.appendChild(label);
+            if(show_question_label) {
+                var label = document.createElement('h3');
+                label.innerHTML = '' + (i + 1) + ': ';
+                question.appendChild(label);
+            }
 
             question.appendChild(stave);
             stave.classList.add('no-above-padding');
@@ -300,7 +309,6 @@ function handle_clef_grouped_data(data, data_key, get_part) {
             i++;
         }
     });
-    write_doc();
 }
 
 function scale_clef(starting_note, original_clef) {
@@ -320,8 +328,6 @@ function scale_clef(starting_note, original_clef) {
 }
 
 function handle_label_scale(data) {
-    title = 'Timed Scale Quiz (Major and minor)';
-    prompt = 'Create the requested scale by filling in the appropriate accidentals.';
     MScales = data[MScalesKey] || 0;
     mScales = data[mScalesKey] || 0;
     hmScales = data[hmScalesKey] || 0;
@@ -407,7 +413,6 @@ function handle_label_scale(data) {
 
         staves.push(question);
     }
-    write_doc();
 }
 
 function gen_answer_row(n_answers, width) {
@@ -546,6 +551,7 @@ function Draw_stave(target_div, clef, signature, notes, duration, show_accidenta
 
     var voices = [voice];
 
+    // used in VexFlow;
     var formatter = new VF.Formatter().joinVoices(voices).format(voices, staveSize);
 
     voices.forEach(function (v) {
