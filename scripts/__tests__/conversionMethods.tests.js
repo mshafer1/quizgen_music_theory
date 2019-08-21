@@ -29,7 +29,7 @@ describe('Test randomMm', () => {
 
   it('Test randomMm returns right counts (0,1,0,0)', () => {
     data = conversionMethods.random_major_minor(0, 1, 0, 0);
-    expect(data).toContain('Minor');
+    expect(data).toContain('Natural Minor');
     expect(data).not.toContain('Major');
   })
 
@@ -50,7 +50,7 @@ describe('Test randomMm', () => {
 
 
   it('Test randomMm returns right counts (2,3,4,5)', () => {
-    expected_minor = ['Minor', 'Minor'];
+    expected_minor = Array(2).fill('Natural Minor');
     expected_major = ['Major', 'Major', 'Major'];
     expected_harmonic = Array(4).fill('Harmonic Minor');
     expected_melodic = Array(5).fill('Melodic Minor');
