@@ -56,50 +56,19 @@ function get_indeces(dict) {
     return indeces;
 }
 
+
 function try_parse_interval_data(get_data, out_data) {
-    // NIntervals in get_data && Intervals in get_data && (StartingBassNotes in get_data || StartingTrebleNotes in get_data)
-    var result = false;
-
-    if(get_data[qType] != intervalRaw) {
-        return result;
-    }
-
-    if (!('indexes' in get_data)) {
-        return result;
-    }
-
-    var indeces = get_indeces(get_data);
-
-    
-    for(var i = 0; i < indeces.length; i++) {
-        var index = indeces[i]
-        out_data[i] = {};
-
-        data_keys = {N: `NIntervals${index}`, BasePitches: `BasePitches${index}[]`, Interval: `Interval${index}`, Clef: `Clef${index}`};
-        for (var key in data_keys) {
-            var key_ = data_keys[key];
-            
-            console.log("Looking for: " + key_);
-
-            if (!(key_ in get_data)) {
-                return result;
-            }
-
-            out_data[i][key] = get_data[key_];
-        }
-    }
-
-    console.log("Out Data: ")
-    console.log(out_data);
-
-    return true;
+    return try_parse_quiz_data(get_data, out_data, intervalRaw, 'NIntervals', 'Interval');
 }
 
 function try_parse_triad_id_data(get_data, out_data) {
-    // NTriad in get_data && Intervals in get_data && (StartingBassNotes in get_data || StartingTrebleNotes in get_data)
+    return try_parse_quiz_data(get_data, out_data, triadIDRaw, 'NTriads', 'Triad');
+}
+
+function try_parse_quiz_data(get_data, out_data, quizTypeKey, NKey, dataLable) {
     var result = false;
 
-    if(get_data[qType] != triadIDRaw) {
+    if(get_data[qType] != quizTypeKey) {
         return result;
     }
 
@@ -113,7 +82,8 @@ function try_parse_triad_id_data(get_data, out_data) {
         var index = indeces[i]
         out_data[i] = {};
 
-        data_keys = {N: `NTriads${index}`, BasePitches: `BasePitches${index}[]`, Triad: `Triad${index}`, Clef: `Clef${index}`};
+        data_keys = {N: `${NKey}${index}`, BasePitches: `BasePitches${index}[]`, Clef: `Clef${index}`};
+        data_keys[dataLable] = `${dataLable}${index}`;
         for (var key in data_keys) {
             var key_ = data_keys[key];
             
