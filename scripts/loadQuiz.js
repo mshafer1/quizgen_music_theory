@@ -74,15 +74,11 @@ function try_parse_quiz_data(get_data, out_data, quizTypeKey, NKey, dataLable) {
         return result;
     }
 
-    if (!('indexes' in get_data)) {
+    if(!(NKey in get_data)) {
         return result;
     }
 
-    var indeces = get_indeces(get_data);
-    
-    for(var i = 0; i < indeces.length; i++) {
-        var index = indeces[i]
-        out_data[i] = {};
+    out_data.N = get_data[NKey];
 
         data_keys = {N: `${NKey}${index}`, BasePitches: `BasePitches${index}[]`, Clef: `Clef${index}`};
         data_keys[dataLable] = `${dataLable}${index}`;
@@ -97,34 +93,6 @@ function try_parse_quiz_data(get_data, out_data, quizTypeKey, NKey, dataLable) {
 
             out_data[i][key] = get_data[key_];
         }
-    }
-
-    console.log("Out Data: ")
-    console.log(out_data);
-
-    return true;
-}
-
-function try_parse_key_signature_quiz_data(get_data, out_data) {
-    return try_parse_key_type_quiz_data(get_data, out_data, signatureIDRaw, 'NKeys', 'keys[]');
-}
-
-function try_parse_key_type_quiz_data(get_data, out_data, expectedQuizType, NKey, keysName) {
-    var result = false;
-
-    var quizType = get_data[qType];
-    if(quizType != expectedQuizType) {
-        return result;
-    }
-
-    if(!(NKey in get_data)) {
-        return result;
-    }
-
-    out_data.N = get_data[NKey];
-
-    if(!(keysName in get_data)) {
-        return result;
     }
 
     out_data.Keys = get_data[keysName];
@@ -183,12 +151,6 @@ function init() {
     
         handle_clef_grouped_data(out, 'Triad', get_triad, show_question_label=false);
     }
-    else if(try_parse_key_signature_quiz_data(get_data, out)) {
-        title = 'Timed Key Signature Quiz, ID';
-        prompt = 'Write the correct key signatures (both major and minor) in the blanks below.';
-
-        handle_label_key_signature(out, show_question_label=false);
-    }
     else {
         alert("Invalid request for quiz!");
         return;
@@ -197,31 +159,7 @@ function init() {
     write_doc();
 }
 
-
-function handle_label_key_signature(data, show_question_label=true) {
-    var total = shuffled_slice(data.N, data.Keys);
-    var slices = slice_array(rowSize, total);
-
-    slices.forEach(function (slice, index) {
-        var stave = new_stave('Stave' + index);
-
-        Draw_stave_with_key_sig(stave, null, slice);
-
-        var MajorAnswers = gen_answer_row(slice.length, staveSize, 'Major:')
-        var MinorAnswers = gen_answer_row(slice.length, staveSize, 'Minor:')
-
-        stave.appendChild(MajorAnswers);
-        stave.appendChild(document.createElement("br"));
-        stave.appendChild(document.createElement("br"));
-        stave.appendChild(MinorAnswers);
-
-        stave.classList.add('nosplit');
-
-        staves.push(stave);
-    });
-}
-
-function handle_note_id(data, show_question_label=true, add_bars_between_parts=true) {
+function handle_note_id(data, show_question_label=true) {
     var clefs = [TrebleClef, AltoClef, BassClef]
     var i = 0;
 
@@ -290,7 +228,7 @@ function handle_note_id(data, show_question_label=true, add_bars_between_parts=t
     });
 }
 
-function handle_clef_grouped_data(data, data_key, get_part, show_question_label=true, add_bars_between_parts=true) {
+function handle_clef_grouped_data(data, data_key, get_part, show_question_label=true) {
     var compiled_data = [];
     for (var key in data) {
         var clef = data[key].Clef;
@@ -308,6 +246,7 @@ function handle_clef_grouped_data(data, data_key, get_part, show_question_label=
 
     console.log("Compile Data: ", compiled_data);
 
+    staves = [];
 
     var clef = null;
 
@@ -319,6 +258,10 @@ function handle_clef_grouped_data(data, data_key, get_part, show_question_label=
         console.log("Clef: ", clef);
 
         var clef_parts = shuffle(compiled_data.filter(function (item) { return item.clef == clef; }));
+
+        var slices = slice_array(rowSize, clef_parts);
+        
+        staveSize = Math.max(staveSize, (slices.length > 0)?(slices[0].length * 100):0);
 
         var slices = slice_array(rowSize, clef_parts);
         
@@ -334,7 +277,7 @@ function handle_clef_grouped_data(data, data_key, get_part, show_question_label=
 
             console.log("Slice: ", slice);
 
-            slice.forEach(function (part, index) {
+            slice.forEach(function (part) {
                 console.log('Part: ', part);
                 console.log("Part starting note: ", part.starting_note);
                 console.log("Part info: ", part.interval);
