@@ -75,7 +75,7 @@ function try_parse_interval_data(get_data, out_data) {
         var index = indeces[i]
         out_data[i] = {};
 
-        data_keys = {NIntervals: `NIntervals${index}`, BasePitches: `BasePitches${index}[]`, Interval: `Interval${index}`, Clef: `Clef${index}`};
+        data_keys = {N: `NIntervals${index}`, BasePitches: `BasePitches${index}[]`, Interval: `Interval${index}`, Clef: `Clef${index}`};
         for (var key in data_keys) {
             var key_ = data_keys[key];
             
@@ -113,7 +113,7 @@ function try_parse_triad_id_data(get_data, out_data) {
         var index = indeces[i]
         out_data[i] = {};
 
-        data_keys = {NTriads: `NTriads${index}`, BasePitches: `BasePitches${index}[]`, Triad: `Triad${index}`, Clef: `Clef${index}`};
+        data_keys = {N: `NTriads${index}`, BasePitches: `BasePitches${index}[]`, Triad: `Triad${index}`, Clef: `Clef${index}`};
         for (var key in data_keys) {
             var key_ = data_keys[key];
             
@@ -159,13 +159,19 @@ function init() {
         handle_label_scale(get_data);
     }
     else if (try_parse_interval_data(get_data, out)) {
-        handle_label_interval(out);
+        title = 'Timed Interval Quiz, ID';
+        prompt = 'Identify the following intervals (include number and quality)';
+
+        handle_clef_grouped_data(out, 'Interval', gen_interval);
     }
     else if (get_data[qType] == noteID) {
         handle_note_id(get_data);
     }
     else if (try_parse_triad_id_data(get_data, out)) {
-        handle_triad_id(out);
+        title = "Timed Triad Quiz, ID";
+        prompt = "Identify each triad with lead sheet symbols indicating root and quality.";
+    
+        handle_clef_grouped_data(out, 'Triad', get_triad);
     }
     else {
         alert("Invalid request for quiz!");
@@ -242,28 +248,25 @@ function handle_note_id(data) {
     write_doc()
 }
 
-function handle_triad_id(data) {
-    title = "Timed Triad Quiz, ID";
-    prompt = "Identify each triad with lead sheet symbols indicating root and quality.";
-
+function handle_clef_grouped_data(data, data_key, get_part) {
     var compiled_data = [];
     for (var key in data) {
-        // console.log("Data: ", data);
         var clef = data[key].Clef;
-        var triad = data[key].Triad;
+        var data_value = data[key][data_key];
         var base_pitches = data[key].BasePitches;
 
-        var info = base_pitches.map(function(base_pitch){
-            return new IntervalInfo(base_pitch, triad, clef);
+        var info = base_pitches.map(function(base_pitch) {
+            return new IntervalInfo(base_pitch, data_value, clef);
         });
 
-        var part = shuffled_slice(data[key].NTriads, info);
+        var part = shuffled_slice(data[key].N, info);
+
         compiled_data = compiled_data.concat(part);
     }
 
-    // console.log("Compiled data: ", compiled_data)
+    console.log("Compile Data: ", compiled_data);
 
-    staves = []
+    staves = [];
 
     var clef = null;
 
@@ -272,11 +275,12 @@ function handle_triad_id(data) {
     var i = 0;
 
     clef_order.forEach(function (clef) {
-        console.log(clef);
-        var clef_triads = shuffle(compiled_data.filter(function (item) { return item.clef == clef }));
-        console.log(clef + " Triads: ", clef_triads);
+        console.log("Clef: ", clef);
 
-        var slices = slice_array(rowSize, clef_triads);
+        var clef_parts = shuffle(compiled_data.filter(function (item) { return item.clef == clef; }));
+
+        var slices = slice_array(rowSize, clef_parts);
+        
         staveSize = Math.max(staveSize, (slices.length > 0)?(slices[0].length * 100):0);
 
         for(var j = 0; j < slices.length; j++) {
@@ -295,92 +299,9 @@ function handle_triad_id(data) {
                 console.log('Interval: ', interval);
                 console.log("Interval starting note: ", interval.starting_note);
                 console.log("Interval interval: ", interval.interval);
-                var keys = get_triad(interval.starting_note, interval.interval);
-                console.log("Keys: " , keys);
-                
-                console.log("Keys: " + JSON.stringify(keys));
-                notes.push(keys_to_note(keys));
-            });
 
-            console.log("Notes: " + JSON.stringify(notes));
-            Draw_stave(stave, clef, null, notes, 'w');
+                var keys = get_part(interval.starting_note, interval.interval);
 
-            question = new_stave("Stave" + i);
-            question.classList.add("nosplit");
-
-            var label = document.createElement('h3');
-            label.innerHTML = '' + (i + 1) + ': ';
-            question.appendChild(label);
-
-            question.appendChild(stave);
-            stave.classList.add('no-above-padding');
-
-            question.appendChild(answer_row);
-            question.appendChild(document.createElement('br'));
-            question.appendChild(document.createElement('br'));
-
-            staves.push(question);
-
-            i++;
-        }
-    });
-    write_doc();
-}
-
-function handle_label_interval(data) {
-    title = 'Timed Interval Quiz, ID';
-    prompt = 'Identify the following intervals (include number and quality)';
-
-    var compiled_data = [];
-    for (var key in data) {
-        var clef = data[key].Clef;
-        var interval = data[key].Interval;
-        var base_pitches = data[key].BasePitches;
-
-        var info = base_pitches.map(function(base_pitch){
-            return new IntervalInfo(base_pitch, interval, clef);
-        });
-
-        var part = shuffled_slice(data[key].NIntervals, info);
-        compiled_data = compiled_data.concat(part);
-    }
-
-    console.log("Compiled data: ", compiled_data)
-
-    staves = []
-
-    var clef = null;
-
-    var clef_order = [TrebleClef, AltoClef, BassClef];
-
-    var i = 0;
-
-    clef_order.forEach(function (clef) {
-        console.log(clef);
-        var clef_intervals = shuffle(compiled_data.filter(function (item) { return item.clef == clef }));
-        console.log(clef + " Intervals: ", clef_intervals);
-
-        var slices = slice_array(rowSize, clef_intervals);
-
-        console.log("Slices: ", slices);
-
-        for(var j = 0; j < slices.length; j++) {
-            var slice = slices[j];
-       
-            stave = new_stave('Stave' + i);
-            console.log("new stave");
-
-            var notes = []
-
-            answer_row = gen_answer_row(slice.length, staveSize);
-
-            console.log("Slice: ", slice);
-
-            slice.forEach(function (interval) {
-                console.log('Interval: ', interval);
-                console.log("Interval starting note: ", interval.starting_note);
-                console.log("Interval interval: ", interval.interval);
-                var keys = gen_interval(interval.starting_note, interval.interval);
                 console.log("Keys: " , keys);
                 
                 console.log("Keys: " + JSON.stringify(keys));
