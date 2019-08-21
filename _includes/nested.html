@@ -9,8 +9,19 @@
     {% else %}
         <div class="w3-col s{{ input[1]=>width }}">
             <div class="w3-row w3-container">
+            
+            {% assign lable_width='s4' %}
+            {% if input[1]=>lable_width %}
+            {% assign lable_width=input[1]=>lable_width %}
+            {% endif %}
+
+            {% assign child_width='s8' %}
+            {% if input[1]=>child_width %}
+            {% assign child_width=input[1]["child_width"] %}
+            {% endif %}
             <!-- input {{ input }} -->
-            {% include input_selector input=input count=count width='s8' lable_width='s4' padding='padding: 0px!important;' %}
+            <!-- lable_width: {{ input[1]["lable_width"] }}-->
+            {% include input_selector input=input count=count width=child_width lable_width=lable_width padding='padding: 0px!important;' %}
             </div>
        </div>
     {% endif %}

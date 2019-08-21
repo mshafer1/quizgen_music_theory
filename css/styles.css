@@ -1,6 +1,10 @@
 ---
 ---
 
+html, body {
+    font-family: 'Roboto', sans-serif!important;
+}
+
 .no-above-padding {
     margin-top: -50px;
 }
@@ -78,5 +82,24 @@ div.answer-inline {
 @media print {
     .print-hide {
         display: none!important;
+    }
+
+    html {
+        font-family: 'EB Garamond', serif!important;
+        font-size: 16pt!important;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'EB Garamond', serif!important;
+    }
+
+    p {
+        font-size: 22pt;
+        font-family: 'EB Garamond', serif!important;
+    }
+
+    label {
+        font-size: 20pt!important;
+        font-family: 'EB Garamond', serif!important;
     }
 }

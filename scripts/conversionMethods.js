@@ -3,6 +3,7 @@ const AltoClef = 'alto';
 const TrebleClef = 'treble';
 const Major = 'Major';
 const Minor = 'Minor';
+const NaturalMinor = 'Natural Minor'
 const HarmonicMinor = 'Harmonic Minor';
 const MelodicMinor = 'Melodic Minor';
 
@@ -103,7 +104,7 @@ function random_major_minor(nMajor, nminor, nhminor, nmminor) {
             pick[i] = Major;
         }
         else if (i < nMajor + nminor) {
-            pick[i] = Minor;
+            pick[i] = NaturalMinor;
         }
         else if (i < nMajor + nminor + nhminor) {
             pick[i] = HarmonicMinor;

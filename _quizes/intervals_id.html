@@ -23,12 +23,16 @@ children:
     type: number
     default: 4
     name: 'NIntervals${n}'
-    width: 2
+    width: 4
+    lable_width: m5 s12
+    child_width: m7 s12
   
   'Clef':
     type: select
     name: 'Clef${n}'
     width: 2
+    lable_width: m3 s12
+    child_with: m9 s12
     values:
       "Treble": "treble"
       "Alto": "alto"
@@ -37,7 +41,9 @@ children:
   'Interval':
     type: select
     name: 'Interval${n}'
-    width: 3
+    width: 4
+    lable_width: m3 s12
+    child_width: m9 s12
     values:
       "Augmented unison": "A1"
       "Minor second": "m2"
@@ -63,17 +69,18 @@ children:
       "Augmented seventh": "A7"
       "Perfect octave": "P8"
       "Diminished octave": "d8"
-
-  'Base pitches':
-    type: keyboard_template
-    name: 'BasePitches${n}[]'
-    width: 4
   
   'X':
     type: button
     onclick: onclick="delete_row(${n})"
-    width: 1
+    width: 2
 
+  'Starting Notes':
+    type: keyboard_template
+    name: 'BasePitches${n}[]'
+    width: 12
+    lable_width: m1 s3
+    child_width: m11 s9
 ---
 
 <script>
@@ -89,6 +96,7 @@ children:
     row.html(genRow(index));
     index += 1;
     $('#stack').append(row);
+    resize();
   }
 
   function delete_row(n) {

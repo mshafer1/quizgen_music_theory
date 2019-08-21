@@ -1,11 +1,15 @@
 {% assign input=include.input %}
 {% assign count=include.count %}
 {% assign width=include.width %}
-{% assign lable_width=include.lable_width %}
 {% assign padding=include.padding %}
 
-{% if lable_width %}
+{% if include.lable_width %}
+{% assign lable_width=include.lable_width %}
+<!-- got a lable width {{ lable_width }} -->
 {% else %}
+<!-- input was {{ include }} -->
+<!-- lable_width {{ include.lable_width }} -->
+
     {% assign lable_width='s2' %}
 {% endif %}
 

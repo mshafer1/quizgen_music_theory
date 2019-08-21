@@ -417,9 +417,9 @@ function scale_clef(starting_note, original_clef) {
     var index = note.key();
 
     var ab3 = teoria.note("Ab3").key();
-    var g2 = teoria.note("G2").key();
+    var b3 = teoria.note("B3").key();
 
-    if (index <= g2) {
+    if (index <= b3) {
         return BassClef;
     } else if (index >= ab3) {
         return TrebleClef;
@@ -472,8 +472,10 @@ function handle_label_scale(data) {
             starting_note = hmNotes.pop();
         } else if (mMscale == MelodicMinor) {
             starting_note = mmNotes.pop();
-        } else { // Minor
+        } else if (mMscale == NaturalMinor) { // Minor
             starting_note = mNotes.pop();
+        } else {
+            console.error("Unknown scale type: ", mMscale);
         }
 
         clef = scale_clef(starting_note, clef);
