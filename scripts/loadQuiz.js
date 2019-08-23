@@ -11,6 +11,7 @@ const scaleRaw = 'ScaleLabel';
 const intervalRaw = 'IntervalID';
 const noteID = 'NoteID';
 const triadIDRaw = 'TriadID';
+const signatureIDRaw = 'KeySignatureID';
 
 const QuizID = 'ID';
 
@@ -103,7 +104,37 @@ function try_parse_quiz_data(get_data, out_data, quizTypeKey, NKey, dataLable) {
     return true;
 }
 
+function try_parse_key_signature_quiz_data(get_data, out_data) {
+    return try_parse_key_type_quiz_data(get_data, out_data, signatureIDRaw, 'NKeys', 'keys[]');
+}
+
+function try_parse_key_type_quiz_data(get_data, out_data, expectedQuizType, NKey, keysName) {
+    var result = false;
+
+    var quizType = get_data[qType];
+    if(quizType != expectedQuizType) {
+        return result;
+    }
+
+    if(!(NKey in get_data)) {
+        return result;
+    }
+
+    out_data.N = get_data[NKey];
+
+    if(!(keysName in get_data)) {
+        return result;
+    }
+
+    out_data.Keys = get_data[keysName];
+
+    result = true;
+
+    return result;
+}
+
 function init() {
+    staves = [];
     var get_data = load_get();
     console.log(get_data);
 
@@ -150,6 +181,12 @@ function init() {
     
         handle_clef_grouped_data(out, 'Triad', get_triad, show_question_label=false);
     }
+    else if(try_parse_key_signature_quiz_data(get_data, out)) {
+        title = 'Timed Key Signature Quiz, ID';
+        prompt = 'Write the correct key signatures (both major and minor) in the blanks below.';
+
+        handle_label_key_signature(out, show_question_label=false);
+    }
     else {
         alert("Invalid request for quiz!");
         return;
@@ -158,10 +195,23 @@ function init() {
     write_doc();
 }
 
+
+function handle_label_key_signature(data, show_question_label=true) {
+    var total = shuffled_slice(data.N, data.Keys);
+    var slices = slice_array(rowSize, total);
+
+    slices.forEach(function (slice, index) {
+        var stave = new_stave('Stave' + index);
+
+        Draw_stave_with_key_sig(stave, null, slice);
+
+        staves.push(stave);
+    });
+}
+
 function handle_note_id(data, show_question_label=true, add_bars_between_parts=true) {
     var clefs = [TrebleClef, AltoClef, BassClef]
     var i = 0;
-    staves = [];
 
     clefs.forEach(function (clef) {
         console.log(clef);
@@ -247,7 +297,6 @@ function handle_clef_grouped_data(data, data_key, get_part, show_question_label=
 
     console.log("Compile Data: ", compiled_data);
 
-    staves = [];
 
     var clef = null;
 
@@ -347,7 +396,6 @@ function handle_label_scale(data) {
     total = MScales + mScales;
     console.log(`Total: ${total}`);
 
-    staves = [];
 
     var mNotes = data[mStartingNotes] || [];
     mNotes = shuffled_slice(mScales, mNotes);
@@ -513,15 +561,79 @@ function new_stave(id = '') {
     return result;
 }
 
-function Draw_stave(target_div, clef, signature, notes, duration, show_accidentals = true) {
+function Draw_stave_with_key_sig(target_div, time_signature, keys) {
+    var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
+    renderer.resize(staveSize + 200, STAVE_HEIGHT*2);
+
+    var context = renderer.getContext();    
+    context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
+
+    // var context2 = renderer.getContext();
+    // context2.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
+
+    // var treble_stave = _key_sig_handle_clef(TrebleClef, context, keys, time_signature);
+    
+    // var bass_stave = _key_sig_handle_clef(BassClef, context, keys, time_signature);
+
+   
+    // // connector.draw(context);
+
+    // treble_stave.draw();
+    // bass_stave.draw();
+
+    // var connector= new VF.StaveConnector({ top_stave: treble_stave, bottom_stave: bass_stave, type: 'brace' });
+    // connector.setContext(context).draw();
+
+  
+    // Create the staves
+    var topStaff = new Vex.Flow.Stave(20, 0, 300);
+    var bottomStaff = new Vex.Flow.Stave(20, 150, 300);
+  
+    topStaff.addClef('treble');
+    bottomStaff.addClef('bass');
+  
+    var brace = new Vex.Flow.StaveConnector(topStaff, bottomStaff).setType(3);
+    var lineLeft = new Vex.Flow.StaveConnector(topStaff, bottomStaff).setType(1);
+    var lineRight = new Vex.Flow.StaveConnector(topStaff, bottomStaff).setType(6);
+  
+    topStaff.setContext(context).draw();
+    bottomStaff.setContext(context).draw();
+  
+    brace.setContext(context).draw();
+    lineLeft.setContext(context).draw();
+    lineRight.setContext(context).draw();
+}
+
+function _key_sig_handle_clef(clef, context, keys, time_signature) {
+    // example here: https://github.com/0xfe/vexflow/issues/134
+    var stave = new VF.Stave(15, 30, staveSize);
+    console.log("Stave created: ", stave);
+    if (time_signature != null) {
+        stave.addTimeSignature(time_signature);
+    }
+
+    stave.addClef(clef);
+
+    stave.setContext(context); //.draw();
+
+    // keys.forEach(function (key) {
+    //     var signature = new VF.KeySignature(key);
+    //     signature.padding = 100;
+    //     signature.addToStave(stave);
+    // })
+
+    return stave;
+}
+
+function Draw_stave(target_div, clef, time_signature, notes, duration, show_accidentals = true) {
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
     renderer.resize(staveSize + 200, STAVE_HEIGHT);
     var context = renderer.getContext();
     context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
 
     var stave = new VF.Stave(10, 40, staveSize);
-    if (signature != null) {
-        stave.addTimeSignature(signature);
+    if (time_signature != null) {
+        stave.addTimeSignature(time_signature);
     }
 
     stave.addClef(clef);
