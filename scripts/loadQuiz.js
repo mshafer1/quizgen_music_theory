@@ -29,6 +29,7 @@ const BARNote = {}; // create an object
 
 
 const STAVE_HEIGHT = 150;
+const DUAL_STAVE_HEIGHT = 75;
 
 const NOTES_PER_LINE = 'NPerLine';
 
@@ -205,6 +206,15 @@ function handle_label_key_signature(data, show_question_label=true) {
 
         Draw_stave_with_key_sig(stave, null, slice);
 
+        var MajorAnswers = gen_answer_row(slice.length, staveSize, 'Major:')
+        var MinorAnswers = gen_answer_row(slice.length, staveSize, 'Minor:')
+
+        stave.appendChild(MajorAnswers);
+        stave.appendChild(document.createElement("br"));
+        stave.appendChild(document.createElement("br"));
+        stave.appendChild(MinorAnswers);
+
+
         staves.push(stave);
     });
 }
@@ -229,7 +239,7 @@ function handle_note_id(data, show_question_label=true, add_bars_between_parts=t
 
         var slices = slice_array(rowSize, notes);
 
-        staveSize = Math.max(staveSize, (slices.length > 0)?(slices[0].length * 100):0);
+        staveSize = Math.max(staveSize, (slices.length > 0)?(slices[0].length * 120):0);
         console.log("StaveSize: ", staveSize);
 
         var nStaff = slices.length
@@ -471,9 +481,19 @@ function handle_label_scale(data) {
     }
 }
 
-function gen_answer_row(n_answers, width) {
+function gen_answer_row(n_answers, width, lable=null) {
+
     var result = document.createElement('div');
-    result.style.paddingLeft = '15px';
+    var lable_span = '';
+
+    if (lable != null) {
+        lable_span = document.createElement('span');
+        lable_span.innerHTML = lable;
+        result.appendChild(lable_span);
+    }
+    else {
+        result.style.paddingLeft = '15px';
+    }
 
     var part_width = width / n_answers;
     var padding = 15;
@@ -562,32 +582,24 @@ function new_stave(id = '') {
 }
 
 function Draw_stave_with_key_sig(target_div, time_signature, keys) {
+    var left_padding = 20;
+    var standard_width = 150;
+
+    console.log("Stave Size: ", staveSize);
+    var width_per = (staveSize - 50 - left_padding)/(keys.length - 1);
+    console.log("Width per: ", width_per);
+    var padding = width_per;
+    console.log("Padding: ", padding);
+
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
-    renderer.resize(staveSize + 200, STAVE_HEIGHT*2);
+    renderer.resize(staveSize + 200, STAVE_HEIGHT*1.2);
 
     var context = renderer.getContext();    
     context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
-
-    // var context2 = renderer.getContext();
-    // context2.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
-
-    // var treble_stave = _key_sig_handle_clef(TrebleClef, context, keys, time_signature);
-    
-    // var bass_stave = _key_sig_handle_clef(BassClef, context, keys, time_signature);
-
-   
-    // // connector.draw(context);
-
-    // treble_stave.draw();
-    // bass_stave.draw();
-
-    // var connector= new VF.StaveConnector({ top_stave: treble_stave, bottom_stave: bass_stave, type: 'brace' });
-    // connector.setContext(context).draw();
-
   
     // Create the staves
-    var topStaff = new Vex.Flow.Stave(20, 0, 300);
-    var bottomStaff = new Vex.Flow.Stave(20, 150, 300);
+    var topStaff = new VF.Stave(15, 0, staveSize + 30);
+    var bottomStaff = new VF.Stave(15, DUAL_STAVE_HEIGHT, staveSize + 30);
   
     topStaff.addClef('treble');
     bottomStaff.addClef('bass');
@@ -596,33 +608,69 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys) {
     var lineLeft = new Vex.Flow.StaveConnector(topStaff, bottomStaff).setType(1);
     var lineRight = new Vex.Flow.StaveConnector(topStaff, bottomStaff).setType(6);
   
-    topStaff.setContext(context).draw();
-    bottomStaff.setContext(context).draw();
-  
+
+    if( time_signature != null) {
+        topStaff.addTimeSignature(time_signature);
+        bottomStaff.addTimeSignature(time_signature);
+    }
+
+    topStaff.setContext(context);
+    bottomStaff.setContext(context);
+
+    var next_shift = 0;
+    keys.forEach(function (key, index) {
+    		console.log(key);
+        var signature = new VF.KeySignature(key);
+
+        signature.addToStave(topStaff);
+        var width = signature.getWidth();
+        var this_padding = Math.max(0, next_shift );
+
+        console.log("  Width: ", width);
+        console.log("  This Padding: ", this_padding);
+        console.log("  Current Shift: ", next_shift);
+
+        if(width == 0) {
+            next_shift += padding;
+        }
+        else {
+            next_shift = padding - width;
+        }
+        if(width != 0) {
+            next_shift -= left_padding;
+            // next_shift += (keys.length);
+        }
+        
+        // if(width == 0 ) {
+        //     next_shift = padding;
+            
+        // }
+        // else if(index == 0) {
+        //     next_shift = padding - width - left_padding ;
+        // }
+        // else {
+        	
+        // }
+
+        console.log("  NextShift: ", next_shift);
+
+        signature.padding = (index == 0)? left_padding: this_padding;
+
+        // signature.addToStave(bottomStaff);
+        var signature = new VF.KeySignature(key);
+        // signature.padding = 100;
+
+        signature.padding = (index == 0)? left_padding: this_padding;
+
+        signature.addToStave(bottomStaff);
+   });
+
+    topStaff.draw();
+    bottomStaff.draw();
+
     brace.setContext(context).draw();
     lineLeft.setContext(context).draw();
     lineRight.setContext(context).draw();
-}
-
-function _key_sig_handle_clef(clef, context, keys, time_signature) {
-    // example here: https://github.com/0xfe/vexflow/issues/134
-    var stave = new VF.Stave(15, 30, staveSize);
-    console.log("Stave created: ", stave);
-    if (time_signature != null) {
-        stave.addTimeSignature(time_signature);
-    }
-
-    stave.addClef(clef);
-
-    stave.setContext(context); //.draw();
-
-    // keys.forEach(function (key) {
-    //     var signature = new VF.KeySignature(key);
-    //     signature.padding = 100;
-    //     signature.addToStave(stave);
-    // })
-
-    return stave;
 }
 
 function Draw_stave(target_div, clef, time_signature, notes, duration, show_accidentals = true) {
@@ -631,7 +679,7 @@ function Draw_stave(target_div, clef, time_signature, notes, duration, show_acci
     var context = renderer.getContext();
     context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
 
-    var stave = new VF.Stave(10, 40, staveSize);
+    var stave = new VF.Stave(10, 0, staveSize);
     if (time_signature != null) {
         stave.addTimeSignature(time_signature);
     }
