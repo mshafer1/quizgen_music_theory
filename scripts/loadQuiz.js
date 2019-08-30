@@ -159,7 +159,7 @@ function init() {
     write_doc();
 }
 
-function handle_note_id(data, show_question_label=true) {
+function handle_note_id(data, show_question_label=true, add_bars_between_parts=true) {
     var clefs = [TrebleClef, AltoClef, BassClef]
     var i = 0;
 
@@ -228,7 +228,7 @@ function handle_note_id(data, show_question_label=true) {
     });
 }
 
-function handle_clef_grouped_data(data, data_key, get_part, show_question_label=true) {
+function handle_clef_grouped_data(data, data_key, get_part, show_question_label=true, add_bars_between_parts=true) {
     var compiled_data = [];
     for (var key in data) {
         var clef = data[key].Clef;
@@ -277,7 +277,7 @@ function handle_clef_grouped_data(data, data_key, get_part, show_question_label=
 
             console.log("Slice: ", slice);
 
-            slice.forEach(function (part) {
+            slice.forEach(function (part, index) {
                 console.log('Part: ', part);
                 console.log("Part starting note: ", part.starting_note);
                 console.log("Part info: ", part.interval);
