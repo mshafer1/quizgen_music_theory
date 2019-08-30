@@ -665,12 +665,18 @@ function Draw_stave(target_div, clef, time_signature, notes, duration, show_acci
 
     stave.setContext(context).draw();
 
+    var stave_width = stave.getWidth();
+    var left_padding = stave.getNoteStartX();
+    var width_per = (stave_width  - left_padding )/(notes.length);
+
     var stave_notes = []
     for (var i = 0; i < notes.length; i++) {
         note = notes[i];
 
         if (note == BARNote) {
-            stave_notes.push(new Vex.Flow.BarNote());
+            var bar_note = new Vex.Flow.BarNote();
+            // bar_note.padding = 3;
+            stave_notes.push(bar_note);
         }
         else {
             stave_note = new VF.StaveNote({
@@ -683,6 +689,9 @@ function Draw_stave(target_div, clef, time_signature, notes, duration, show_acci
                 for (j = 0; j < note.accidentals.length; j++) {
                     stave_note.addAccidental(note.accidentals[j].index, new VF.Accidental(note.accidentals[j].value))
                 }
+            }
+            if (i != 0) {
+                stave_note.padding = Math.floor((width_per - stave_note.width) / 2 - 1);
             }
 
             stave_notes.push(stave_note);
