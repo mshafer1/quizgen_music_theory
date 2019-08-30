@@ -215,6 +215,7 @@ function handle_label_key_signature(data, show_question_label=true) {
         stave.appendChild(document.createElement("br"));
         stave.appendChild(MinorAnswers);
 
+        stave.classList.add('nosplit');
 
         staves.push(stave);
     });
