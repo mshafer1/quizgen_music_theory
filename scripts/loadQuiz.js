@@ -148,6 +148,7 @@ function init() {
 
     if(NOTES_PER_LINE in get_data) {
         rowSize = Number(get_data[NOTES_PER_LINE]);
+        staveSize = Math.max(staveSize, (rowSize > 0)?(rowSize * 104):0);
     }
     if (QuizID in get_data) {
         Math.seedrandom(Number(get_data[QuizID]));
@@ -239,7 +240,6 @@ function handle_note_id(data, show_question_label=true, add_bars_between_parts=t
 
         var slices = slice_array(rowSize, notes);
 
-        staveSize = Math.max(staveSize, (slices.length > 0)?(slices[0].length * 120):0);
         console.log("StaveSize: ", staveSize);
 
         var nStaff = slices.length
@@ -321,8 +321,6 @@ function handle_clef_grouped_data(data, data_key, get_part, show_question_label=
 
         var slices = slice_array(rowSize, clef_parts);
         
-        staveSize = Math.max(staveSize, (slices.length > 0)?(slices[0].length * 100):0);
-
         for(var j = 0; j < slices.length; j++) {
             var slice = slices[j];
        
@@ -582,14 +580,7 @@ function new_stave(id = '') {
 }
 
 function Draw_stave_with_key_sig(target_div, time_signature, keys) {
-    var left_padding = 20;
     var standard_width = 150;
-
-    console.log("Stave Size: ", staveSize);
-    var width_per = (staveSize  - left_padding )/(keys.length );
-    console.log("Width per: ", width_per);
-    var padding = width_per;
-    console.log("Padding: ", padding);
 
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
     renderer.resize(staveSize + 200, STAVE_HEIGHT*1.2);
@@ -599,72 +590,64 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys) {
   
     // Create the staves
     var topStaff = new VF.Stave(15, 0, staveSize + 30);
-
-    console.log("Staff width (set): ", staveSize + 30);
-    console.log("Staff width (actual): ", topStaff.getWidth());
-    console.log("Staff X start: ", topStaff.getNoteStartX());
-
     var bottomStaff = new VF.Stave(15, DUAL_STAVE_HEIGHT, staveSize + 30);
-  
+
     topStaff.addClef('treble');
     bottomStaff.addClef('bass');
-  
-    var brace = new Vex.Flow.StaveConnector(topStaff, bottomStaff).setType(3);
-    var lineLeft = new Vex.Flow.StaveConnector(topStaff, bottomStaff).setType(1);
-    var lineRight = new Vex.Flow.StaveConnector(topStaff, bottomStaff).setType(6);
-  
 
     if( time_signature != null) {
         topStaff.addTimeSignature(time_signature);
         bottomStaff.addTimeSignature(time_signature);
     }
 
+    console.log("Staff width (set): ", staveSize + 30);
+    console.log("Staff width (actual): ", topStaff.getWidth());
+    console.log("Staff X start: ", topStaff.getNoteStartX());
+
+    var stave_width = topStaff.getWidth();
+    var left_padding = topStaff.getNoteStartX();
+    console.log("Stave Size: ", stave_width);
+    var width_per = (stave_width  - left_padding )/(keys.length);
+    console.log("Width per: ", width_per);
+
+  
+    // TODO (mshafer) use the enum names
+    var brace = new Vex.Flow.StaveConnector(topStaff, bottomStaff).setType(3);
+    var lineLeft = new Vex.Flow.StaveConnector(topStaff, bottomStaff).setType(1);
+    var lineRight = new Vex.Flow.StaveConnector(topStaff, bottomStaff).setType(6);
+  
+
     topStaff.setContext(context);
     bottomStaff.setContext(context);
 
-    var next_shift = 0;
+    var next_padding = 0;
     keys.forEach(function (key, index) {
     		console.log(key);
         var signature = new VF.KeySignature(key);
 
         signature.addToStave(topStaff);
         var width = signature.getWidth();
-        var this_padding = Math.max(0, next_shift );
-
-        console.log("  Width: ", width);
-        console.log("  This Padding: ", this_padding);
-        console.log("  Current Shift: ", next_shift);
-
-        if(width == 0) {
-            next_shift += padding;
-        }
-        else {
-            next_shift = padding - width;
-        }
-        // if(width != 0) {
-        //     next_shift -= left_padding;
-        // }
         
-        // if(width == 0 ) {
-        //     next_shift = padding;
-            
-        // }
-        // else if(index == 0) {
-        //     next_shift = padding - width - left_padding ;
-        // }
-        // else {
-        	
-        // }
+        var padding = left_padding; // needed?? use 0??
+        if (index > 0) {
+            padding = next_padding;
+        }
+        signature.padding = padding;
 
-        console.log("  NextShift: ", next_shift);
+        next_padding = width_per - width;
+        if (index == 0 && width == 0) {
+            next_padding += left_padding;
+        } else if(width == 0) {
+            next_padding += padding;
+        }
+        
+        console.log("  Width: ", width);
+        console.log("  This Padding: ", signature.padding);
+        console.log("  NextShift: ", next_padding);
 
-        signature.padding = (index == 0)? left_padding: this_padding;
-
-        // signature.addToStave(bottomStaff);
         var signature = new VF.KeySignature(key);
-        // signature.padding = 100;
-
-        signature.padding = (index == 0)? left_padding: this_padding;
+        
+        signature.padding = padding;
 
         signature.addToStave(bottomStaff);
    });
