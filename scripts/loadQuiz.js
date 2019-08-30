@@ -581,8 +581,6 @@ function new_stave(id = '') {
 }
 
 function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_between_parts=true) {
-    var standard_width = 150;
-
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
     renderer.resize(staveSize + 200, STAVE_HEIGHT*1.2);
 
@@ -601,17 +599,10 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_betw
         bottomStaff.addTimeSignature(time_signature);
     }
 
-    console.log("Staff width (set): ", staveSize + 30);
-    console.log("Staff width (actual): ", topStaff.getWidth());
-    console.log("Staff X start: ", topStaff.getNoteStartX());
-
     var stave_width = topStaff.getWidth();
     var left_padding = topStaff.getNoteStartX();
-    console.log("Stave Size: ", stave_width);
     var width_per = (stave_width  - left_padding )/(keys.length);
-    console.log("Width per: ", width_per);
 
-  
     // TODO (mshafer) use the enum names
     var brace = new Vex.Flow.StaveConnector(topStaff, bottomStaff).setType(3);
     var lineLeft = new Vex.Flow.StaveConnector(topStaff, bottomStaff).setType(1);
@@ -622,9 +613,6 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_betw
     bottomStaff.setContext(context);
 
     var next_padding = 0;
-    var topVoice = [];
-    var bottomVoice = [];
-    var total_x = 0;
     keys.forEach(function (key, index) {
     		console.log(key);
         var signature = new VF.KeySignature(key);
@@ -646,10 +634,6 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_betw
             next_padding += padding;
         }
         total_x += width;
-        
-        console.log("  Width: ", width);
-        console.log("  This Padding: ", signature.padding);
-        console.log("  NextShift: ", next_padding);
 
         var signature = new VF.KeySignature(key);
         
