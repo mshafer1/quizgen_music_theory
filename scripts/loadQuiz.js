@@ -579,7 +579,7 @@ function new_stave(id = '') {
     return result;
 }
 
-function Draw_stave_with_key_sig(target_div, time_signature, keys) {
+function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_between_parts=true) {
     var standard_width = 150;
 
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
@@ -621,6 +621,9 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys) {
     bottomStaff.setContext(context);
 
     var next_padding = 0;
+    var topVoice = [];
+    var bottomVoice = [];
+    var total_x = 0;
     keys.forEach(function (key, index) {
     		console.log(key);
         var signature = new VF.KeySignature(key);
@@ -628,11 +631,12 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys) {
         signature.addToStave(topStaff);
         var width = signature.getWidth();
         
-        var padding = left_padding; // needed?? use 0??
+        var padding = left_padding;
         if (index > 0) {
             padding = next_padding;
         }
         signature.padding = padding;
+        total_x += padding;
 
         next_padding = width_per - width;
         if (index == 0 && width == 0) {
@@ -640,6 +644,7 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys) {
         } else if(width == 0) {
             next_padding += padding;
         }
+        total_x += width;
         
         console.log("  Width: ", width);
         console.log("  This Padding: ", signature.padding);
