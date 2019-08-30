@@ -625,7 +625,6 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_betw
             padding = next_padding;
         }
         signature.padding = padding;
-        total_x += padding;
 
         next_padding = width_per - width;
         if (index == 0 && width == 0) {
@@ -633,7 +632,6 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_betw
         } else if(width == 0) {
             next_padding += padding;
         }
-        total_x += width;
 
         var signature = new VF.KeySignature(key);
         
