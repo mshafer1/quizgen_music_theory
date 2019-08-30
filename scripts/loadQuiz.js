@@ -31,7 +31,7 @@ const STAVE_HEIGHT = 150;
 
 const NOTES_PER_LINE = 'NPerLine';
 
-staveSize = 900;
+staveSize = 950;
 rowSize = 6;
 title = '';
 prompt = '';
@@ -158,7 +158,7 @@ function init() {
     write_doc();
 }
 
-function handle_note_id(data, show_question_label=true) {
+function handle_note_id(data, show_question_label=true, add_bars_between_parts=true) {
     var clefs = [TrebleClef, AltoClef, BassClef]
     var i = 0;
     staves = [];
@@ -197,6 +197,10 @@ function handle_note_id(data, show_question_label=true) {
                 var key = slice[k];
                 console.log(JSON.stringify(key));
                 notes.push(keys_to_note([teorian_note_to_key(key)]))
+
+                if(add_bars_between_parts && k != slice.length-1) {
+                    notes.push(BARNote);
+                }
             }
             console.log(JSON.stringify(notes));
 
@@ -225,7 +229,7 @@ function handle_note_id(data, show_question_label=true) {
     });
 }
 
-function handle_clef_grouped_data(data, data_key, get_part, show_question_label=true) {
+function handle_clef_grouped_data(data, data_key, get_part, show_question_label=true, add_bars_between_parts=true) {
     var compiled_data = [];
     for (var key in data) {
         var clef = data[key].Clef;
@@ -272,7 +276,7 @@ function handle_clef_grouped_data(data, data_key, get_part, show_question_label=
 
             console.log("Slice: ", slice);
 
-            slice.forEach(function (part) {
+            slice.forEach(function (part, index) {
                 console.log('Part: ', part);
                 console.log("Part starting note: ", part.starting_note);
                 console.log("Part info: ", part.interval);
@@ -283,6 +287,10 @@ function handle_clef_grouped_data(data, data_key, get_part, show_question_label=
                 
                 console.log("Keys: " + JSON.stringify(keys));
                 notes.push(keys_to_note(keys));
+
+                if(add_bars_between_parts && index != slice.length-1) {
+                    notes.push(BARNote);
+                }
             });
 
             console.log("Notes: " + JSON.stringify(notes));
