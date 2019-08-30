@@ -491,7 +491,7 @@ function gen_answer_row(n_answers, width, lable=null) {
         result.appendChild(lable_span);
     }
     else {
-        result.style.paddingLeft = '15px';
+        result.style.paddingLeft = '25px';
     }
 
     var part_width = width / n_answers;
@@ -656,7 +656,7 @@ function Draw_stave(target_div, clef, time_signature, notes, duration, show_acci
     var context = renderer.getContext();
     context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
 
-    var stave = new VF.Stave(10, 0, staveSize);
+    var stave = new VF.Stave(10, 20, staveSize);
     if (time_signature != null) {
         stave.addTimeSignature(time_signature);
     }
@@ -690,10 +690,7 @@ function Draw_stave(target_div, clef, time_signature, notes, duration, show_acci
                     stave_note.addAccidental(note.accidentals[j].index, new VF.Accidental(note.accidentals[j].value))
                 }
             }
-            if (i != 0) {
-                stave_note.padding = Math.floor((width_per - stave_note.width) / 2 - 1);
-            }
-
+            
             stave_notes.push(stave_note);
         }
     }
