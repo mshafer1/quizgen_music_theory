@@ -1,0 +1,42 @@
+---
+type: Key Signature Identifying
+
+inputs:
+  'qType':
+    type: hidden
+    default: KeySignatureID
+    name: qType
+  'Keys per line':
+    type: number
+    default: 6
+    name: NPerLine
+    max: 10
+    min: 6
+  '# of Keys':
+    type: number
+    default: 0
+    min: 1
+    name: NKeys
+  'Keys':
+    type: multi
+    name: 'keys[]'
+    values:
+        "C/Am": "C"
+        "G/Em": "G"
+        "D/Bm": "D"
+        "A/F#m": "A"
+        "E/C#m": "E"
+        "B/G#m": "B"
+        "F#/D#m": "F#"
+        "C#/A#m": "C#"
+        "F/Dm": "F"
+        "B&#9837;/Gm": "Bb"
+        "E&#9837;/Cm": "Eb"
+        "A&#9837;/Fm": "Ab"
+        "D&#9837;/B&#9837;m": "Db"
+        "G&#9837;/E&#9837;m": "Gb"
+        "C&#9837;/A&#9837;m": "Cb"
+    
+---
+
+{% include form.html inputs=page.inputs %}
