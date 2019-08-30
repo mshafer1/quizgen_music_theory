@@ -586,7 +586,7 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys) {
     var standard_width = 150;
 
     console.log("Stave Size: ", staveSize);
-    var width_per = (staveSize - 50 - left_padding)/(keys.length - 1);
+    var width_per = (staveSize  - left_padding )/(keys.length );
     console.log("Width per: ", width_per);
     var padding = width_per;
     console.log("Padding: ", padding);
@@ -599,6 +599,11 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys) {
   
     // Create the staves
     var topStaff = new VF.Stave(15, 0, staveSize + 30);
+
+    console.log("Staff width (set): ", staveSize + 30);
+    console.log("Staff width (actual): ", topStaff.getWidth());
+    console.log("Staff X start: ", topStaff.getNoteStartX());
+
     var bottomStaff = new VF.Stave(15, DUAL_STAVE_HEIGHT, staveSize + 30);
   
     topStaff.addClef('treble');
@@ -636,10 +641,9 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys) {
         else {
             next_shift = padding - width;
         }
-        if(width != 0) {
-            next_shift -= left_padding;
-            // next_shift += (keys.length);
-        }
+        // if(width != 0) {
+        //     next_shift -= left_padding;
+        // }
         
         // if(width == 0 ) {
         //     next_shift = padding;
