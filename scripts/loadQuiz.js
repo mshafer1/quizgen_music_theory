@@ -623,7 +623,6 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_betw
         }
         signature.padding = padding;
 
-        
         next_padding = width_per - width;
         if (index == 0 && width == 0) {
             next_padding += left_padding;
