@@ -42,10 +42,10 @@ VF = Vex.Flow;
 function get_indeces(dict) {
     var indeces = dict['indexes']
 
-    console.log(typeof(indeces));
+    console.log(typeof (indeces));
     console.log("Indexes: " + indeces);
 
-    if (typeof(indeces) != 'number' && indeces.indexOf(',') != -1) {
+    if (typeof (indeces) != 'number' && indeces.indexOf(',') != -1) {
         indeces = indeces.split(',');
     }
     else {
@@ -67,24 +67,28 @@ function try_parse_triad_id_data(get_data, out_data) {
     return try_parse_quiz_data(get_data, out_data, triadIDRaw, 'NTriads', 'Triad');
 }
 
+
 function try_parse_quiz_data(get_data, out_data, quizTypeKey, NKey, dataLable) {
     var result = false;
 
-    if(get_data[qType] != quizTypeKey) {
+    if (get_data[qType] != quizTypeKey) {
         return result;
     }
 
-    if(!(NKey in get_data)) {
+    if (!('indexes' in get_data)) {
         return result;
     }
 
-    out_data.N = get_data[NKey];
+    var indeces = get_indeces(get_data);
 
-        data_keys = {N: `${NKey}${index}`, BasePitches: `BasePitches${index}[]`, Clef: `Clef${index}`};
+    for (var i = 0; i < indeces.length; i++) {
+        var index = indeces[i]
+        out_data[i] = {};
+        data_keys = { N: `${NKey}${index}`, BasePitches: `BasePitches${index}[]`, Clef: `Clef${index}` };
         data_keys[dataLable] = `${dataLable}${index}`;
         for (var key in data_keys) {
             var key_ = data_keys[key];
-            
+
             console.log("Looking for: " + key_);
 
             if (!(key_ in get_data)) {
@@ -95,10 +99,7 @@ function try_parse_quiz_data(get_data, out_data, quizTypeKey, NKey, dataLable) {
         }
     }
 
-    out_data.Keys = get_data[keysName];
-
     result = true;
-
     return result;
 }
 
@@ -110,17 +111,17 @@ function try_parse_key_type_quiz_data(get_data, out_data, expectedQuizType, NKey
     var result = false;
 
     var quizType = get_data[qType];
-    if(quizType != expectedQuizType) {
+    if (quizType != expectedQuizType) {
         return result;
     }
 
-    if(!(NKey in get_data)) {
+    if (!(NKey in get_data)) {
         return result;
     }
 
     out_data.N = get_data[NKey];
 
-    if(!(keysName in get_data)) {
+    if (!(keysName in get_data)) {
         return result;
     }
 
@@ -143,9 +144,9 @@ function init() {
         return;
     }
 
-    if(NOTES_PER_LINE in get_data) {
+    if (NOTES_PER_LINE in get_data) {
         rowSize = Number(get_data[NOTES_PER_LINE]);
-        staveSize = Math.max(staveSize, (rowSize > 0)?(rowSize * 104):0);
+        staveSize = Math.max(staveSize, (rowSize > 0) ? (rowSize * 104) : 0);
     }
     if (QuizID in get_data) {
         Math.seedrandom(Number(get_data[QuizID]));
@@ -155,7 +156,7 @@ function init() {
         (mScalesKey in get_data && mStartingNotes in get_data) ||
         (MScalesKey in get_data && MStartingNotes in get_data) ||
         (hmScalesKey in get_data && hmStartingNotes in get_data) ||
-        (mmScalesKey in get_data && mmStartingNotes in get_data)) ) {
+        (mmScalesKey in get_data && mmStartingNotes in get_data))) {
 
         title = 'Timed Scale Quiz (Major and minor)';
         prompt = 'Create the requested scale by filling in the appropriate accidentals.';
@@ -166,25 +167,25 @@ function init() {
         title = 'Timed Interval Quiz, ID';
         prompt = 'Identify the following intervals (include number and quality)';
 
-        handle_clef_grouped_data(out, 'Interval', gen_interval, show_question_label=false);
+        handle_clef_grouped_data(out, 'Interval', gen_interval, show_question_label = false);
     }
     else if (get_data[qType] == noteID) {
         title = "Timed Note Quiz, ID";
         prompt = "Identify the following notes";
 
-        handle_note_id(get_data, show_question_label=false);
+        handle_note_id(get_data, show_question_label = false);
     }
     else if (try_parse_triad_id_data(get_data, out)) {
         title = "Timed Triad Quiz, ID";
         prompt = "Identify each triad with lead sheet symbols indicating root and quality.";
-    
-        handle_clef_grouped_data(out, 'Triad', get_triad, show_question_label=false);
+
+        handle_clef_grouped_data(out, 'Triad', get_triad, show_question_label = false);
     }
-    else if(try_parse_key_signature_quiz_data(get_data, out)) {
+    else if (try_parse_key_signature_quiz_data(get_data, out)) {
         title = 'Timed Key Signature Quiz, ID';
         prompt = 'Write the correct key signatures (both major and minor) in the blanks below.';
 
-        handle_label_key_signature(out, show_question_label=false);
+        handle_label_key_signature(out, show_question_label = false);
     }
     else {
         alert("Invalid request for quiz!");
@@ -195,7 +196,7 @@ function init() {
 }
 
 
-function handle_label_key_signature(data, show_question_label=true) {
+function handle_label_key_signature(data, show_question_label = true) {
     var total = shuffled_slice(data.N, data.Keys);
     var slices = slice_array(rowSize, total);
 
@@ -218,7 +219,7 @@ function handle_label_key_signature(data, show_question_label=true) {
     });
 }
 
-function handle_note_id(data, show_question_label=true, add_bars_between_parts=true) {
+function handle_note_id(data, show_question_label = true, add_bars_between_parts = true) {
     var clefs = [TrebleClef, AltoClef, BassClef]
     var i = 0;
 
@@ -256,7 +257,7 @@ function handle_note_id(data, show_question_label=true, add_bars_between_parts=t
                 console.log(JSON.stringify(key));
                 notes.push(keys_to_note([teorian_note_to_key(key)]))
 
-                if(add_bars_between_parts && k != slice.length-1) {
+                if (add_bars_between_parts && k != slice.length - 1) {
                     notes.push(BARNote);
                 }
             }
@@ -271,7 +272,7 @@ function handle_note_id(data, show_question_label=true, add_bars_between_parts=t
             if (show_question_label) {
                 var label = document.createElement('h3');
                 label.innerHTML = '' + (i + 1) + ': ';
-                question.appendChild(label);    
+                question.appendChild(label);
             }
 
             var answer_row = gen_answer_row(slice.length, staveSize);
@@ -287,14 +288,14 @@ function handle_note_id(data, show_question_label=true, add_bars_between_parts=t
     });
 }
 
-function handle_clef_grouped_data(data, data_key, get_part, show_question_label=true, add_bars_between_parts=true) {
+function handle_clef_grouped_data(data, data_key, get_part, show_question_label = true, add_bars_between_parts = true) {
     var compiled_data = [];
     for (var key in data) {
         var clef = data[key].Clef;
         var data_value = data[key][data_key];
         var base_pitches = data[key].BasePitches;
 
-        var info = base_pitches.map(function(base_pitch) {
+        var info = base_pitches.map(function (base_pitch) {
             return new IntervalInfo(base_pitch, data_value, clef);
         });
 
@@ -318,10 +319,10 @@ function handle_clef_grouped_data(data, data_key, get_part, show_question_label=
         var clef_parts = shuffle(compiled_data.filter(function (item) { return item.clef == clef; }));
 
         var slices = slice_array(rowSize, clef_parts);
-        
-        for(var j = 0; j < slices.length; j++) {
+
+        for (var j = 0; j < slices.length; j++) {
             var slice = slices[j];
-       
+
             stave = new_stave('Stave' + i);
             console.log("new stave");
 
@@ -338,12 +339,12 @@ function handle_clef_grouped_data(data, data_key, get_part, show_question_label=
 
                 var keys = get_part(part.starting_note, part.interval);
 
-                console.log("Keys: " , keys);
-                
+                console.log("Keys: ", keys);
+
                 console.log("Keys: " + JSON.stringify(keys));
                 notes.push(keys_to_note(keys));
 
-                if(add_bars_between_parts && index != slice.length-1) {
+                if (add_bars_between_parts && index != slice.length - 1) {
                     notes.push(BARNote);
                 }
             });
@@ -354,7 +355,7 @@ function handle_clef_grouped_data(data, data_key, get_part, show_question_label=
             question = new_stave("Stave" + i);
             question.classList.add("nosplit");
 
-            if(show_question_label) {
+            if (show_question_label) {
                 var label = document.createElement('h3');
                 label.innerHTML = '' + (i + 1) + ': ';
                 question.appendChild(label);
@@ -462,7 +463,7 @@ function handle_label_scale(data) {
         var accidental = '';
         if (start_note.accidental == 'b') {
             accidental = '&#9837;';
-        } else if(start_note.accidental == '#') {
+        } else if (start_note.accidental == '#') {
             accidental = '#';
         }
         console.log('Start_Note: ', start_note);
@@ -477,7 +478,7 @@ function handle_label_scale(data) {
     }
 }
 
-function gen_answer_row(n_answers, width, lable=null) {
+function gen_answer_row(n_answers, width, lable = null) {
 
     var result = document.createElement('div');
     var lable_span = '';
@@ -556,15 +557,15 @@ function gen_scale(mM, starting_note) {
     }
 
     for (var i = 0; i < notes.length; i++) {
-        result.push(teorian_note_to_key(String(notes[i]), keep_accidental=i==0));
+        result.push(teorian_note_to_key(String(notes[i]), keep_accidental = i == 0));
     }
 
-    result.push(teorian_note_to_key(note.name() + note.accidental() + (note.octave() + 1), keep_accidental=true));
+    result.push(teorian_note_to_key(note.name() + note.accidental() + (note.octave() + 1), keep_accidental = true));
 
     if (mM == MelodicMinor) {
         var reversed = notes.reverse();
-        for(var i = 0; i < reversed.length; i++) {
-            result.push(teorian_note_to_key(String(reversed[i]), keep_accidental=i+1==reversed.length));
+        for (var i = 0; i < reversed.length; i++) {
+            result.push(teorian_note_to_key(String(reversed[i]), keep_accidental = i + 1 == reversed.length));
         }
     }
 
@@ -577,13 +578,13 @@ function new_stave(id = '') {
     return result;
 }
 
-function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_between_parts=true) {
+function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_between_parts = true) {
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
-    renderer.resize(staveSize + 200, STAVE_HEIGHT*1.2);
+    renderer.resize(staveSize + 200, STAVE_HEIGHT * 1.2);
 
-    var context = renderer.getContext();    
+    var context = renderer.getContext();
     context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
-  
+
     // Create the staves
     var topStaff = new VF.Stave(15, 0, staveSize + 30);
     var bottomStaff = new VF.Stave(15, DUAL_STAVE_HEIGHT, staveSize + 30);
@@ -591,32 +592,32 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_betw
     topStaff.addClef('treble');
     bottomStaff.addClef('bass');
 
-    if( time_signature != null) {
+    if (time_signature != null) {
         topStaff.addTimeSignature(time_signature);
         bottomStaff.addTimeSignature(time_signature);
     }
 
     var stave_width = topStaff.getWidth();
     var left_padding = topStaff.getNoteStartX();
-    var width_per = (stave_width  - left_padding )/(keys.length);
+    var width_per = (stave_width - left_padding) / (keys.length);
 
     // TODO (mshafer) use the enum names
     var brace = new Vex.Flow.StaveConnector(topStaff, bottomStaff).setType(3);
     var lineLeft = new Vex.Flow.StaveConnector(topStaff, bottomStaff).setType(1);
     var lineRight = new Vex.Flow.StaveConnector(topStaff, bottomStaff).setType(6);
-  
+
 
     topStaff.setContext(context);
     bottomStaff.setContext(context);
 
     var next_padding = 0;
     keys.forEach(function (key, index) {
-    		console.log(key);
+        console.log(key);
         var signature = new VF.KeySignature(key);
 
         signature.addToStave(topStaff);
         var width = signature.getWidth();
-        
+
         var padding = left_padding;
         if (index > 0) {
             padding = next_padding;
@@ -626,16 +627,16 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_betw
         next_padding = width_per - width;
         if (index == 0 && width == 0) {
             next_padding += left_padding;
-        } else if(width == 0) {
+        } else if (width == 0) {
             next_padding += padding;
         }
 
         var signature = new VF.KeySignature(key);
-        
+
         signature.padding = padding;
 
         signature.addToStave(bottomStaff);
-   });
+    });
 
     topStaff.draw();
     bottomStaff.draw();
@@ -662,7 +663,7 @@ function Draw_stave(target_div, clef, time_signature, notes, duration, show_acci
 
     var stave_width = stave.getWidth();
     var left_padding = stave.getNoteStartX();
-    var width_per = (stave_width  - left_padding )/(notes.length);
+    var width_per = (stave_width - left_padding) / (notes.length);
 
     var stave_notes = []
     for (var i = 0; i < notes.length; i++) {
@@ -685,7 +686,7 @@ function Draw_stave(target_div, clef, time_signature, notes, duration, show_acci
                     stave_note.addAccidental(note.accidentals[j].index, new VF.Accidental(note.accidentals[j].value))
                 }
             }
-            
+
             stave_notes.push(stave_note);
         }
     }
