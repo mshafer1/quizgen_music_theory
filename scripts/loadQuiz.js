@@ -11,6 +11,7 @@ const scaleRaw = 'ScaleLabel';
 const intervalRaw = 'IntervalID';
 const noteID = 'NoteID';
 const triadIDRaw = 'TriadID';
+const triadConstructionraw = 'TriadConst';
 const signatureIDRaw = 'KeySignatureID';
 
 const QuizID = 'ID';
@@ -28,7 +29,7 @@ const Intervals = 'Intervals[]';
 const BARNote = {}; // create an object
 
 
-const STAVE_HEIGHT = 150;
+STAVE_HEIGHT = 150;
 const DUAL_STAVE_HEIGHT = 75;
 
 const NOTES_PER_LINE = 'NPerLine';
@@ -67,6 +68,9 @@ function try_parse_triad_id_data(get_data, out_data) {
     return try_parse_quiz_data(get_data, out_data, triadIDRaw, 'NTriads', 'Triad');
 }
 
+function try_parse_triad_construction_data(get_data, out_data) {
+    return try_parse_quiz_data(get_data, out_data, triadConstructionraw, 'NTriads', 'Triad');
+}
 
 function try_parse_quiz_data(get_data, out_data, quizTypeKey, NKey, dataLable) {
     var result = false;
@@ -187,6 +191,12 @@ function init() {
 
         handle_label_key_signature(out, show_question_label = false);
     }
+    else if (try_parse_triad_construction_data(get_data, out)) {
+        title = 'Timed Triad Quiz, Construction';
+        prompt = 'Write the requested triad in root position. Pay careful attention to clef signs.';
+
+        handle_clef_grouped_construction(out, 'Triad', show_question_label = false);
+    }
     else {
         alert("Invalid request for quiz!");
         return;
@@ -281,6 +291,111 @@ function handle_note_id(data, show_question_label = true, add_bars_between_parts
             question.appendChild(answer_row);
 
             // add to staves
+            staves.push(question);
+
+            i++;
+        }
+    });
+}
+
+function handle_clef_grouped_construction(data, data_key, add_bars_between_parts = false) {
+    var compiled_data = [];
+    for (var key in data) {
+        var clef = data[key].Clef;
+        var data_value = data[key][data_key];
+        var base_pitches = data[key].BasePitches;
+
+        var info = base_pitches.map(function (base_pitch) {
+            return new IntervalInfo(base_pitch, data_value, clef);
+        });
+
+        var part = shuffled_slice(data[key].N, info);
+
+        compiled_data = compiled_data.concat(part);
+    }
+
+    console.log("Compiled Data: ", compiled_data);
+
+    var clef = null;
+
+    var clef_order = [TrebleClef, AltoClef, BassClef];
+
+    var i = 0;
+
+
+    clef_order.forEach(function (clef) {
+        console.log("Clef: ", clef);
+
+        var clef_parts = shuffle(compiled_data.filter(function (item) { return item.clef == clef; }));
+
+        var slices = slice_array(rowSize, clef_parts);
+
+        for (var j = 0; j < slices.length; j++) {
+            var slice = slices[j];
+
+            stave = new_stave('Stave' + i);
+            console.log("new stave");
+
+            var notes = []
+
+            // answer_row = gen_answer_row(slice.length, staveSize);
+
+            console.log("Slice: ", slice);
+
+            var answer_lables = [];
+
+            slice.forEach(function (part, index) {
+                console.log('Part: ', part);
+                console.log("Part starting note: ", part.starting_note);
+                console.log("Part info: ", part.interval);
+
+                var note = teorian_note_to_key(part.starting_note);
+
+                var answer = note.letter;
+                if(note.accidental == 'b') {
+                    answer += '&#9837;'
+                } else {
+                    answer += note.accidental;
+                }
+
+                if (part.interval == 'dim') {
+                    answer += '&deg;'
+                } else if (part.interval == 'augmented') {
+                    answer += '+'
+                } else if (part.interval == 'm' || part.interval == 'M') {
+                    answer += part.interval;
+                }
+
+                answer_lables.push(answer);
+
+                console.log("Keys: " + JSON.stringify(answer_lables));
+
+                if (add_bars_between_parts && index != slice.length - 1) {
+                    notes.push(BARNote);
+                }
+            });
+
+            var answer_row = gen_answer_row(slice.length, staveSize, lable=null, answers=answer_lables);
+
+            console.log("Notes: " + JSON.stringify(notes));
+            Draw_stave(stave, clef, null, [], 'w', false, 15);
+
+            question = new_stave("Stave" + i);
+            question.classList.add("nosplit");
+
+            if (show_question_label) {
+                var label = document.createElement('h3');
+                label.innerHTML = '' + (i + 1) + ': ';
+                question.appendChild(label);
+            }
+
+            question.appendChild(stave);
+            stave.classList.add('no-above-padding');
+
+            question.appendChild(answer_row);
+            question.appendChild(document.createElement('br'));
+            question.appendChild(document.createElement('br'));
+
             staves.push(question);
 
             i++;
@@ -478,7 +593,7 @@ function handle_label_scale(data) {
     }
 }
 
-function gen_answer_row(n_answers, width, lable = null) {
+function gen_answer_row(n_answers, width, lable = null, answers = null) {
 
     var result = document.createElement('div');
     var lable_span = '';
@@ -502,6 +617,10 @@ function gen_answer_row(n_answers, width, lable = null) {
             result.appendChild(part);
 
             if (j == 1) {
+                if (answers != null) {
+                    var answer = answers[i];
+                    part.innerHTML = answer;
+                }
                 part.classList.add("answer-inline");
                 part.style.width = answer_width + 'px';
                 // part.innerHTML = "<hr/>";
@@ -510,7 +629,6 @@ function gen_answer_row(n_answers, width, lable = null) {
                 part.innerHTML = '';
                 part.style.width = padding + 'px';
             }
-
         }
     }
 
@@ -646,13 +764,14 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_betw
     lineRight.setContext(context).draw();
 }
 
-function Draw_stave(target_div, clef, time_signature, notes, duration, show_accidentals = true) {
+function Draw_stave(target_div, clef, time_signature, notes, duration, show_accidentals = true, spacing=10) {
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
     renderer.resize(staveSize + 200, STAVE_HEIGHT);
     var context = renderer.getContext();
     context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
 
-    var stave = new VF.Stave(10, 20, staveSize);
+    var stave = new VF.Stave(10, 10, staveSize);
+    stave.options.spacing_between_lines_px = spacing;
     if (time_signature != null) {
         stave.addTimeSignature(time_signature);
     }

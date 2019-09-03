@@ -34,6 +34,7 @@ div.answer-inline {
     border-bottom: 1px solid black;
     color: black;
     width: 30px;
+    text-align: center;
 }
 
 {% include key.css key_name="black_key" key_width=site.key_width key_height=site.black_height color=444 fade_color="0a0a0a" hover_color="afafaf" font_color="9090a0" %}
