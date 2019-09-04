@@ -1,0 +1,191 @@
+---
+type: Intervals Construction
+
+
+quizType:
+  type: hidden
+  default: IntervalConst
+  name: qType
+
+notesPerLine:
+  type: number
+  default: 6
+  name: NPerLine
+  max: 10
+
+children:
+  'index':
+    type: hidden
+    default: '${n}'
+    class: 'js-index'
+
+  '# of Intervals':
+    type: number
+    default: 4
+    name: 'NIntervals${n}'
+    width: 4
+    lable_width: m5 s12
+    child_width: m7 s12
+  
+  'Clef':
+    type: select
+    name: 'Clef${n}'
+    width: 2
+    lable_width: m3 s12
+    child_with: m9 s12
+    values:
+      "Treble": "treble"
+      "Alto": "alto"
+      "Bass": "bass"
+
+  'Interval':
+    type: select
+    name: 'Interval${n}'
+    width: 4
+    lable_width: m3 s12
+    child_width: m9 s12
+    values:
+      "Augmented unison up": "Au1"
+      "Augmented unison down": "Ad1"
+      "Minor second up": "mu2"
+      "Minor second down": "md2"
+      "Major second up": "Mu2"
+      "Major second down": "Md2"
+      "Augmented second up": "Au2"
+      "Augmented second down": "Ad2"
+      "Minor third up": "mu3"
+      "Minor third down": "md3"
+      "Major third up": "Mu3"
+      "Major third down": "Md3"
+      "Augmented third up": "Au3"
+      "Augmented third down": "Ad3"
+      "Diminished third up": "du3"
+      "Diminished third down": "dd3"
+      "Diminished fourth up": "du4"
+      "Diminished fourth down": "dd4"
+      "Perfect fourth up": "Pu4"
+      "Perfect fourth down": "Pd4"
+      "Augmented fourth up": "Au4"
+      "Augmented fourth down": "Ad4"
+      "Diminished fifth up": "du4"
+      "Diminished fifth down": "dd4"
+      "Perfect fifth up": "Pu5"
+      "Perfect fifth down": "Pd5"
+      "Augmented fifth up": "Au5"
+      "Augmented fifth down": "Ad5"
+      "Minor sixth up": "mu6"
+      "Minor sixth down": "md6"
+      "Major sixth up": "Mu6"
+      "Major sixth down": "Md6"
+      "Diminished sixth up": "du6"
+      "Diminished sixth down": "dd6"
+      "Augmented sixth up": "Au6"
+      "Augmented sixth down": "Ad6"
+      "Minor seventh up": "mu7"
+      "Minor seventh down": "md7"
+      "Major seventh up": "Mu7"
+      "Major seventh down": "Md7"
+      "Diminished seventh up": "du7"
+      "Diminished seventh down": "dd7"
+      "Augmented seventh up": "Au7"
+      "Augmented seventh down": "Ad7"
+      "Perfect octave up": "Pu8"
+      "Perfect octave down": "Pd8"
+      "Diminished octave up": "du8"
+      "Diminished octave down": "dd8"
+  
+  'X':
+    type: button
+    onclick: onclick="delete_row(${n})"
+    width: 2
+
+  'Starting Notes':
+    type: keyboard_template
+    name: 'BasePitches${n}[]'
+    width: 12
+    lable_width: l1 m12 s12
+    child_width: l11 m12 s12
+---
+
+<script>
+  var index = 0;
+  function genRow(n) {
+    {% include _keyboard_script.js index='n' %}
+
+    return `{% include nested.html children=page.children %}`
+  }
+
+  function add_row() {
+    row = $(`<div id="Row_${index}" class="w3-padding"></div>`)
+    row.html(genRow(index));
+    index += 1;
+    $('#stack').append(row);
+    resize();
+  }
+
+  function delete_row(n) {
+    $('#Row_' + n).remove();
+  }
+
+  function pre_submit() {
+    // check if #indexes already exists, and if so, delet it
+    $('#indexes').remove();
+
+    // compile list of valid IDs into hidden input then submit.
+
+    var ids = [];
+    $(".js-index").each(function() {
+        ids.push($(this).val());
+    });
+
+    var form = $('form');
+    
+    var input = $('<input>').attr({
+      type: 'hidden',
+      id: 'indexes',
+      name: 'indexes',
+      value: ids,
+    })
+
+    form.append(input);
+
+    console.log(ids);
+    return true;
+  }
+</script>
+
+<form action="/quiz.html" method="GET" target="_blank" onsubmit=" return pre_submit()">
+  <div>
+      <input type="hidden" value="" name="ID" id="_ID"/>
+      <script>
+          $('#_ID').val(Math.floor(Math.random() * 90000 + 1000));
+      </script>
+      {% assign count=0 %}
+
+      {% assign input=site._empty_array | push: 'qType' | push: page.quizType  %}
+      {% include basic_input.html %}
+
+        
+      
+      
+      <div id="stack" class="w3-margin-top striped-w3">
+        <div></div>
+        <div class="w3-row-padding w3-margin w3-padding">
+        {% assign input=site._empty_array | push: '# notes per line' | push: page.notesPerLine %}
+        {% include input_selector input=input %}
+        </div>    
+      </div>
+
+      <script>
+        add_row();
+      </script>
+
+      <div class="w3-row-padding center w3-padding">
+        <button type="button" class="w3-btn w3-black" onclick="add_row()">+</button>
+      </div>
+
+      <div class="w3-row-padding w3-margin-top w3-margin w3-padding">
+          <input type="submit" class="w3-btn w3-black" value="Generate"/>
+      </div>
+  </div>
+</form>

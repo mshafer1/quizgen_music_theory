@@ -9,9 +9,10 @@ const mmScalesKey = 'mmScales';
 
 const scaleRaw = 'ScaleLabel';
 const intervalRaw = 'IntervalID';
+const intervalConstructionRaw = 'IntervalConst';
 const noteID = 'NoteID';
 const triadIDRaw = 'TriadID';
-const triadConstructionraw = 'TriadConst';
+const triadConstructionRaw = 'TriadConst';
 const signatureIDRaw = 'KeySignatureID';
 
 const QuizID = 'ID';
@@ -69,7 +70,11 @@ function try_parse_triad_id_data(get_data, out_data) {
 }
 
 function try_parse_triad_construction_data(get_data, out_data) {
-    return try_parse_quiz_data(get_data, out_data, triadConstructionraw, 'NTriads', 'Triad');
+    return try_parse_quiz_data(get_data, out_data, triadConstructionRaw, 'NTriads', 'Triad');
+}
+
+function try_parse_interval_construction_data(get_data, out_data) {
+    return try_parse_quiz_data(get_data, out_data, intervalConstructionRaw, 'NIntervals', 'Interval');
 }
 
 function try_parse_quiz_data(get_data, out_data, quizTypeKey, NKey, dataLable) {
@@ -195,7 +200,17 @@ function init() {
         title = 'Timed Triad Quiz, Construction';
         prompt = 'Write the requested triad in root position. Pay careful attention to clef signs.';
 
-        handle_clef_grouped_construction(out, 'Triad', show_question_label = false);
+        STAVE_HEIGHT *= 1.1;
+        
+        handle_clef_grouped_construction(out, 'Triad', TriadConstructionAnswerGen, (_) => null, add_bars_between_parts=false, show_question_label = false, show_accidentals=false);
+    }
+    else if(try_parse_interval_construction_data(get_data, out)) {
+        title = 'Timed Interval Quiz, Construction';
+        prompt = 'Write the requested interval on the staff.';
+
+        STAVE_HEIGHT *= 1.1;
+
+        handle_clef_grouped_construction(out, 'Interval', IntervalConstructionAnswerGen, ReturnBaseNote, add_bars_between_parts=true, show_question_label = false, show_accidentals=true);
     }
     else {
         alert("Invalid request for quiz!");
@@ -298,7 +313,7 @@ function handle_note_id(data, show_question_label = true, add_bars_between_parts
     });
 }
 
-function handle_clef_grouped_construction(data, data_key, add_bars_between_parts = false) {
+function handle_clef_grouped_construction(data, data_key, gen_answer, gen_note, add_bars_between_parts = false, show_question_label = false, show_accidentals=true) {
     var compiled_data = [];
     for (var key in data) {
         var clef = data[key].Clef;
@@ -338,8 +353,6 @@ function handle_clef_grouped_construction(data, data_key, add_bars_between_parts
 
             var notes = []
 
-            // answer_row = gen_answer_row(slice.length, staveSize);
-
             console.log("Slice: ", slice);
 
             var answer_lables = [];
@@ -349,21 +362,13 @@ function handle_clef_grouped_construction(data, data_key, add_bars_between_parts
                 console.log("Part starting note: ", part.starting_note);
                 console.log("Part info: ", part.interval);
 
-                var note = teorian_note_to_key(part.starting_note);
-
-                var answer = note.letter;
-                if(note.accidental == 'b') {
-                    answer += '&#9837;'
-                } else {
-                    answer += note.accidental;
-                }
-
-                if (part.interval == 'dim') {
-                    answer += '&deg;'
-                } else if (part.interval == 'augmented') {
-                    answer += '+'
-                } else if (part.interval == 'm' || part.interval == 'M') {
-                    answer += part.interval;
+                var answer = gen_answer(part);
+                var _notes = gen_note(part);
+                if (_notes != null) {
+                    console.log("Receivede Notes: ", _notes);
+                    _notes.forEach(function (note) {
+                        notes.push(note);
+                    });
                 }
 
                 answer_lables.push(answer);
@@ -378,7 +383,7 @@ function handle_clef_grouped_construction(data, data_key, add_bars_between_parts
             var answer_row = gen_answer_row(slice.length, staveSize, lable=null, answers=answer_lables);
 
             console.log("Notes: " + JSON.stringify(notes));
-            Draw_stave(stave, clef, null, [], 'w', false, 15);
+            Draw_stave(stave, clef, null, notes, 'w', show_accidentals, 15);
 
             question = new_stave("Stave" + i);
             question.classList.add("nosplit");
@@ -401,6 +406,49 @@ function handle_clef_grouped_construction(data, data_key, add_bars_between_parts
             i++;
         }
     });
+}
+
+function ReturnBaseNote(part) {
+    var note = keys_to_note([teorian_note_to_key(part.starting_note)]);
+    note.padding = 30;
+    var result = [note];
+
+    return result;
+}
+
+function IntervalConstructionAnswerGen(part) {
+    var note = teorian_note_to_key(part.interval);
+    
+    var result = note.letter + note.octave + " ";
+    if(note.accidental == "u") {
+        result += "up";
+    } else if(note.accidental == "d") {
+        result += "down";
+    } else {
+        console.error("Unknownd interval direction: ", note);
+    }
+    return result;
+}
+
+function TriadConstructionAnswerGen(part) {
+    var note = teorian_note_to_key(part.starting_note);
+    var answer = note.letter;
+    if (note.accidental == 'b') {
+        answer += '&#9837;';
+    }
+    else {
+        answer += note.accidental;
+    }
+    if (part.interval == 'dim') {
+        answer += '&deg;';
+    }
+    else if (part.interval == 'augmented') {
+        answer += '+';
+    }
+    else if (part.interval == 'm' || part.interval == 'M') {
+        answer += part.interval;
+    }
+    return answer;
 }
 
 function handle_clef_grouped_data(data, data_key, get_part, show_question_label = true, add_bars_between_parts = true) {
@@ -799,6 +847,10 @@ function Draw_stave(target_div, clef, time_signature, notes, duration, show_acci
                 keys: note.keys,
                 duration: duration,
             });
+
+            if(note.padding != undefined) {
+                stave_note.extraLeftPx = note.padding;
+            }
 
             if (show_accidentals && note.accidentals != null) {
                 for (j = 0; j < note.accidentals.length; j++) {
