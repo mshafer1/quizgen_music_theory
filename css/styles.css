@@ -80,6 +80,10 @@ div.answer-inline {
     break-after: avoid;
 }
 
+.onTop {
+    z-index: 100!important;
+}
+
 @media print {
     .print-hide {
         display: none!important;
