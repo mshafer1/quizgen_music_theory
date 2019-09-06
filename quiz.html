@@ -8,9 +8,9 @@ title: Quiz
     <script src="/scripts/vexflow/vexflow-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/seedrandom/2.4.3/seedrandom.min.js"></script>
     <script src="/scripts/teoria/teoria.js"></script>
-    <script src="/scripts/getHelpers.js"></script>
-    <script src="/scripts/conversionMethods.js"></script>
-    <script src="/scripts/loadQuiz.js"></script>
+    <script src="/scripts/getHelpers.js?{{ site.time | url_encode }}"></script>
+    <script src="/scripts/conversionMethods.js?{{ site.time | url_encode }}"></script>
+    <script src="/scripts/loadQuiz.js?{{ site.time | url_encode }}"></script>
   </head>
   <body class="QuizBody w3-margin">
     <button class="w3-button w3-black print-hide w3-right" onclick="window.print(); return false;">Print</button>
