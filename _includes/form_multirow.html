@@ -1,0 +1,29 @@
+{% assign quizType=include.quizType %}
+
+<form action="/quiz.html" method="GET" target="_blank" onsubmit=" return pre_submit()">
+    <div>
+      <input type="hidden" value="" name="ID" id="_ID" />
+      <script>
+        $('#_ID').val(Math.floor(Math.random() * 90000 + 1000));
+      </script>
+      {% assign count=0 %}
+  
+      <div id="stack" class="w3-margin-top striped-w3">
+            {% for input in include.inputs %}
+                {% include form_row.html %}
+            {% endfor %}
+      </div>    
+  
+      <script>
+        add_row();
+      </script>
+  
+      <div class="w3-row-padding center w3-padding">
+        <button type="button" class="w3-btn w3-black" onclick="add_row()">+</button>
+      </div>
+  
+      <div class="w3-row-padding w3-margin-top w3-margin w3-padding">
+        <input type="submit" class="w3-btn w3-black" value="Generate" />
+      </div>
+    </div>
+  </form>
