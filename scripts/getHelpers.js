@@ -43,7 +43,7 @@ function load_get() { //originally from https:///stackoverflow.com/a/12049737 - 
 
 function load_value(raw) {
     result = Number(raw);
-    if (typeof(result) != 'number' || isNaN(result) || raw.length == 0) {
+    if (typeof(result) != 'number' || isNaN(result) || ('' + raw).trim().length == 0) {
         return raw;
     }
     else {
