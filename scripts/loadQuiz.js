@@ -164,23 +164,16 @@ function init() {
     if (QuizID in get_data) {
         Math.seedrandom(Number(get_data[QuizID]));
     }
-    if (TITLE in get_data) {
-        title = get_data[TITLE];
-    }
-    if(PROMPT in get_data) {
-        prompt = get_data[PROMPT];
-    }
-    if(HEADER in get_data) {
-        header = get_data[HEADER];
-        console.log("Header", header);
-    }
 
     if (get_data[qType] == scaleRaw && (
         (mScalesKey in get_data && mStartingNotes in get_data) ||
         (MScalesKey in get_data && MStartingNotes in get_data) ||
         (hmScalesKey in get_data && hmStartingNotes in get_data) ||
         (mmScalesKey in get_data && mmStartingNotes in get_data))) {
-            
+        
+        title = 'Timed Scale Quiz (Major and minor)';
+        prompt = 'Create the requested scale by filling in the appropriate accidentals.';    
+        
         handle_label_scale(get_data);
     }
     else if (try_parse_interval_data(get_data, out)) {
@@ -199,6 +192,8 @@ function init() {
         handle_clef_grouped_data(out, 'Triad', get_triad, show_question_label = false);
     }
     else if (try_parse_key_signature_quiz_data(get_data, out)) {
+        title = 'Timed Key Signature Quiz, ID';
+        prompt = 'Write the correct key signatures (both major and minor) in the blanks below.';
 
         handle_label_key_signature(out, show_question_label = false);
     }
@@ -223,7 +218,26 @@ function init() {
         return;
     }
 
+    // apply here so defaults can be stored above
+    title = safe_load_variable(TITLE, get_data, title);
+    prompt = safe_load_variable(PROMPT, get_data, prompt);
+    header = safe_load_variable(HEADER, get_data, header);
+
     write_doc();
+}
+
+function safe_load_variable(key, data, _default=null) {
+    if (key in data && ('' + data[key]).length > 0) {
+        return safe(data[key]);
+    }
+    else {
+        return _default;
+    }
+}
+
+function safe(raw) {
+    // in theory, encodURI works to, but this makes it display what they put, rather then a URL
+    return raw.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;');
 }
 
 
