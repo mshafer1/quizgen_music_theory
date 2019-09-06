@@ -83,52 +83,7 @@ children:
     child_width: m11 s9
 ---
 
-<script>
-  var index = 0;
-  function genRow(n) {
-    {% include _keyboard_script.js index='n' %}
-
-    return `{% include nested.html children=page.children %}`
-  }
-
-  function add_row() {
-    row = $(`<div id="Row_${index}" class="w3-padding"></div>`)
-    row.html(genRow(index));
-    index += 1;
-    $('#stack').append(row);
-    resize();
-  }
-
-  function delete_row(n) {
-    $('#Row_' + n).remove();
-  }
-
-  function pre_submit() {
-    // check if #indexes already exists, and if so, delet it
-    $('#indexes').remove();
-
-    // compile list of valid IDs into hidden input then submit.
-
-    var ids = [];
-    $(".js-index").each(function () {
-      ids.push($(this).val());
-    });
-
-    var form = $('form');
-
-    var input = $('<input>').attr({
-      type: 'hidden',
-      id: 'indexes',
-      name: 'indexes',
-      value: ids,
-    })
-
-    form.append(input);
-
-    console.log(ids);
-    return true;
-  }
-</script>
+{% include _row_gen.html children=page.children %}
 
 <form action="/quiz.html" method="GET" target="_blank" onsubmit=" return pre_submit()">
   <div>
