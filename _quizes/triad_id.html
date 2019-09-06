@@ -90,7 +90,7 @@ children:
     // compile list of valid IDs into hidden input then submit.
 
     var ids = [];
-    $(".js-index").each(function() {
+    $(".js-index").each(function () {
         ids.push($(this).val());
     });
 
@@ -112,7 +112,7 @@ children:
 
 <form action="/quiz.html" method="GET" target="_blank" onsubmit=" return pre_submit()">
   <div>
-      <input type="hidden" value="" name="ID" id="_ID"/>
+    <input type="hidden" value="" name="ID" id="_ID" />
       <script>
           $('#_ID').val(Math.floor(Math.random() * 90000 + 1000));
       </script>
@@ -121,9 +121,6 @@ children:
       {% assign input=site._empty_array | push: 'qType' | push: page.quizType  %}
       {% include basic_input.html %}
 
-        
-      
-      
       <div id="stack" class="w3-margin-top striped-w3">
         <div></div>
         <div class="w3-row-padding w3-margin w3-padding">
@@ -141,7 +138,7 @@ children:
       </div>
 
       <div class="w3-row-padding w3-margin-top w3-margin w3-padding">
-          <input type="submit" class="w3-btn w3-black" value="Generate"/>
+      <input type="submit" class="w3-btn w3-black" value="Generate" />
       </div>
   </div>
 </form>
