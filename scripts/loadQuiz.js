@@ -219,11 +219,15 @@ function init() {
     }
 
     // apply here so defaults can be stored above
-    title = safe_load_variable(TITLE, get_data, title);
-    prompt = safe_load_variable(PROMPT, get_data, prompt);
-    header = safe_load_variable(HEADER, get_data, header);
+    title = wrap_in_element('h1', safe_load_variable(TITLE, get_data, title));
+    prompt = wrap_in_element('p', safe_load_variable(PROMPT, get_data, prompt));
+    header =  wrap_in_element('p', safe_load_variable(HEADER, get_data, header));
 
     write_doc();
+}
+
+function wrap_in_element(element, piggy) {
+    return `<${element}>${piggy}</${element}>`
 }
 
 function safe_load_variable(key, data, _default=null) {
@@ -237,7 +241,7 @@ function safe_load_variable(key, data, _default=null) {
 
 function safe(raw) {
     // in theory, encodURI works to, but this makes it display what they put, rather then a URL
-    return raw.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;');
+    return String('' + raw).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;');
 }
 
 
@@ -899,11 +903,11 @@ function Draw_stave(target_div, clef, time_signature, notes, duration, show_acci
 
 
 function write_doc() {
-    $(`<h1>${title}</h1>`).appendTo('body');
+    $(title).appendTo('body');
 
-    $(`<p>${prompt}</p>`).appendTo('body');
+    $(prompt).appendTo('body');
 
-    $(`<p>${header}</p>`).appendTo('body');
+    $(header).appendTo('body');
 
     for (var i = 0; i < staves.length; i++) {
         var stave = staves[i];
