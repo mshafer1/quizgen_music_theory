@@ -110,12 +110,12 @@ children:
     // compile list of valid IDs into hidden input then submit.
 
     var ids = [];
-    $(".js-index").each(function() {
-        ids.push($(this).val());
+    $(".js-index").each(function () {
+      ids.push($(this).val());
     });
 
     var form = $('form');
-    
+
     var input = $('<input>').attr({
       type: 'hidden',
       id: 'indexes',
@@ -132,36 +132,33 @@ children:
 
 <form action="/quiz.html" method="GET" target="_blank" onsubmit=" return pre_submit()">
   <div>
-      <input type="hidden" value="" name="ID" id="_ID"/>
-      <script>
-          $('#_ID').val(Math.floor(Math.random() * 90000 + 1000));
-      </script>
-      {% assign count=0 %}
+    <input type="hidden" value="" name="ID" id="_ID" />
+    <script>
+      $('#_ID').val(Math.floor(Math.random() * 90000 + 1000));
+    </script>
+    {% assign count=0 %}
 
-      {% assign input=site._empty_array | push: 'qType' | push: page.quizType  %}
-      {% include basic_input.html %}
+    {% assign input=site._empty_array | push: 'qType' | push: page.quizType  %}
+    {% include basic_input.html %}
 
-        
-      
-      
-      <div id="stack" class="w3-margin-top striped-w3">
-        <div></div>
-        <div class="w3-row-padding w3-margin w3-padding">
+    <div id="stack" class="w3-margin-top striped-w3">
+      <div></div>
+      <div class="w3-row-padding w3-margin w3-padding">
         {% assign input=site._empty_array | push: '# notes per line' | push: page.notesPerLine %}
         {% include input_selector input=input %}
-        </div>    
       </div>
+    </div>    
 
-      <script>
-        add_row();
-      </script>
+    <script>
+      add_row();
+    </script>
 
-      <div class="w3-row-padding center w3-padding">
-        <button type="button" class="w3-btn w3-black" onclick="add_row()">+</button>
-      </div>
+    <div class="w3-row-padding center w3-padding">
+      <button type="button" class="w3-btn w3-black" onclick="add_row()">+</button>
+    </div>
 
-      <div class="w3-row-padding w3-margin-top w3-margin w3-padding">
-          <input type="submit" class="w3-btn w3-black" value="Generate"/>
-      </div>
+    <div class="w3-row-padding w3-margin-top w3-margin w3-padding">
+      <input type="submit" class="w3-btn w3-black" value="Generate" />
+    </div>
   </div>
 </form>

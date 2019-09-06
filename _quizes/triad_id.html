@@ -66,7 +66,7 @@ children:
 <script>
   var index = 0;
   function genRow(n) {
-    {% include _keyboard_script.js index = 'n' %}
+    {% include _keyboard_script.js index='n' %}
 
     return `{% include nested.html children=page.children %}`
   }
@@ -127,7 +127,7 @@ children:
         {% assign input=site._empty_array | push: '# notes per line' | push: page.notesPerLine %}
         {% include input_selector input=input %}
       </div>
-    </div>
+    </div>    
 
     <script>
       add_row();
