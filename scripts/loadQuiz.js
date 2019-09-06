@@ -183,6 +183,9 @@ function init() {
         handle_clef_grouped_data(out, 'Interval', gen_interval, show_question_label = false);
     }
     else if (get_data[qType] == noteID) {
+        title = "Timed Note Quiz, ID";
+        prompt = "Identify the following notes";
+
         handle_note_id(get_data, show_question_label = false);
     }
     else if (try_parse_triad_id_data(get_data, out)) {
