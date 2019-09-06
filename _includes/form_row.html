@@ -1,0 +1,17 @@
+{% assign lable_width='s2' %}
+{% if input[1]=>lable_width %}
+{% assign lable_width=input[1]=>lable_width %}
+{% endif %}
+
+{% assign child_width='s8' %}
+{% if input[1]=>child_width %}
+{% assign child_width=input[1]["child_width"] %}
+{% endif %}
+
+{% if input[1]=>type == "hidden" %}
+    {% include basic_input.html %}
+{% else %}
+    <div class="w3-row-padding w3-margin-top w3-margin w3-padding">
+        {% include input_selector inputs=input count=count width=child_width lable_width=lable_width %}
+    </div>
+{% endif %}
