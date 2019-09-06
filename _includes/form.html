@@ -6,13 +6,7 @@
         </script>
         {% assign count=0 %}
         {% for input in include.inputs %}
-            {% if input[1]=>type == "hidden" %}
-                {% include basic_input.html %}
-            {% else %}
-                <div class="w3-row-padding w3-margin-top w3-margin w3-padding">
-                    {% include input_selector inputs=input count=count %}
-                </div>
-            {% endif %}
+            {% include form_row.html %}
         {% endfor %}
         <div class="w3-row-padding w3-margin-top w3-margin w3-padding">
             <input type="submit" class="w3-btn w3-black" value="Generate"/>

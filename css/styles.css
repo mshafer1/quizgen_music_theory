@@ -84,6 +84,11 @@ div.answer-inline {
     z-index: 100!important;
 }
 
+.my-input {
+    width: 100%;
+    min-height: 2em;
+}
+
 @media print {
     .print-hide {
         display: none!important;

@@ -1,16 +1,40 @@
 ---
 type: Triad Construction
 
-quizType:
-  type: hidden
-  default: TriadConst
-  name: qType
+inputs:
+  quizType:
+    type: hidden
+    default: TriadConst
+    name: qType
+  
+  title:
+    type: text
+    default: 'Timed Triad Quiz, Construction'
+    name: title
+    class: my-input
+    lable_width: l2 m12 s12
+    child_width: l6 m12 s12
 
-notesPerLine:
-  type: number
-  default: 3
-  name: NPerLine
-  max: 10
+  prompt:
+    type: text
+    default: 'Write the requested triad in root position. Pay careful attention to clef signs.'
+    name: prompt
+    class: my-input
+    lable_width: l2 m12 s12
+    child_width: l6 m12 s12
+
+  Quiz Header:
+    type: textarea
+    name: quizHeader
+    class: my-input
+    lable_width: l2 m12 s12
+    child_width: l6 m12 s12
+
+  notesPerLine:
+    type: number
+    default: 3
+    name: NPerLine
+    max: 10
 
 children:
   'index':
@@ -63,86 +87,6 @@ children:
     child_width: l11 m12 s12
 ---
 
-<script>
-        var index = 0;
-        function genRow(n) {
-          {% include _keyboard_script.js index='n' %}
-      
-          return `{% include nested.html children=page.children %}`
-        }
-      
-        function add_row() {
-          row = $(`<div id="Row_${index}" class="w3-padding"></div>`)
-          row.html(genRow(index));
-          index += 1;
-          $('#stack').append(row);
-          resize();
-        }
-      
-        function delete_row(n) {
-          $('#Row_' + n).remove();
-        }
-      
-        function pre_submit() {
-          // check if #indexes already exists, and if so, delet it
-          $('#indexes').remove();
-      
-          // compile list of valid IDs into hidden input then submit.
-      
-          var ids = [];
-          $(".js-index").each(function() {
-              ids.push($(this).val());
-          });
-      
-          var form = $('form');
-          
-          var input = $('<input>').attr({
-            type: 'hidden',
-            id: 'indexes',
-            name: 'indexes',
-            value: ids,
-          })
-      
-          form.append(input);
-      
-          console.log(ids);
-          return true;
-        }
-      </script>
-      
-      <form action="/quiz.html" method="GET" target="_blank" onsubmit=" return pre_submit()">
-        <div>
-            <input type="hidden" value="" name="ID" id="_ID"/>
-            <script>
-                $('#_ID').val(Math.floor(Math.random() * 90000 + 1000));
-            </script>
-            {% assign count=0 %}
-      
-            {% assign input=site._empty_array | push: 'qType' | push: page.quizType  %}
-            {% include basic_input.html %}
-      
-              
-            
-            
-            <div id="stack" class="w3-margin-top striped-w3">
-              <div></div>
-              <div class="w3-row-padding w3-margin w3-padding">
-              {% assign input=site._empty_array | push: '# notes per line' | push: page.notesPerLine %}
-              {% include input_selector input=input %}
-              </div>    
-            </div>
-      
-            <script>
-              add_row();
-            </script>
-      
-            <div class="w3-row-padding center w3-padding">
-              <button type="button" class="w3-btn w3-black" onclick="add_row()">+</button>
-            </div>
-      
-            <div class="w3-row-padding w3-margin-top w3-margin w3-padding">
-                <input type="submit" class="w3-btn w3-black" value="Generate"/>
-            </div>
-        </div>
-      </form>
-      
+{% include _row_gen.html children=page.children %}
+
+{% include form_multirow.html inputs=page.inputs %}
