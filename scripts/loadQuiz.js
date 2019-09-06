@@ -1,6 +1,9 @@
 $(window).load(init);
 
 const qType = 'qType';
+const TITLE = 'title';
+const PROMPT = 'prompt';
+const HEADER = 'quizHeader';
 const intervaltype = 'interval';
 const mScalesKey = 'mScales';
 const MScalesKey = 'MScales';
@@ -39,6 +42,7 @@ staveSize = 950;
 rowSize = 6;
 title = '';
 prompt = '';
+header = '';
 VF = Vex.Flow;
 
 function get_indeces(dict) {
@@ -160,16 +164,23 @@ function init() {
     if (QuizID in get_data) {
         Math.seedrandom(Number(get_data[QuizID]));
     }
+    if (TITLE in get_data) {
+        title = get_data[TITLE];
+    }
+    if(PROMPT in get_data) {
+        prompt = get_data[PROMPT];
+    }
+    if(HEADER in get_data) {
+        header = get_data[HEADER];
+        console.log("Header", header);
+    }
 
     if (get_data[qType] == scaleRaw && (
         (mScalesKey in get_data && mStartingNotes in get_data) ||
         (MScalesKey in get_data && MStartingNotes in get_data) ||
         (hmScalesKey in get_data && hmStartingNotes in get_data) ||
         (mmScalesKey in get_data && mmStartingNotes in get_data))) {
-
-        title = 'Timed Scale Quiz (Major and minor)';
-        prompt = 'Create the requested scale by filling in the appropriate accidentals.';
-
+            
         handle_label_scale(get_data);
     }
     else if (try_parse_interval_data(get_data, out)) {
@@ -179,9 +190,6 @@ function init() {
         handle_clef_grouped_data(out, 'Interval', gen_interval, show_question_label = false);
     }
     else if (get_data[qType] == noteID) {
-        title = "Timed Note Quiz, ID";
-        prompt = "Identify the following notes";
-
         handle_note_id(get_data, show_question_label = false);
     }
     else if (try_parse_triad_id_data(get_data, out)) {
@@ -191,8 +199,6 @@ function init() {
         handle_clef_grouped_data(out, 'Triad', get_triad, show_question_label = false);
     }
     else if (try_parse_key_signature_quiz_data(get_data, out)) {
-        title = 'Timed Key Signature Quiz, ID';
-        prompt = 'Write the correct key signatures (both major and minor) in the blanks below.';
 
         handle_label_key_signature(out, show_question_label = false);
     }
@@ -882,6 +888,8 @@ function write_doc() {
     $(`<h1>${title}</h1>`).appendTo('body');
 
     $(`<p>${prompt}</p>`).appendTo('body');
+
+    $(`<p>${header}</p>`).appendTo('body');
 
     for (var i = 0; i < staves.length; i++) {
         var stave = staves[i];
