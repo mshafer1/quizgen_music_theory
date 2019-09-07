@@ -8,6 +8,7 @@ branches:
   - gh-pages
   - _get_build_working
 cache:
+  bundler: true
   directories:
   - node_modules
 before_install:
