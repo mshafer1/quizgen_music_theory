@@ -6,6 +6,7 @@ branches:
   only:
   - master
   - gh-pages
+  - _get_build_working
 cache:
   directories:
   - node_modules
@@ -13,7 +14,7 @@ before_install:
 - npm update
 install:
 - npm install dev
-- npm install jekyll
+- bundler install jekyll
 script:
 - jekyll build -d _site
 - npm run coverage
