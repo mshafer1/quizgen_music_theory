@@ -13,8 +13,9 @@ cache:
 before_install:
 - npm update
 install:
-- npm install dev
 - bundler add jekyll
+- bundler add jekyll-tidy
+- npm install dev
 script:
 - jekyll build -d _site
 - npm run coverage
