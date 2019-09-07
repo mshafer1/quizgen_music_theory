@@ -14,6 +14,7 @@ before_install:
 install:
 - npm install dev
 script:
+- jekyll build -d _site
 - npm run coverage
 after_success:
 - npm run coveralls
