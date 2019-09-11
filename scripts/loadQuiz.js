@@ -17,6 +17,7 @@ const noteID = 'NoteID';
 const triadIDRaw = 'TriadID';
 const triadConstructionRaw = 'TriadConst';
 const signatureIDRaw = 'KeySignatureID';
+const signatureConstRaw = 'KeySignatureConst';
 
 const QuizID = 'ID';
 
@@ -34,7 +35,9 @@ const BARNote = {}; // create an object
 
 
 STAVE_HEIGHT = 150;
-const DUAL_STAVE_HEIGHT = 75;
+DUAL_STAVE_HEIGHT = STAVE_HEIGHT / 2;
+const CONSTRUCTION_STAVE_HEIGHT = STAVE_HEIGHT * 1.5;
+const CONSTRUCTION_DUAL_STAVE_HEIGHT = CONSTRUCTION_STAVE_HEIGHT / 2;
 
 const NOTES_PER_LINE = 'NPerLine';
 
@@ -120,6 +123,10 @@ function try_parse_key_signature_quiz_data(get_data, out_data) {
     return try_parse_key_type_quiz_data(get_data, out_data, signatureIDRaw, 'NKeys', 'keys[]');
 }
 
+function try_parse_key_signature_construction_quiz_data(get_data, out_data) {
+    return try_parse_key_type_quiz_data(get_data, out_data, signatureConstRaw, 'NKeys', 'keys[]');
+}
+
 function try_parse_key_type_quiz_data(get_data, out_data, expectedQuizType, NKey, keysName) {
     var result = false;
 
@@ -198,23 +205,35 @@ function init() {
         title = 'Timed Key Signature Quiz, ID';
         prompt = 'Write the correct key signatures (both major and minor) in the blanks below.';
 
+        STAVE_HEIGHT *= 1.2;
+
         handle_label_key_signature(out, show_question_label = false);
     }
     else if (try_parse_triad_construction_data(get_data, out)) {
         title = 'Timed Triad Quiz, Construction';
         prompt = 'Write the requested triad in root position. Pay careful attention to clef signs.';
 
-        STAVE_HEIGHT *= 1.1;
+        STAVE_HEIGHT = CONSTRUCTION_STAVE_HEIGHT;
         
-        handle_clef_grouped_construction(out, 'Triad', TriadConstructionAnswerGen, (_) => null, add_bars_between_parts=false, show_question_label = false, show_accidentals=false);
+        handle_clef_grouped_construction(out, 'Interval', IntervalConstructionAnswerGen, ReturnBaseNote, add_bars_between_parts=true, show_question_label = false, show_accidentals=true);
     }
     else if(try_parse_interval_construction_data(get_data, out)) {
         title = 'Timed Interval Quiz, Construction';
         prompt = 'Write the requested interval on the staff.';
 
-        STAVE_HEIGHT *= 1.1;
+        STAVE_HEIGHT = CONSTRUCTION_STAVE_HEIGHT;
 
         handle_clef_grouped_construction(out, 'Interval', IntervalConstructionAnswerGen, ReturnBaseNote, add_bars_between_parts=true, show_question_label = false, show_accidentals=true);
+    }
+    else if(try_parse_key_signature_construction_quiz_data(get_data, out)) {
+        title = 'Timed Key Signature Quiz, Construction'
+        prompt = 'Write in the requested key signature on the grand staff.'
+
+        STAVE_HEIGHT = CONSTRUCTION_STAVE_HEIGHT;
+        DUAL_STAVE_HEIGHT = CONSTRUCTION_DUAL_STAVE_HEIGHT;
+
+        console.log(out);
+        handle_construct_key_signature(out, show_question_label = false);
     }
     else {
         alert("Invalid request for quiz!");
@@ -435,6 +454,60 @@ function handle_clef_grouped_construction(data, data_key, gen_answer, gen_note, 
     });
 }
 
+function handle_construct_key_signature(data, show_question_label = true) {
+    var total = shuffled_slice(data.N, data.Keys);
+    var slices = slice_array(rowSize, total);
+
+    slices.forEach(function (slice, index) {
+        var stave = new_stave('Stave' + index);
+
+        Draw_stave_with_key_sig(stave, null, [], false, 15);
+
+        var answers = []
+        slice.forEach(function (answer) {
+            console.log("Answer: ", answer);
+
+            var note = teorian_note_to_key(answer);
+            console.log("Note: ", note);
+
+            var lable = note.letter
+
+            accidental = note.accidental;
+
+            if(accidental.startsWith('b')) {
+                lable += "&#9837;";
+
+                accidental = accidental.substring(1);
+            } else if(accidental.startsWith('#')) {
+                lable += "#";
+                accidental = accidental.substring(1);
+            }
+
+            lable += " ";
+            if (accidental == "m") {
+                lable += "minor";
+            } else {
+                lable += "Major"
+            }
+
+            answers.push(lable);
+        })
+
+        var MajorAnswers = gen_answer_row(slice.length, staveSize, null, answers=answers)
+
+        var question = new_stave("Q" + index);
+        question.appendChild(document.createElement("br"));
+        question.appendChild(MajorAnswers);
+        question.appendChild(stave);
+        question.appendChild(document.createElement("br"));
+
+        question.classList.add('nosplit');
+
+        staves.push(question);
+    });
+}
+
+
 function ReturnBaseNote(part) {
     var note = keys_to_note([teorian_note_to_key(part.starting_note)]);
     note.padding = 30;
@@ -495,7 +568,6 @@ function handle_clef_grouped_data(data, data_key, get_part, show_question_label 
     }
 
     console.log("Compile Data: ", compiled_data);
-
 
     var clef = null;
 
@@ -771,16 +843,19 @@ function new_stave(id = '') {
     return result;
 }
 
-function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_between_parts = true) {
+function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_between_parts = true, spacing=10) {
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
-    renderer.resize(staveSize + 200, STAVE_HEIGHT * 1.2);
+    renderer.resize(staveSize + 200, STAVE_HEIGHT * (spacing/10));
 
     var context = renderer.getContext();
     context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
 
     // Create the staves
     var topStaff = new VF.Stave(15, 0, staveSize + 30);
+    console.log("Spacing: ", spacing);
+    topStaff.options.spacing_between_lines_px = spacing;
     var bottomStaff = new VF.Stave(15, DUAL_STAVE_HEIGHT, staveSize + 30);
+    bottomStaff.options.spacing_between_lines_px = spacing;
 
     topStaff.addClef('treble');
     bottomStaff.addClef('bass');
@@ -800,8 +875,8 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_betw
     var lineRight = new Vex.Flow.StaveConnector(topStaff, bottomStaff).setType(6);
 
 
-    topStaff.setContext(context);
-    bottomStaff.setContext(context);
+    topStaff.setContext(context).draw();
+    bottomStaff.setContext(context).draw();
 
     var next_padding = 0;
     keys.forEach(function (key, index) {

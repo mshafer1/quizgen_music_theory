@@ -1,0 +1,80 @@
+---
+type: Key Signature Construction
+
+inputs:
+  'qType':
+    type: hidden
+    default: KeySignatureConst
+    name: qType
+
+  title:
+    type: text
+    default: 'Timed Key Signature Quiz, Construction'
+    name: title
+    class: my-input
+    lable_width: l2 m12 s12
+    child_width: l6 m12 s12
+
+  prompt:
+    type: text
+    default: 'Write in the requested key signature on the grand staff.'
+    name: prompt
+    class: my-input
+    lable_width: l2 m12 s12
+    child_width: l6 m12 s12
+
+  Quiz Header:
+    type: textarea
+    name: quizHeader
+    class: my-input
+    lable_width: l2 m12 s12
+    child_width: l6 m12 s12
+
+  'Keys per line':
+    type: number
+    default: 6
+    name: NPerLine
+    max: 10
+    min: 1
+  '# of Keys':
+    type: number
+    default: 12
+    min: 1
+    name: NKeys
+  'Keys':
+    type: multi
+    name: 'keys[]'
+    values:
+      "C": "C1"
+      "Am": "Am1"
+      "G": "G1"
+      "Em": "Em1"
+      "D": "D1"
+      "Bm": "Bm1"
+      "A": "A1"
+      "F#m": "F#m1"
+      "E": "E1"
+      "C#m": "C#m1"
+      "B": "B1"
+      "G#m": "G#m1"
+      "F#": "F#1"
+      "D#m": "D#m1"
+      "C#": "C#1"
+      "A#m": "A#m1"
+      "F": "F1"
+      "Dm": "Dm1"
+      "B&#9837;": "Bb1"
+      "Gm": "Gm1"
+      "E&#9837;": "Eb1"
+      "Cm": "Cm1"
+      "A&#9837;": "Ab1"
+      "Fm": "Fm1"
+      "D&#9837;": "Db1"
+      "B&#9837;m": "Bbm1"
+      "G&#9837;": "Gb1"
+      "E&#9837;m": "Ebm1"
+      "C&#9837;": "Cb1"
+      "A&#9837;m": "Abm1"
+---
+
+{% include form.html inputs=page.inputs %}
