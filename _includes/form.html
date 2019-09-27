@@ -2,7 +2,9 @@
     <div class="striped-w3">
         <input type="hidden" value="" name="ID" id="_ID"/>
         <script>
-            $('#_ID').val(Math.floor(Math.random() * 90000 + 1000));
+            var seed_id = Math.floor(Math.random() * 90000 + 1000);
+            $('#_ID').val(seed_id);
+            console.log("Seed: ", seed_id);
         </script>
         {% assign count=0 %}
         {% for input in include.inputs %}

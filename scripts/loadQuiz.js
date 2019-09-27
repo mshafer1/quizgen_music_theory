@@ -113,6 +113,8 @@ function try_parse_quiz_data(get_data, out_data, quizTypeKey, NKey, dataLable) {
         }
     }
 
+    console.log("Out Data: ", out_data);
+
     result = true;
     return result;
 }
@@ -300,7 +302,7 @@ function handle_note_id(data, show_question_label = true, add_bars_between_parts
 
         var raw_notes = data[clefLabel + 'Notes[]'] || [];
 
-        // var notes = shuffled_slice(n, raw_notes);
+        var notes = shuffled_slice(n, raw_notes);
 
         console.log("Notes: " + JSON.stringify(notes));
 

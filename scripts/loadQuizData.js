@@ -25,6 +25,37 @@ function simple_handle() {
     }
 }
 
+function handle_multi_row_insertion() {
+    if(!('indexes' in GET_data)) {
+        return;
+    }
+
+    var indexes = GET_data['indexes'];
+
+    if(indexes.constructor === Array) {
+        indexes = indexes.split(',').map(value => load_value(value));
+    } else {
+        // must be single number
+        indexes = [indexes];
+    }
+
+
+    
+    console.log("Indexes: ");
+    console.log(indexes);
+
+    indexes.forEach(function (value) {
+        index = value;
+        add_row();
+    })
+}
+
 function load() {
+    handle_multi_row_insertion();
     simple_handle();
+
+    if(typeof index !== 'undefined' &&  index == 0 && typeof add_row !== 'undefined'){
+      // only add a default row if one not already added.
+      add_row();
+    }
 }
