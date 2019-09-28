@@ -5,7 +5,6 @@ console.log("GET Data: ", GET_data);
 
 function simple_handle() {
     for(var key in GET_data) {
-        console.log("Key-val: ", key, GET_data[key]);
 
         if (key.indexOf('[]') != -1) {
             var values = GET_data[key];
@@ -14,8 +13,6 @@ function simple_handle() {
                 if(!(checkbox.length)) {
                     checkbox = $(`input[name='${key}'][value='${value}']`)
                 }
-                console.log("Key: ", key, "\n\tValue: ", value);
-                console.log("CheckBox: ", checkbox);
                 checkbox.prop("checked", true);
             })
             continue;
@@ -33,7 +30,13 @@ function handle_multi_row_insertion() {
     var indexes = GET_data['indexes'];
 
     if(indexes.constructor === Array) {
-        indexes = indexes.split(',').map(value => load_value(value));
+        indexes = indexes.map(value => load_value(value));
+    } else if(indexes.constructor === String) {
+        if(indexes.indexOf(",") != -1){
+            indexes = indexes.split(',').map(value => load_value(value));
+        } else {
+            indexes = [load_value(indexes)]
+        }
     } else {
         // must be single number
         indexes = [indexes];
@@ -56,6 +59,7 @@ function load() {
 
     if(typeof index !== 'undefined' &&  index == 0 && typeof add_row !== 'undefined'){
       // only add a default row if one not already added.
+      console.log("Add Row")
       add_row();
     }
 }
