@@ -213,7 +213,7 @@ function init() {
 
         STAVE_HEIGHT = CONSTRUCTION_STAVE_HEIGHT;
         
-        handle_clef_grouped_construction(out, 'Triad', TriadConstructionAnswerGen, ReturnBaseNote, add_bars_between_parts=true, show_question_label = false, show_accidentals=true);
+        handle_clef_grouped_construction(out, 'Triad', TriadConstructionAnswerGen, (_) => null, add_bars_between_parts=false, show_question_label = false, show_accidentals=true);
     }
     else if(try_parse_interval_construction_data(get_data, out)) {
         title = 'Timed Interval Quiz, Construction';
