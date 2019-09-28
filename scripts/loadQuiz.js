@@ -1,5 +1,3 @@
-$(window).load(init);
-
 const qType = 'qType';
 const TITLE = 'title';
 const PROMPT = 'prompt';
