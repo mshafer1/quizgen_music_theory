@@ -215,7 +215,7 @@ function init() {
 
         STAVE_HEIGHT = CONSTRUCTION_STAVE_HEIGHT;
         
-        handle_clef_grouped_construction(out, 'Interval', IntervalConstructionAnswerGen, ReturnBaseNote, add_bars_between_parts=true, show_question_label = false, show_accidentals=true);
+        handle_clef_grouped_construction(out, 'Triad', TriadConstructionAnswerGen, ReturnBaseNote, add_bars_between_parts=true, show_question_label = false, show_accidentals=true);
     }
     else if(try_parse_interval_construction_data(get_data, out)) {
         title = 'Timed Interval Quiz, Construction';
@@ -361,6 +361,7 @@ function handle_note_id(data, show_question_label = true, add_bars_between_parts
 
 function handle_clef_grouped_construction(data, data_key, gen_answer, gen_note, add_bars_between_parts = false, show_question_label = false, show_accidentals=true) {
     var compiled_data = [];
+    console.log("Data: ", data);
     for (var key in data) {
         var clef = data[key].Clef;
         var data_value = data[key][data_key];
