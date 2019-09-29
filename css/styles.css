@@ -89,6 +89,15 @@ div.answer-inline {
     min-height: 2em;
 }
 
+div.selectable:hover {
+    background: lightgray;
+    cursor: pointer;
+}
+
+input:checked + label div.selectable{
+    background: darkgray;
+}
+
 @media print {
     .print-hide {
         display: none!important;

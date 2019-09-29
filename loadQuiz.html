@@ -1,0 +1,77 @@
+---
+layout: default
+title: Generate New Quiz
+---
+
+{% capture page_list %}
+{% for page in site.quizes %}
+{% if page.qType %}
+<div class="w3-row w3-container w3-border-bottom w3-border-white">
+    <div class="w3-col l5 w3-hide-small w3-hide-medium w3-padding w3-border-white">{{ page.type }}</div>
+    <div class="w3-col s12 w3-hide-large w3-padding">{{ page.type  }}</div>
+    <div class="w3-col l7 m12 s12 w3-padding ">
+        <!-- <a href="{{ page.url }}" class="w3-black w3-button"></a> -->
+        <span id="_saved_{{ page.url | replace: ".", "_" | replace: "/", "_" }}">loading . . .</span>
+        <script>
+            $(window).ready(() => {
+                var target_ = '_saved_{{ page.url | replace: ".", "_" | replace: "/", "_" }}';
+                var path = 'quizes/{{ page.qType }}/';
+                console.log('Target: ', target_);
+                console.log('Path: ', path);
+
+                var first=true;
+
+                for(var key in saved_quizes) {
+                    if (!(key.startsWith(path))) {
+                        continue;
+                    }
+
+                    value = saved_quizes[key];
+                    console.log("Appending: ", value);
+
+                    if(first) {
+                        // clear out the loading
+                        $('#' + target_).html('');
+                        first = false;
+                    }
+
+                    $('#' + target_).append(`
+                    <div class="w3-row w3-margin"><div class="w3-col s10"><a href="{{ page.url }}?${value}" class="w3-black w3-button">${ key.substring(path.length) }</a></div></div>
+                    `)
+                }
+
+                if(first) {
+                    // didn't find any - we're not still loading either.
+                    $('#' + target_).html('');
+                }
+            })
+        </script>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+{% endcapture %}
+
+<script>
+    var saved_quizes = []
+    for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        var value = localStorage.getItem(key);
+        saved_quizes[key] = value;
+        console.log("Found one: ", key, "--", value);
+    }
+</script>
+
+<div class="w3-padding"></div>
+<div class="w3-display-container">
+    <div class="w3-card-4 w3-display-topmiddle w3-twothird w3-dark-gray w3-margin-left">
+        <div class="w3-border w3-border-white w3-margin">
+            <div class="w3-cell-row">
+                <div class="w3-cell w3-black">
+                    Select Saved Quiz to Open:
+                </div>
+            </div>
+            {{ page_list }}
+        </div>
+    </div>
+</div>
