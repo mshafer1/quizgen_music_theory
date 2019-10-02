@@ -68,7 +68,7 @@ title: Load Saved Quiz
         $('.js_confirmDialog_action').html(action);
         $('.js_confirmDialog_target').html(name);
 
-        $('#confirmDialog_confirmed').click(function () {
+        $('#confirmDialog_confirmed').off().click(function () {
             var dialog = $('#confirmDialog');
             dialog.prop('disabled', true).children().prop('disabled', true);
             call_back(function () {
@@ -86,7 +86,7 @@ title: Load Saved Quiz
         console.log('removing: ', parent);
         var parent = $(parent);
 
-        confirm('delete', name, function (after) {
+        confirm('DELETE', name, function (after) {
             localStorage.removeItem(path);
             parent.fadeOut('fast', function () {
                 $(this).remove();
@@ -135,7 +135,7 @@ title: Load Saved Quiz
                     <button id="confirmDialog_confirmed" class="w3-black w3-button"><span class="js_confirmDialog_action"></span></button>
                 </div>
                 <div class="w3-col s6">
-                    <button onclick="_close_confirm_dialogue()" class="w3-black w3-button">Cancel</button>
+                    <button onclick="_close_confirm_dialogue()" class="w3-black w3-button">CANCEL</button>
                 </div>
             </div>
         </div>
