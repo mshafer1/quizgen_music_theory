@@ -29,7 +29,7 @@ extra_head: "
             </div>
             <div class="w3-row w3-margin-top w3-margin-bottom">
                 <label><div class="w3-col s12 js_new_name js_save_option selectable">
-                    New Name: <input type="text" onclick="clear_selection(this)" oninput="set_selection(this)"/>
+                    New Name: <input type="text" id="_new_name_input" onclick="clear_selection(this)" oninput="set_selection(this)"/>
                 </div></label>
             </div>
         </div>
@@ -43,32 +43,5 @@ extra_head: "
     var _key_holder = $('#qType').val();
     var target_path = 'quizes/' + _key_holder + '/';
 
-    var saved_quizes = []
-    for (var path in window.localStorage) {
-        if (!(path.startsWith(target_path))) {
-            continue;
-        }
-
-        name = path.substring(target_path.length);
-        value = localStorage.getItem(path)
-        // console.log("Found one: ", name, "--", value);
-        saved_quizes[name] = value;
-    }
-
-    for(var quizName in saved_quizes) {
-
-        {% capture row_template %}
-        <div class="w3-row">
-            <div class="w3-col s12">
-                <input type="radio" value="${ quizName }" class="js_save_option" id="_rb_${quizName}" style="display: none;" onclick="set_selection(this)"/>
-                <label for="_rb_${quizName}"><div class="selectable">${ quizName }</div></label>
-            </div>
-        </div>
-        {% endcapture %}
-
-        new_row = `
-        {{ row_template }}
-        `
-        $('#previousQuizList').append(new_row);
-    }
+    update_saved_quizes();
 </script>
