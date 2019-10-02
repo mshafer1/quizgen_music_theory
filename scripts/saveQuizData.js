@@ -5,9 +5,6 @@ function clear_selection(caller) {
         $(this).attr('checked', false);
     })
 
-    $('.js_new_name').each(function () {
-        $(this).css.background="none";
-    })
 
     $('#save_footer').hide();
 
@@ -30,20 +27,24 @@ function set_selection(target) {
     var value = target.value;
     console.log('Value: ', value);
 
-    if(value.length == 0) {
-        return;
-    }
-
     $('.js_new_name').each(function () {
-        console.log("Clearing: ", $(this));
         $(this).css('background', 'transparent');
     })
 
     var parent_div = target.closest('.js_save_option');
 
-    parent_div.style.background="darkgray";
-
     footer = $('#save_footer');
+
+    if(value.length == 0) {
+        footer.hide();
+        return;
+    }
+
+    if ($(parent_div).hasClass('js_new_name')) {
+        console.log("parent is new name");
+
+        parent_div.style.background="darkgray";
+    }
 
     footer.html(`
     <div class="w3-row">

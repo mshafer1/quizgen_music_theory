@@ -1,15 +1,15 @@
 ---
 layout: default
-title: Generate New Quiz
+title: Load Saved Quiz
 ---
 
 {% capture page_list %}
 {% for page in site.quizes %}
 {% if page.qType %}
 <div class="w3-row w3-container w3-border-bottom w3-border-white">
-    <div class="w3-col l5 w3-hide-small w3-hide-medium w3-padding w3-border-white">{{ page.type }}</div>
-    <div class="w3-col s12 w3-hide-large w3-padding">{{ page.type  }}</div>
-    <div class="w3-col l7 m12 s12 w3-padding ">
+    <div class="w3-col l3 w3-hide-small w3-hide-medium w3-padding w3-border-white">{{ page.type }}</div>
+    <div class="w3-col xs12 w3-hide-large w3-padding">{{ page.type  }}</div>
+    <div class="w3-col l9 m12 s12 xs12 w3-padding ">
         <!-- <a href="{{ page.url }}" class="w3-black w3-button"></a> -->
         <span id="_saved_{{ page.url | replace: ".", "_" | replace: "/", "_" }}">loading . . .</span>
         <script>
@@ -19,9 +19,9 @@ title: Generate New Quiz
                 console.log('Target: ', target_);
                 console.log('Path: ', path);
 
-                var first=true;
+                var first = true;
 
-                for(var key in saved_quizes) {
+                for (var key in saved_quizes) {
                     if (!(key.startsWith(path))) {
                         continue;
                     }
@@ -29,18 +29,21 @@ title: Generate New Quiz
                     value = saved_quizes[key];
                     console.log("Appending: ", value);
 
-                    if(first) {
+                    if (first) {
                         // clear out the loading
                         $('#' + target_).html('');
                         first = false;
                     }
 
                     $('#' + target_).append(`
-                    <div class="w3-row w3-margin"><div class="w3-col s10"><a href="{{ page.url }}?${value}" class="w3-black w3-button">${ key.substring(path.length) }</a></div></div>
+                    <div class="w3-row w3-padding bottom_dot_seperated w3-border-white js_saved_quiz_row">
+                        <div class="w3-col s10"><a href="{{ page.url }}?${value}" class="w3-black w3-button w3-round">${key.substring(path.length)}</a></div>
+                        <div class="w3-col s2"><button class="w3-button w3-black w3-round" onclick="remove_row(this, '${key.substring(path.length)}', '${key}')"><i class="fa fa-trash"></i></button></div>
+                    </div>
                     `)
                 }
 
-                if(first) {
+                if (first) {
                     // didn't find any - we're not still loading either.
                     $('#' + target_).html('');
                 }
@@ -60,6 +63,41 @@ title: Generate New Quiz
         saved_quizes[key] = value;
         console.log("Found one: ", key, "--", value);
     }
+
+    function confirm(action, name, call_back) {
+        $('.js_confirmDialog_action').html(action);
+        $('.js_confirmDialog_target').html(name);
+
+        $('#confirmDialog_confirmed').click(function () {
+            var dialog = $('#confirmDialog');
+            dialog.prop('disabled', true).children().prop('disabled', true);
+            call_back(function () {
+                dialog.fadeOut('slow', function() {
+                    $(this).prop('disabled', false).children().prop('disabled', false);
+                });
+            });
+        })
+
+        $('#confirmDialog').fadeIn('slow');
+    }
+
+    function remove_row(target, name, path) {
+        var parent = target.closest('.js_saved_quiz_row');
+        console.log('removing: ', parent);
+        var parent = $(parent);
+
+        confirm('delete', name, function (after) {
+            localStorage.removeItem(path);
+            parent.fadeOut('fast', function () {
+                $(this).remove();
+                after();
+            })
+        })
+    }
+
+    function _close_confirm_dialogue() {
+        $('#confirmDialog').hide();
+    }
 </script>
 
 <div class="w3-padding"></div>
@@ -72,6 +110,34 @@ title: Generate New Quiz
                 </div>
             </div>
             {{ page_list }}
+        </div>
+    </div>
+</div>
+
+
+<div id="confirmDialog" class="w3-modal notselectable">
+    <div class="w3-modal-content w3-card-4">
+        <header class="w3-container quizgen-dark-red">
+            <span onclick="_close_confirm_dialogue()" class="w3-button w3-black w3-display-topright">
+                <i class="fa fa-times"></i>
+            </span>
+            <h2>Are you sure you want to 
+                <span class="js_confirmDialog_action"></span> 
+                <span class="js_confirmDialog_target w3-dark-gray"></span>?
+            </h2>
+        </header>
+        <div class="w3-container quizgen-moderate-gray">
+            <p>
+                This action CANNOT be undone. Proceed only with caution.
+            </p>
+            <div class="w3-row w3-margin-top w3-margin-bottom">
+                <div class="w3-col s6">
+                    <button id="confirmDialog_confirmed" class="w3-black w3-button"><span class="js_confirmDialog_action"></span></button>
+                </div>
+                <div class="w3-col s6">
+                    <button onclick="_close_confirm_dialogue()" class="w3-black w3-button">Cancel</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>

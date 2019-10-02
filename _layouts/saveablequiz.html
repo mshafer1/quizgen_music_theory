@@ -28,9 +28,9 @@ extra_head: "
 
             </div>
             <div class="w3-row w3-margin-top w3-margin-bottom">
-                <div class="w3-col s12 js_new_name js_save_option">
-                    <label>New Name: <input type="text" onclick="clear_selection(this)" oninput="set_selection(this)"/></label>
-                </div>
+                <label><div class="w3-col s12 js_new_name js_save_option selectable">
+                    New Name: <input type="text" onclick="clear_selection(this)" oninput="set_selection(this)"/>
+                </div></label>
             </div>
         </div>
         
@@ -49,10 +49,9 @@ extra_head: "
             continue;
         }
 
-
         name = path.substring(target_path.length);
         value = localStorage.getItem(path)
-        console.log("Found one: ", name, "--", value);
+        // console.log("Found one: ", name, "--", value);
         saved_quizes[name] = value;
     }
 
