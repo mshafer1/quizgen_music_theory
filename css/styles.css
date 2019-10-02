@@ -1,5 +1,5 @@
 ---
----
+--- 
 
 html, body {
     font-family: 'Roboto', sans-serif!important;
@@ -10,12 +10,12 @@ html, body {
 }
 
 div.w3-dropdown-hover:hover .fa-caret-right {
-    -ms-filter:"progid:DXImageTransform.Microsoft.BasicImage(rotation=1)";
-    transform:rotate(90deg)
+    -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=1)";
+    transform: rotate(90deg)
 }
 
-div.striped-w3 > div:nth-child(odd) {
-    background-color:lightgray;
+div.striped-w3>div:nth-child(odd) {
+    background-color: lightgray;
     color: black;
 }
 
@@ -37,30 +37,29 @@ div.answer-inline {
     text-align: center;
 }
 
-{% include key.css key_name="black_key" key_width=site.key_width key_height=site.black_height color=444 fade_color="0a0a0a" hover_color="afafaf" font_color="9090a0" %}
+    {% include key.css key_name="black_key" key_width=site.key_width key_height=site.black_height color=444 fade_color="0a0a0a" hover_color="afafaf" font_color="9090a0" %}
 
-{% include key.css key_name="white_key" key_width=site.key_width key_height=site.white_height color="dadaca" fade_color="cacaba" hover_color="f0f0a0" checked_color="a0a0b0" %}
+    {% include key.css key_name="white_key" key_width=site.key_width key_height=site.white_height color="dadaca" fade_color="cacaba" hover_color="f0f0a0" checked_color="a0a0b0" %}
 
 .white_key {
     z-index: 0;
-    
     /* border color */
-	background: #000000;
+    background: #000000;
 }
 
 .black_key {
-	z-index: 1;
+    z-index: 1;
 }
 
 .keyboardPart {
-	display: inline-block;
+    display: inline-block;
 }
 
 .center {
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
-	text-align: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
 }
 
 .nosplit {
@@ -70,7 +69,6 @@ div.answer-inline {
 .nobreak {
     page-break-before: avoid;
     break-before: avoid;
-
 }
 
 .notAfter {
@@ -94,11 +92,11 @@ div.selectable:hover {
     cursor: pointer;
 }
 
-input:checked + label div.selectable{
+input:checked+label div.selectable {
     background: darkgray;
 }
 
-.bottom_dot_seperated:not(:last-child) { 
+.bottom_dot_seperated:not(:last-child) {
     border-bottom-style: dashed;
     border-bottom-width: 1px;
 }
@@ -126,21 +124,17 @@ input:checked + label div.selectable{
     .print-hide {
         display: none!important;
     }
-
     html {
         font-family: 'EB Garamond', serif!important;
         font-size: 16pt!important;
     }
-
     h1, h2, h3, h4, h5, h6 {
         font-family: 'EB Garamond', serif!important;
     }
-
     p {
         font-size: 22pt;
         font-family: 'EB Garamond', serif!important;
     }
-
     label {
         font-size: 20pt!important;
         font-family: 'EB Garamond', serif!important;
