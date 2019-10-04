@@ -5,6 +5,14 @@ html, body {
     font-family: 'Roboto', sans-serif!important;
 }
 
+html {
+    height: 100%;
+}
+
+body {
+    min-height: 100%;
+}
+
 .no-above-padding {
     margin-top: -50px;
 }
@@ -126,6 +134,29 @@ input:checked+label div.selectable {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.footer {
+    display: flex!important;
+}
+
+.footer > footer {
+    position: fixed!important; 
+    bottom: 0px!important; 
+    left: 0px!important;
+}
+
+
+/* w3-css small screen point */
+@media only screen and (max-width:601px) {
+    .footer > footer {
+        position: static!important;
+        margin-top: 32px;
+    }
+
+    .footer > #bottom_padding {
+        display: none!important;
+    }
 }
 
 @media print {
