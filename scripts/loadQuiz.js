@@ -746,7 +746,7 @@ function gen_answer_row(n_answers, width, lable = null, answers = null) {
     var result = document.createElement('div');
     var lable_span = '';
 
-    result.style.width = (width+20) + 'px';
+    result.style.width = (width+30) + 'px';
     if (lable != null) {
         lable_span = document.createElement('span');
         lable_span.innerHTML = lable;
