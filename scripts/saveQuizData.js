@@ -117,7 +117,7 @@ function _save_data(name) {
 
     var form = $('#_input_form')[0];
 
-    if (pre_submit.prototype !== undefined) {
+    if (typeof callback === "function") {
         pre_submit();
     }
 
