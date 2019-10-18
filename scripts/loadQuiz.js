@@ -430,7 +430,7 @@ function handle_clef_grouped_construction(data, data_key, gen_answer, gen_note, 
             var answer_row = gen_answer_row(slice.length, staveSize, lable=null, answers=answer_lables);
 
             console.log("Notes: " + JSON.stringify(notes));
-            Draw_stave(stave, clef, null, notes, 'w', show_accidentals, 1.5);
+            Draw_stave(stave, clef, null, notes, 'w', show_accidentals, 15);
 
             question = new_stave("Stave" + i);
             question.classList.add("nosplit");
@@ -462,7 +462,7 @@ function handle_construct_key_signature(data, show_question_label = true) {
     slices.forEach(function (slice, index) {
         var stave = new_stave('Stave' + index);
 
-        Draw_stave_with_key_sig(stave, null, [], false, 1.5);
+        Draw_stave_with_key_sig(stave, null, [], false, 15);
 
         var answers = []
         slice.forEach(function (answer) {
@@ -845,17 +845,19 @@ function new_stave(id = '') {
     return result;
 }
 
-function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_between_parts = true, scale=1.0) {
+function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_between_parts = true, spacing=10) {
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
-    renderer.resize(staveSize + 200, STAVE_HEIGHT * (scale));
+    renderer.resize(staveSize + 200, STAVE_HEIGHT * (spacing/10));
 
     var context = renderer.getContext();
-    context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed").scale(scale, scale);
+    context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
 
     // Create the staves
-    
-    var topStaff = new VF.Stave(10*scale + 2, 0, staveSize / scale + 30);
-    var bottomStaff = new VF.Stave(10*scale + 2, DUAL_STAVE_HEIGHT, staveSize / scale + 30);
+    var topStaff = new VF.Stave(15, 0, staveSize + 30);
+    console.log("Spacing: ", spacing);
+    topStaff.options.spacing_between_lines_px = spacing;
+    var bottomStaff = new VF.Stave(15, DUAL_STAVE_HEIGHT, staveSize + 30);
+    bottomStaff.options.spacing_between_lines_px = spacing;
 
     topStaff.addClef('treble');
     bottomStaff.addClef('bass');
@@ -914,13 +916,14 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_betw
     lineRight.setContext(context).draw();
 }
 
-function Draw_stave(target_div, clef, time_signature, notes, duration, show_accidentals = true, scale=1.0) {
+function Draw_stave(target_div, clef, time_signature, notes, duration, show_accidentals = true, spacing=10) {
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
-    renderer.resize((staveSize + 200), STAVE_HEIGHT);
+    renderer.resize(staveSize + 200, STAVE_HEIGHT);
     var context = renderer.getContext();
-    context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed").scale(scale, scale);
+    context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
 
-    var stave = new VF.Stave(10 / scale, 10 / scale, staveSize / scale);
+    var stave = new VF.Stave(10, 10, staveSize);
+    stave.options.spacing_between_lines_px = spacing;
     if (time_signature != null) {
         stave.addTimeSignature(time_signature);
     }
