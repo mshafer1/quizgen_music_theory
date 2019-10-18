@@ -961,7 +961,7 @@ function Draw_stave(target_div, clef, time_signature, notes, duration, show_acci
                     stave_note.addAccidental(note.accidentals[j].index, new VF.Accidental(note.accidentals[j].value))
                 }
             }
-
+            
             stave_notes.push(stave_note);
         }
     }
