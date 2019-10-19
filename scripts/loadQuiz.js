@@ -34,7 +34,7 @@ const BARNote = {}; // create an object
 
 STAVE_HEIGHT = 150;
 DUAL_STAVE_HEIGHT = STAVE_HEIGHT / 2;
-const CONSTRUCTION_STAVE_HEIGHT = STAVE_HEIGHT * 1.5;
+const CONSTRUCTION_STAVE_HEIGHT = STAVE_HEIGHT;// * 1.5;
 const CONSTRUCTION_DUAL_STAVE_HEIGHT = CONSTRUCTION_STAVE_HEIGHT / 2;
 
 const NOTES_PER_LINE = 'NPerLine';
@@ -846,6 +846,7 @@ function new_stave(id = '') {
 }
 
 function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_between_parts = true, scale=1.0) {
+    scale = 1.0; // force no scaling
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
     renderer.resize(staveSize + 200, STAVE_HEIGHT * (scale));
 
@@ -915,6 +916,7 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_betw
 }
 
 function Draw_stave(target_div, clef, time_signature, notes, duration, show_accidentals = true, scale=1.0) {
+    scale = 1.0; // force no scaling
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
     renderer.resize((staveSize + 200), STAVE_HEIGHT);
     var context = renderer.getContext();
