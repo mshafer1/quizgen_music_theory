@@ -92,10 +92,17 @@ function set_selection(target) {
         <div class="w3-col s10">${value}</div>
         <div class="w3-col s1"><button class="w3-btn w3-black" onclick="_save_data('${value}')">Save</button></div>
     </div>
+    <div class="w3-row js-error" style="display: none;">
+        Error: Could not save quiz. Verify that QuizGen.MusicTheoryPractice.net is allowed to store local storage in your browser.
+        <ul>
+            <li>Firefox: <a href="https://support.mozilla.org/en-US/kb/storage" target="_blank">Docs</a></li>
+            <li>Chrome: <a href="https://techglimpse.com/enable-localstorage-support-google-chrome-browser/" target="_blank">TechGlimpse Article</a></li>
+            <li>Other browsers: <a href="https://www.google.com/search?q=how+to+enable+local+storage+in+my+browser" target="_blank">Google it </a></li>
+        </ul>
+    </div>
     `);
 
     footer.show();
-
 }
 
 function _show_save_dialogue() {
@@ -124,9 +131,19 @@ function _save_data(name) {
     // from https://stackoverflow.com/a/48950600
     queryString = new URLSearchParams(new FormData(form)).toString();
     // console.log("queryString", queryString);
-    localStorage.setItem(target_path, queryString);
-
-    _close_save_dialogue();
+    try
+    {
+        localStorage.setItem(target_path, queryString);
+        _close_save_dialogue();
+    }
+    catch (e)
+    {
+        if(e instanceof DOMException)
+        {
+            $('.js-error').show();
+        }
+        throw(e);
+    }
 }
 
 save = _show_save_dialogue;
