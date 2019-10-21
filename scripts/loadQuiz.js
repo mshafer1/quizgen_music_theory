@@ -46,6 +46,8 @@ prompt = '';
 header = '';
 VF = Vex.Flow;
 
+CONSTUCTION_SCALING_ENABLED = false;
+
 function get_indeces(dict) {
     var indeces = dict['indexes']
 
@@ -162,6 +164,11 @@ function init() {
     if (!(qType in get_data)) {
         alert("Invalid request for quiz!");
         return;
+    }
+
+    var key = 'CONSTUCTION_SCALING_ENABLED'
+    if (key in data && ('' + data[key]).length > 0) {
+        CONSTUCTION_SCALING_ENABLED = (data[key] == 'true');
     }
 
     if (NOTES_PER_LINE in get_data) {
@@ -846,7 +853,9 @@ function new_stave(id = '') {
 }
 
 function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_between_parts = true, scale=1.0) {
-    scale = 1.0; // force no scaling
+    if (!CONSTUCTION_SCALING_ENABLED) {
+        scale = 1.0; // force no scaling
+    }
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
     renderer.resize(staveSize + 200, STAVE_HEIGHT * (scale));
 
@@ -916,7 +925,9 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_betw
 }
 
 function Draw_stave(target_div, clef, time_signature, notes, duration, show_accidentals = true, scale=1.0) {
-    scale = 1.0; // force no scaling
+    if (!CONSTUCTION_SCALING_ENABLED) {
+        scale = 1.0; // force no scaling
+    }
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
     renderer.resize((staveSize + 200), STAVE_HEIGHT);
     var context = renderer.getContext();
