@@ -34,7 +34,7 @@ const BARNote = {}; // create an object
 
 STAVE_HEIGHT = 150;
 DUAL_STAVE_HEIGHT = STAVE_HEIGHT / 2;
-const CONSTRUCTION_STAVE_HEIGHT = STAVE_HEIGHT;// * 1.5;
+const CONSTRUCTION_STAVE_HEIGHT = STAVE_HEIGHT * 1.2;
 const CONSTRUCTION_DUAL_STAVE_HEIGHT = CONSTRUCTION_STAVE_HEIGHT / 2;
 
 const NOTES_PER_LINE = 'NPerLine';
@@ -45,6 +45,8 @@ title = '';
 prompt = '';
 header = '';
 VF = Vex.Flow;
+
+CONSTUCTION_SCALING_ENABLED = true;
 
 function get_indeces(dict) {
     var indeces = dict['indexes']
@@ -164,6 +166,11 @@ function init() {
         return;
     }
 
+    var key = 'CONSTUCTION_SCALING_ENABLED'
+    if (key in get_data && ('' + get_data[key]).length > 0) {
+        CONSTUCTION_SCALING_ENABLED = (get_data[key] == 'true');
+    }
+
     if (NOTES_PER_LINE in get_data) {
         rowSize = Number(get_data[NOTES_PER_LINE]);
         staveSize = Math.max(staveSize, (rowSize > 0) ? (rowSize * 104) : 0);
@@ -205,7 +212,7 @@ function init() {
         title = 'Timed Key Signature Quiz, ID';
         prompt = 'Write the correct key signatures (both major and minor) in the blanks below.';
 
-        STAVE_HEIGHT *= 1.2;
+        STAVE_HEIGHT = CONSTRUCTION_STAVE_HEIGHT;
 
         handle_label_key_signature(out, show_question_label = false);
     }
@@ -494,13 +501,15 @@ function handle_construct_key_signature(data, show_question_label = true) {
             answers.push(lable);
         })
 
-        var MajorAnswers = gen_answer_row(slice.length, staveSize, null, answers=answers)
+        var MajorAnswers = gen_answer_row(slice.length, staveSize, null, answers=answers, 35)
 
         var question = new_stave("Q" + index);
         question.appendChild(document.createElement("br"));
+        question.appendChild(document.createElement("br"));
+        question.appendChild(document.createElement("br"));
+
         question.appendChild(MajorAnswers);
         question.appendChild(stave);
-        question.appendChild(document.createElement("br"));
 
         question.classList.add('nosplit');
 
@@ -741,19 +750,20 @@ function handle_label_scale(data) {
     }
 }
 
-function gen_answer_row(n_answers, width, lable = null, answers = null) {
+function gen_answer_row(n_answers, width, lable = null, answers = null, extra_padding=0) {
 
     var result = document.createElement('div');
     var lable_span = '';
 
-    result.style.width = (width+30) + 'px';
+    result.style.width = (width+60) + 'px';
     if (lable != null) {
         lable_span = document.createElement('span');
         lable_span.innerHTML = lable;
         result.appendChild(lable_span);
     }
     else {
-        result.style.paddingLeft = '25px';
+        padding = 25 + extra_padding;
+        result.style.paddingLeft = padding + 'px';
     }
 
     var part_width = width / n_answers;
@@ -846,9 +856,11 @@ function new_stave(id = '') {
 }
 
 function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_between_parts = true, scale=1.0) {
-    scale = 1.0; // force no scaling
+    if (!CONSTUCTION_SCALING_ENABLED) {
+        scale = 1.0; // force no scaling
+    }
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
-    renderer.resize(staveSize + 200, STAVE_HEIGHT * (scale));
+    renderer.resize(staveSize + 200, STAVE_HEIGHT * scale);
 
     var context = renderer.getContext();
     context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed").scale(scale, scale);
@@ -916,7 +928,9 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_betw
 }
 
 function Draw_stave(target_div, clef, time_signature, notes, duration, show_accidentals = true, scale=1.0) {
-    scale = 1.0; // force no scaling
+    if (!CONSTUCTION_SCALING_ENABLED) {
+        scale = 1.0; // force no scaling
+    }
     var renderer = new VF.Renderer(target_div, VF.Renderer.Backends.SVG);
     renderer.resize((staveSize + 200), STAVE_HEIGHT);
     var context = renderer.getContext();
@@ -931,17 +945,12 @@ function Draw_stave(target_div, clef, time_signature, notes, duration, show_acci
 
     stave.setContext(context).draw();
 
-    var stave_width = stave.getWidth();
-    var left_padding = stave.getNoteStartX();
-    var width_per = (stave_width - left_padding) / (notes.length);
-
     var stave_notes = []
     for (var i = 0; i < notes.length; i++) {
         note = notes[i];
 
         if (note == BARNote) {
             var bar_note = new Vex.Flow.BarNote();
-            // bar_note.padding = 3;
             stave_notes.push(bar_note);
         }
         else {
@@ -973,7 +982,7 @@ function Draw_stave(target_div, clef, time_signature, notes, duration, show_acci
     var voices = [voice];
 
     // used in VexFlow;
-    var formatter = new VF.Formatter().joinVoices(voices).format(voices, staveSize);
+    var formatter = new VF.Formatter().joinVoices(voices).format(voices, staveSize / scale);
 
     voices.forEach(function (v) {
         v.draw(context, stave);
