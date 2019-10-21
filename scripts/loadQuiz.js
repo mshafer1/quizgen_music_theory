@@ -46,7 +46,7 @@ prompt = '';
 header = '';
 VF = Vex.Flow;
 
-CONSTUCTION_SCALING_ENABLED = false;
+CONSTUCTION_SCALING_ENABLED = true;
 
 function get_indeces(dict) {
     var indeces = dict['indexes']
