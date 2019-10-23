@@ -46,7 +46,10 @@ prompt = '';
 header = '';
 VF = Vex.Flow;
 
+const VF_NOTE_TYPE = typeof new VF.StaveNote({clef: 'treble',keys: ['a/4'],duration: 'w',});
+
 CONSTUCTION_SCALING_ENABLED = true;
+FIX_BAR_NOTE_SPACING_WITH_WHITE_NOTES = false;
 
 function get_indeces(dict) {
     var indeces = dict['indexes']
@@ -171,6 +174,11 @@ function init() {
         CONSTUCTION_SCALING_ENABLED = (get_data[key] == 'true');
     }
 
+    var key = 'USE_FILLER_NOTES';
+    if (key in get_data && ('' + get_data[key]).length > 0) {
+        FIX_BAR_NOTE_SPACING_WITH_WHITE_NOTES = (get_data[key] == 'true');
+    }
+
     if (NOTES_PER_LINE in get_data) {
         rowSize = Number(get_data[NOTES_PER_LINE]);
         staveSize = Math.max(staveSize, (rowSize > 0) ? (rowSize * 104) : 0);
@@ -222,7 +230,12 @@ function init() {
 
         STAVE_HEIGHT = CONSTRUCTION_STAVE_HEIGHT;
         
-        handle_clef_grouped_construction(out, 'Triad', TriadConstructionAnswerGen, (_) => null, add_bars_between_parts=false, show_question_label = false, show_accidentals=true);
+        if(FIX_BAR_NOTE_SPACING_WITH_WHITE_NOTES) {
+            handle_clef_grouped_construction(out, 'Triad', TriadConstructionAnswerGen, gen_white_same_clef_note, add_bars_between_parts=true, show_question_label = false, show_accidentals=true);
+        }
+        else {
+            handle_clef_grouped_construction(out, 'Triad', TriadConstructionAnswerGen, (_) => null, add_bars_between_parts=false, show_question_label = false, show_accidentals=true);
+        }
     }
     else if(try_parse_interval_construction_data(get_data, out)) {
         title = 'Timed Interval Quiz, Construction';
@@ -364,6 +377,20 @@ function handle_note_id(data, show_question_label = true, add_bars_between_parts
             i++;
         }
     });
+}
+
+function gen_white_same_clef_note(part) {
+    console.log("Info: ", part);
+    if (part.clef == 'treble') {
+        note = 'a/4';
+    } else if (part.clef == 'alto') {
+        note = 'd/4';
+    } else {
+        note = 'g/3'
+    }
+    var result = new VF.StaveNote({clef: part.clef,keys: [note],duration: 'w',});
+    result.setStyle({fillStyle: "white"});
+    return [result];
 }
 
 function handle_clef_grouped_construction(data, data_key, gen_answer, gen_note, add_bars_between_parts = false, show_question_label = false, show_accidentals=true) {
@@ -952,6 +979,10 @@ function Draw_stave(target_div, clef, time_signature, notes, duration, show_acci
         if (note == BARNote) {
             var bar_note = new Vex.Flow.BarNote();
             stave_notes.push(bar_note);
+        }
+        else if(typeof note == VF_NOTE_TYPE) {
+            console.log("Stave Note: ", note)
+            stave_notes.push(note);
         }
         else {
             stave_note = new VF.StaveNote({
