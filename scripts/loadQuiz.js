@@ -980,10 +980,10 @@ function Draw_stave(target_div, clef, time_signature, notes, duration, show_acci
             var bar_note = new Vex.Flow.BarNote();
             stave_notes.push(bar_note);
         }
-        else if(typeof note == VF_NOTE_TYPE) {
-            console.log("Stave Note: ", note)
-            stave_notes.push(note);
-        }
+        // else if(typeof note == VF_NOTE_TYPE) {
+        //     console.log("Stave Note: ", note)
+        //     stave_notes.push(note);
+        // }
         else {
             stave_note = new VF.StaveNote({
                 clef: clef,
