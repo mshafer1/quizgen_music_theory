@@ -46,8 +46,6 @@ prompt = '';
 header = '';
 VF = Vex.Flow;
 
-const VF_NOTE_TYPE = typeof new VF.StaveNote({clef: 'treble',keys: ['a/4'],duration: 'w',});
-
 CONSTUCTION_SCALING_ENABLED = true;
 FIX_BAR_NOTE_SPACING_WITH_WHITE_NOTES = false;
 
@@ -980,7 +978,7 @@ function Draw_stave(target_div, clef, time_signature, notes, duration, show_acci
             var bar_note = new Vex.Flow.BarNote();
             stave_notes.push(bar_note);
         }
-        else if(typeof note == VF_NOTE_TYPE) {
+        else if(note.constructor == VF.StaveNote) {
             console.log("Stave Note: ", note)
             stave_notes.push(note);
         }
@@ -1000,7 +998,7 @@ function Draw_stave(target_div, clef, time_signature, notes, duration, show_acci
                     stave_note.addAccidental(note.accidentals[j].index, new VF.Accidental(note.accidentals[j].value))
                 }
             }
-
+            
             stave_notes.push(stave_note);
         }
     }
