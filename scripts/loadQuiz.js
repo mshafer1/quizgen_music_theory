@@ -48,6 +48,7 @@ VF = Vex.Flow;
 
 CONSTUCTION_SCALING_ENABLED = true;
 FIX_BAR_NOTE_SPACING_WITH_WHITE_NOTES = false;
+CONSTRUCTION_SCALING = 1.5;
 
 function get_indeces(dict) {
     var indeces = dict['indexes']
@@ -155,6 +156,15 @@ function try_parse_key_type_quiz_data(get_data, out_data, expectedQuizType, NKey
     return result;
 }
 
+function _get_value_or_default(key, haystack, default_value) {
+    if(key in haystack && ('' + haystack[key]).length > 0) {
+        return haystack[key];
+    }
+    else {
+        return default_value
+    }
+}
+
 function init() {
     staves = [];
     var get_data = load_get();
@@ -167,15 +177,19 @@ function init() {
         return;
     }
 
-    var key = 'CONSTUCTION_SCALING_ENABLED'
-    if (key in get_data && ('' + get_data[key]).length > 0) {
-        CONSTUCTION_SCALING_ENABLED = (get_data[key] == 'true');
+    CONSTUCTION_SCALING_ENABLED = _get_value_or_default( 'CONSTUCTION_SCALING_ENABLED', get_data, 'false') == 'true' || CONSTUCTION_SCALING_ENABLED;
+
+    FIX_BAR_NOTE_SPACING_WITH_WHITE_NOTES = _get_value_or_default('USE_FILLER_NOTES', get_data, 'false') == 'true' || FIX_BAR_NOTE_SPACING_WITH_WHITE_NOTES;
+
+    scaling_value = _get_value_or_default('CONSTRUCTION_SCALING_SIZE', get_data, 'large')
+    if(scaling_value == 'large') {
+        CONSTRUCTION_SCALING = 1.5;
+    } else if(scaling_value == 'medium') {
+        CONSTRUCTION_SCALING = 1.3;
+    } else if (scaling_value == 'small') {
+        CONSTRUCTION_SCALING = 1.2;
     }
 
-    var key = 'USE_FILLER_NOTES';
-    if (key in get_data && ('' + get_data[key]).length > 0) {
-        FIX_BAR_NOTE_SPACING_WITH_WHITE_NOTES = (get_data[key] == 'true');
-    }
 
     if (NOTES_PER_LINE in get_data) {
         rowSize = Number(get_data[NOTES_PER_LINE]);
@@ -229,10 +243,10 @@ function init() {
         STAVE_HEIGHT = CONSTRUCTION_STAVE_HEIGHT;
         
         if(FIX_BAR_NOTE_SPACING_WITH_WHITE_NOTES) {
-            handle_clef_grouped_construction(out, 'Triad', TriadConstructionAnswerGen, gen_white_same_clef_note, add_bars_between_parts=true, show_question_label = false, show_accidentals=true);
+            handle_clef_grouped_construction(out, 'Triad', TriadConstructionAnswerGen, gen_white_same_clef_note, add_bars_between_parts=true, show_question_label = false, show_accidentals=true, scale=CONSTRUCTION_SCALING);
         }
         else {
-            handle_clef_grouped_construction(out, 'Triad', TriadConstructionAnswerGen, (_) => null, add_bars_between_parts=false, show_question_label = false, show_accidentals=true);
+            handle_clef_grouped_construction(out, 'Triad', TriadConstructionAnswerGen, (_) => null, add_bars_between_parts=false, show_question_label = false, show_accidentals=true, scale=CONSTRUCTION_SCALING);
         }
     }
     else if(try_parse_interval_construction_data(get_data, out)) {
@@ -241,7 +255,7 @@ function init() {
 
         STAVE_HEIGHT = CONSTRUCTION_STAVE_HEIGHT;
 
-        handle_clef_grouped_construction(out, 'Interval', IntervalConstructionAnswerGen, ReturnBaseNote, add_bars_between_parts=true, show_question_label = false, show_accidentals=true);
+        handle_clef_grouped_construction(out, 'Interval', IntervalConstructionAnswerGen, ReturnBaseNote, add_bars_between_parts=true, show_question_label = false, show_accidentals=true, scale=CONSTRUCTION_SCALING);
     }
     else if(try_parse_key_signature_construction_quiz_data(get_data, out)) {
         title = 'Timed Key Signature Quiz, Construction'
@@ -391,7 +405,7 @@ function gen_white_same_clef_note(part) {
     return [result];
 }
 
-function handle_clef_grouped_construction(data, data_key, gen_answer, gen_note, add_bars_between_parts = false, show_question_label = false, show_accidentals=true) {
+function handle_clef_grouped_construction(data, data_key, gen_answer, gen_note, add_bars_between_parts = false, show_question_label = false, show_accidentals=true, scale=1.5) {
     var compiled_data = [];
     console.log("Data: ", data);
     for (var key in data) {
@@ -462,7 +476,7 @@ function handle_clef_grouped_construction(data, data_key, gen_answer, gen_note, 
             var answer_row = gen_answer_row(slice.length, staveSize, lable=null, answers=answer_lables);
 
             console.log("Notes: " + JSON.stringify(notes));
-            Draw_stave(stave, clef, null, notes, 'w', show_accidentals, 1.5);
+            Draw_stave(stave, clef, null, notes, 'w', show_accidentals, scale);
 
             question = new_stave("Stave" + i);
             question.classList.add("nosplit");
