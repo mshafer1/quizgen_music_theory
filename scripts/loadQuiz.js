@@ -47,7 +47,7 @@ header = '';
 VF = Vex.Flow;
 
 CONSTUCTION_SCALING_ENABLED = true;
-FIX_BAR_NOTE_SPACING_WITH_WHITE_NOTES = false;
+FIX_BAR_NOTE_SPACING_WITH_WHITE_NOTES = true;
 CONSTRUCTION_SCALING = 1.5;
 
 function get_indeces(dict) {
@@ -394,11 +394,11 @@ function handle_note_id(data, show_question_label = true, add_bars_between_parts
 function gen_white_same_clef_note(part) {
     console.log("Info: ", part);
     if (part.clef == 'treble') {
-        note = 'a/4';
+        note = 'g/5';
     } else if (part.clef == 'alto') {
-        note = 'd/4';
+        note = 'a/4';
     } else {
-        note = 'g/3'
+        note = 'b/3'
     }
     var result = new VF.StaveNote({clef: part.clef,keys: [note],duration: 'w',});
     result.setStyle({fillStyle: "white"});
