@@ -508,7 +508,7 @@ function handle_construct_key_signature(data, show_question_label = true) {
     slices.forEach(function (slice, index) {
         var stave = new_stave('Stave' + index);
 
-        Draw_stave_with_key_sig(stave, null, [], false, 1.5);
+        Draw_stave_with_key_sig(stave, null, [], true, 1.5, slice.length);
 
         var answers = []
         slice.forEach(function (answer) {
@@ -894,7 +894,7 @@ function new_stave(id = '') {
     return result;
 }
 
-function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_between_parts = true, scale=1.0) {
+function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_between_parts = true, scale=1.0, number_of_blanks=0) {
     if (!CONSTUCTION_SCALING_ENABLED) {
         scale = 1.0; // force no scaling
     }
@@ -926,9 +926,78 @@ function Draw_stave_with_key_sig(target_div, time_signature, keys, add_bars_betw
     var lineLeft = new Vex.Flow.StaveConnector(topStaff, bottomStaff).setType(1);
     var lineRight = new Vex.Flow.StaveConnector(topStaff, bottomStaff).setType(6);
 
+    var _notes = [];
+    if(add_bars_between_parts) {
+        for (var i =  0; i < number_of_blanks; i++) {
+            _notes.push(keys_to_note([teorian_note_to_key('d/4')]));
+            if (i != number_of_blanks - 1) {
+                _notes.push(BARNote);
+            }
+        }
+    }
+    
+    
+    var treble_notes = [];
+    var bass_notes = [];
+    for (var i = 0; i < _notes.length; i++) {
+        note = _notes[i];
+
+        if (note == BARNote) {
+            var bar_note = new Vex.Flow.BarNote();
+            treble_notes.push(bar_note);
+            bass_notes.push(new Vex.Flow.BarNote());
+        }
+        else {
+            console.log("Note KEYS: ", note.keys);
+            stave_note = stave_note = new VF.StaveNote({
+                clef: 'treble',
+                keys: ['d/4'],
+                duration: 'w',
+            });
+            stave_note.setStyle({fillStyle: "white"});
+            treble_notes.push(stave_note);
+
+            stave_note = stave_note = new VF.StaveNote({
+                clef: 'bass',
+                keys: ['b/3'],
+                duration: 'w',
+            });
+            stave_note.setStyle({fillStyle: "white"});
+            bass_notes.push(stave_note);
+        }
+    }
+
+    treble_voice = new VF.Voice({
+        num_beats: 4, // TODO: make this a parameter
+        beat_value: 4
+    }).setStrict(false).addTickables(treble_notes);
+
+    var treble_voices = [treble_voice];
+
+    // used in VexFlow;
+    new VF.Formatter().joinVoices(treble_voices).format(treble_voices, staveSize / scale);
+
+    bass_voice = new VF.Voice({
+        num_beats: 4, // TODO: make this a parameter
+        beat_value: 4
+    }).setStrict(false).addTickables(bass_notes);
+
+    var bass_voices = [bass_voice];
+
+    // used in VexFlow;
+    new VF.Formatter().joinVoices(bass_voices).format(bass_voices, staveSize / scale);
 
     topStaff.setContext(context).draw();
     bottomStaff.setContext(context).draw();
+
+    treble_voices.forEach(function (v) {
+        v.draw(context, topStaff);
+    })
+
+
+    bass_voices.forEach(function (v) {
+        v.draw(context, bottomStaff);
+    })
 
     var next_padding = 0;
     keys.forEach(function (key, index) {
