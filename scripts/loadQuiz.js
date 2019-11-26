@@ -16,6 +16,8 @@ const triadIDRaw = 'TriadID';
 const triadConstructionRaw = 'TriadConst';
 const signatureIDRaw = 'KeySignatureID';
 const signatureConstRaw = 'KeySignatureConst';
+const seventhIDRaw = 'SeventhID';
+const seventhConstRaw = 'SeventhConst';
 
 const QuizID = 'ID';
 
@@ -85,6 +87,15 @@ function try_parse_triad_construction_data(get_data, out_data) {
 function try_parse_interval_construction_data(get_data, out_data) {
     return try_parse_quiz_data(get_data, out_data, intervalConstructionRaw, 'NIntervals', 'Interval');
 }
+
+function try_parse_seventh_chord_id_data(get_data, out_data) {
+    return try_parse_quiz_data(get_data, out_data, seventhIDRaw, 'NSevenths', 'Seventh');
+}
+
+function try_parse_seventh_chord_construction_data(get_data, out_data) {
+    return try_parse_quiz_data(get_data, out_data, seventhConstRaw, 'NSevenths', 'Seventh');
+}
+
 
 function try_parse_quiz_data(get_data, out_data, quizTypeKey, NKey, dataLable) {
     var result = false;
@@ -266,6 +277,21 @@ function init() {
 
         console.log(out);
         handle_construct_key_signature(out, show_question_label = false);
+    }
+    else if(try_parse_seventh_chord_id_data(get_data, out)) {
+        title = 'Timed Seventh Chord Quiz, ID';
+        prompt = 'Identify each seventh chord with lead sheet symbols indicating root and quality';
+
+        console.log('Parsed Data: ', out);
+        handle_clef_grouped_data(out, 'Seventh', get_triad, show_question_label = false);
+    }
+    else if(try_parse_seventh_chord_construction_data(get_data, out)) {
+        title = 'Timed Seventh Quiz, Construction';
+        prompt = 'Write the requested seventh in root position. Pay careful attention to clef signs.';
+
+        STAVE_HEIGHT = CONSTRUCTION_STAVE_HEIGHT;
+        
+        handle_clef_grouped_construction(out, 'Seventh', TriadConstructionAnswerGen, gen_white_same_clef_note, add_bars_between_parts=true, show_question_label = false, show_accidentals=true, scale=CONSTRUCTION_SCALING);
     }
     else {
         alert("Invalid request for quiz!");
@@ -597,6 +623,18 @@ function TriadConstructionAnswerGen(part) {
     else if (part.interval == 'm' || part.interval == 'M') {
         answer += part.interval;
     }
+    else if (part.interval == '7'|| part.interval == 'm7') {
+        answer += part.interval;
+    }
+    else if(part.interval == 'maj7') {
+        answer += 'M7';
+    }
+    else if(part.interval == 'dim7') {
+        answer += '&deg;7';
+    }
+    else if(part.interval == 'm7b5') {
+        answer += '<sup>&#xf8;</sup>7';
+    }
     return answer;
 }
 
@@ -648,6 +686,7 @@ function handle_clef_grouped_data(data, data_key, get_part, show_question_label 
                 console.log("Part starting note: ", part.starting_note);
                 console.log("Part info: ", part.interval);
 
+                
                 var keys = get_part(part.starting_note, part.interval);
 
                 console.log("Keys: ", keys);
@@ -853,7 +892,8 @@ function get_triad(starting_note, triad) {
     var result = Array();
     var note = teoria.note(starting_note);
 
-    var chord = note.chord(triad).notes();
+    console.log('Starting Note: ', starting_note, '\nNote: ', note, '\nTriad', triad);
+    var chord = note.chord(String(triad)).notes();
 
     chord.forEach(function (note) {
         result.push(teorian_note_to_key(String(note)));

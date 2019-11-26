@@ -1,0 +1,97 @@
+---
+type: Seventh Chord Construction
+layout: saveablequiz
+qType: SeventhConst
+description: "Generate blank staffs with prompts to fill in the requested seventh"
+
+
+inputs:
+  quizType:
+    type: hidden
+    default: SeventhConst
+    name: qType
+  
+  title:
+    type: text
+    default: 'Timed Seventh Quiz, Construction'
+    name: title
+    class: my-input
+    lable_width: l2 m12 s12
+    child_width: l6 m12 s12
+
+  prompt:
+    type: text
+    default: 'Write the requested seventh in root position. Pay careful attention to clef signs.'
+    name: prompt
+    class: my-input
+    lable_width: l2 m12 s12
+    child_width: l6 m12 s12
+
+  Quiz Header:
+    type: textarea
+    name: quizHeader
+    class: my-input
+    lable_width: l2 m12 s12
+    child_width: l6 m12 s12
+
+  Keys Per Line:
+    type: number
+    default: 3
+    name: NPerLine
+    max: 10
+
+children:
+  'index':
+    type: hidden
+    default: '${n}'
+    class: 'js-index'
+
+  '# of Sevenths':
+    type: number
+    default: 4
+    name: 'NSevenths${n}'
+    width: 3
+    lable_width: m5 s12
+    child_width: m7 s12
+  
+  'Clef':
+    type: select
+    name: 'Clef${n}'
+    width: 3
+    lable_width: m3 s12
+    child_width: m9 s12
+    values:
+      "Treble": "treble"
+      "Alto": "alto"
+      "Bass": "bass"
+
+  # from: https://www.oreilly.com/library/view/music-theory-for/30000LTI00240/30000LTI00240_ch17lev1sec3.html
+  'Seventh':
+    type: select
+    name: 'Seventh${n}'
+    width: 4
+    lable_width: m3 s12
+    child_width: m9 s12
+    values:
+      "Dominant": "7"
+      "Major": "maj7"
+      "Minor": "m7"
+      "Half-Dim": "m7b5"
+      "Diminished": "dim7"
+
+  'X':
+    type: button
+    onclick: onclick="delete_row(${n})"
+    width: 2
+
+  'Starting Notes':
+    type: keyboard_template
+    name: 'BasePitches${n}[]'
+    width: 12
+    lable_width: l1 m12 s12
+    child_width: l11 m12 s12
+---
+
+{% include _row_gen.html children=page.children %}
+
+{% include form_multirow.html inputs=page.inputs %}
