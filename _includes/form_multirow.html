@@ -14,8 +14,24 @@
             {% endfor %}
       </div>    
   
-      <div class="w3-row-padding center w3-padding">
-        <button type="button" class="w3-btn w3-black" onclick="add_row()">+</button>
+      <div class="w3-row">
+        <div class="w3-col s4">&nbsp;</div>
+        <div class="w3-col s4 center"><button type="button" class="w3-btn w3-black" onclick="add_row()">+</button></div>
+        <div class="w3-col s4 w3-right"><span>Add <input type="number" id="multi_count" value='5' style="width: 3em;"/> 
+          <button type="button" id="multi_add" class="w3-btn w3-black" onclick="add_row(true)">+</button>
+        </span></div>
+        <script>
+          $('#multi_count').keydown(addOnEnter);
+
+          function addOnEnter(event) {
+            if(event.key != 'Enter') {
+              return;
+            }
+            event.preventDefault();
+
+            add_row(true);
+          }
+        </script>
       </div>
   
       <div class="w3-row-padding w3-margin-top w3-margin w3-padding">
