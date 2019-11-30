@@ -7,12 +7,22 @@
     return `{% include nested.html children=children %}`
   }
 
-  function add_row() {
-    row = $(`<div id="Row_${index}" class="w3-padding"></div>`)
-    row.html(genRow(index));
-    index += 1;
-    $('#stack').append(row);
+  function add_row(multi) {
+    var count_to_increment = 1;
+    if (typeof multi !== 'undefined' && multi) {
+      count_to_increment = $('#multi_count').val();
+      count_to_increment = parseInt(count_to_increment);
+    }
+    console.log('How many: ', count_to_increment);
+    for(var i = 0; i < count_to_increment; i++) {
+      row = $(`<div id="Row_${index}" class="w3-padding"></div>`)
+      row.html(genRow(index));
+      index += 1;
+      $('#stack').append(row);
+    }
     resize();
+
+    return false;
   }
 
   function delete_row(n) {
