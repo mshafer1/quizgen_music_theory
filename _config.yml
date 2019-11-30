@@ -5,13 +5,13 @@ plugins:
   - jekyll-tidy
 
 collections:
-  quizes:
+  quizzes:
     output: true
 
 defaults:
   - scope:
       path: ""
-      type: "quizes"
+      type: "quizzes"
     values:
       layout: quiz
 

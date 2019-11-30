@@ -1,11 +1,11 @@
 # Quzgen.musicTheoryPractice.net
 
-A light utility for generating quizes
+A light utility for generating quizzes
 
 [![Build Status](https://travis-ci.org/mshafer1/quizgen_music_theory.svg?branch=master)](https://travis-ci.org/mshafer1/quizgen_music_theory)  [![Coverage Status](https://coveralls.io/repos/github/mshafer1/quizgen_music_theory/badge.svg?branch=master)](https://coveralls.io/github/mshafer1/quizgen_music_theory?branch=master)
 
 QuizGen.MusicTheoryPractice.Net is a <a href="">Free as in Coffee</a> utility.
-Our intent is to make a useful tool for music and music theory teachers to be able to quickly generate printable quizes for their students.
+Our intent is to make a useful tool for music and music theory teachers to be able to quickly generate printable quizzes for their students.
 
 Check out our full range of quiz types in the menu or on <a href="/newQuiz.html">Generate New Quiz</a>.
 

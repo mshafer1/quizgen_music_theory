@@ -2,9 +2,9 @@
 ---
 const SAVE_DIALOGUE_ID = 'saveDialog'
 
-var saved_quizes = []
-function update_saved_quizes() {
-    saved_quizes = []; // flush the variable
+var saved_quizzes = []
+function update_saved_quizzes() {
+    saved_quizzes = []; // flush the variable
     for (var path in window.localStorage) {
         if (!(path.startsWith(target_path))) {
             continue;
@@ -13,11 +13,11 @@ function update_saved_quizes() {
         name = path.substring(target_path.length);
         value = localStorage.getItem(path)
         // console.log("Found one: ", name, "--", value);
-        saved_quizes[name] = value;
+        saved_quizzes[name] = value;
     }
 
     $('#previousQuizList').html(''); // flush the dialogue
-    for (var quizName in saved_quizes) {
+    for (var quizName in saved_quizzes) {
 
         {% capture row_template %}
         <div class="w3-row">
@@ -112,7 +112,7 @@ function _show_save_dialogue() {
 
 function _close_save_dialogue() {
     $('#' + SAVE_DIALOGUE_ID).hide(0, function () {
-        update_saved_quizes();
+        update_saved_quizzes();
         $('#_new_name_input').val('');
         clear_selection();
     });
@@ -120,11 +120,11 @@ function _close_save_dialogue() {
 
 function _save_data(name) {
     var _key_holder = $('#qType').val();
-    var target_path = 'quizes/' + _key_holder + '/' + name;
+    var target_path = 'quizzes/' + _key_holder + '/' + name;
 
     var form = $('#_input_form')[0];
 
-    if (typeof callback === "function") {
+    if (typeof pre_submit === "function") {
         pre_submit();
     }
 

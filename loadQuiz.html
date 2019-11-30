@@ -4,7 +4,7 @@ title: Load Saved Quiz
 ---
 
 {% capture page_list %}
-{% for page in site.quizes %}
+{% for page in site.quizzes %}
 {% if page.qType %}
 <div class="w3-row w3-container w3-border-bottom w3-border-white">
     <div class="w3-col l3 w3-hide-small w3-hide-medium w3-padding w3-border-white">{{ page.type }}</div>
@@ -15,18 +15,18 @@ title: Load Saved Quiz
         <script>
             $(window).ready(() => {
                 var target_ = '_saved_{{ page.url | replace: ".", "_" | replace: "/", "_" }}';
-                var path = 'quizes/{{ page.qType }}/';
+                var path = 'quizzes/{{ page.qType }}/';
                 console.log('Target: ', target_);
                 console.log('Path: ', path);
 
                 var first = true;
 
-                for (var key in saved_quizes) {
+                for (var key in saved_quizzes) {
                     if (!(key.startsWith(path))) {
                         continue;
                     }
 
-                    value = saved_quizes[key];
+                    value = saved_quizzes[key];
                     console.log("Appending: ", value);
 
                     if (first) {
@@ -56,11 +56,11 @@ title: Load Saved Quiz
 {% endcapture %}
 
 <script>
-    var saved_quizes = []
+    var saved_quizzes = []
     for (var i = 0; i < localStorage.length; i++) {
         var key = localStorage.key(i);
         var value = localStorage.getItem(key);
-        saved_quizes[key] = value;
+        saved_quizzes[key] = value;
         console.log("Found one: ", key, "--", value);
     }
 
