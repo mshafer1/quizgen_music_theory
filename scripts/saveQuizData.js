@@ -124,7 +124,7 @@ function _save_data(name) {
 
     var form = $('#_input_form')[0];
 
-    if (typeof callback === "function") {
+    if (typeof pre_submit === "function") {
         pre_submit();
     }
 
