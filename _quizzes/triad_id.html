@@ -1,19 +1,19 @@
 ---
-type: Triad Construction
+type: Triad Identifying
 layout: saveablequiz
-qType: TriadConst
-description: "Generate blank staffs with prompts to fill in the requested triad"
+qType: TriadID
+description: "Generate staffs with triad notes and prompts to identify each triad"
 
 
 inputs:
   quizType:
     type: hidden
-    default: TriadConst
+    default: TriadID
     name: qType
-  
+
   title:
     type: text
-    default: 'Timed Triad Quiz, Construction'
+    default: 'Timed Triad Quiz, ID'
     name: title
     class: my-input
     lable_width: l2 m12 s12
@@ -21,7 +21,7 @@ inputs:
 
   prompt:
     type: text
-    default: 'Write the requested triad in root position. Pay careful attention to clef signs.'
+    default: 'Identify each triad with lead sheet symbols indicating root and quality.'
     name: prompt
     class: my-input
     lable_width: l2 m12 s12
@@ -36,7 +36,7 @@ inputs:
 
   Keys Per Line:
     type: number
-    default: 3
+    default: 6
     name: NPerLine
     max: 10
 
@@ -48,7 +48,7 @@ children:
 
   '# of Triads':
     type: number
-    default: 4
+    default: 2
     name: 'NTriads${n}'
     width: 3
     lable_width: m5 s12
@@ -87,8 +87,8 @@ children:
     type: keyboard_template
     name: 'BasePitches${n}[]'
     width: 12
-    lable_width: l1 m12 s12
-    child_width: l11 m12 s12
+    lable_width: m1 s3
+    child_width: m11 s9
 ---
 
 {% include _row_gen.html children=page.children %}

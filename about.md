@@ -5,10 +5,10 @@ title: About
 
 ## Quzgen.musicTheoryPractice.net
 
-A light utility for generating quizes
+A light utility for generating quizzes
 
 QuizGen.MusicTheoryPractice.Net is a <a href="">Free as in Coffee</a> utility.
-Our intent is to make a useful tool for music and music theory teachers to be able to quickly generate printable quizes for their students.
+Our intent is to make a useful tool for music and music theory teachers to be able to quickly generate printable quizzes for their students.
 
 Check out our full range of quiz types in the menu or on <a href="/newQuiz.html">Generate New Quiz</a>.
 

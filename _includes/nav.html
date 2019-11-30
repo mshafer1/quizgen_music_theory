@@ -6,11 +6,11 @@
     <a href="javascript:void(0)" class="w3-bar-item w3-button w3-right w3-hide-medium w3-hide-large" onclick="showNav()">&#9776;</a>
     
             {% capture page_list %}
-            {% for page in site.quizes %}<a href="{{ page.url }}" class="w3-bar-item w3-mobile w3-button" {% if page.description %}title="{{ page.description }}"{% endif %}>{{ page.type }}</a>{% endfor %}
+            {% for page in site.quizzes %}<a href="{{ page.url }}" class="w3-bar-item w3-mobile w3-button" {% if page.description %}title="{{ page.description }}"{% endif %}>{{ page.type }}</a>{% endfor %}
             {% endcapture %}
 
     <span class="w3-right w3-mobile js-collapse-nav w3-hide-small">
-        <a class="w3-bar-item w3-button w3-mobile" href="/loadQuiz.html">Saved Quizes</a>
+        <a class="w3-bar-item w3-button w3-mobile" href="/loadQuiz.html">Saved Quizzes</a>
         <div class="w3-dropdown-hover w3-black w3-mobile" onmouseover="showSmallNav(true)" onmouseout="showSmallNav(false)">
             <button class="w3-button w3-black w3-mobile">New Quiz <i class="fas fa-caret-right"></i></button>
             <div class="w3-dropdown-content w3-card-4 w3-hide-small w3-bar-block onTop">
