@@ -201,7 +201,6 @@ function init() {
         CONSTRUCTION_SCALING = 1.2;
     }
 
-
     if (NOTES_PER_LINE in get_data) {
         rowSize = Number(get_data[NOTES_PER_LINE]);
         staveSize = Math.max(staveSize, (rowSize > 0) ? (rowSize * 104) : 0);
@@ -253,13 +252,10 @@ function init() {
 
         STAVE_HEIGHT = CONSTRUCTION_STAVE_HEIGHT;
         
-        if(FIX_BAR_NOTE_SPACING_WITH_WHITE_NOTES) {
-            handle_clef_grouped_construction(out, 'Triad', TriadConstructionAnswerGen, gen_white_same_clef_note, add_bars_between_parts=true, show_question_label = false, show_accidentals=true, scale=CONSTRUCTION_SCALING);
+        var gen_notes = (FIX_BAR_NOTE_SPACING_WITH_WHITE_NOTES)?gen_white_same_clef_note:(_) => null;
+
+        handle_clef_grouped_construction(out, 'Triad', TriadConstructionAnswerGen, gen_notes, add_bars_between_parts=true, show_question_label = false, show_accidentals=true, scale=CONSTRUCTION_SCALING);
         }
-        else {
-            handle_clef_grouped_construction(out, 'Triad', TriadConstructionAnswerGen, (_) => null, add_bars_between_parts=false, show_question_label = false, show_accidentals=true, scale=CONSTRUCTION_SCALING);
-        }
-    }
     else if(try_parse_interval_construction_data(get_data, out)) {
         title = 'Timed Interval Quiz, Construction';
         prompt = 'Write the requested interval on the staff.';
@@ -455,6 +451,23 @@ function handle_clef_grouped_construction(data, data_key, gen_answer, gen_note, 
     var clef_order = [TrebleClef, AltoClef, BassClef];
 
     var i = 0;
+
+    // get auto parts,
+    var auto_notes = compiled_data.filter(function (item) { return item.clef == ClefAuto; });
+    console.log("All Notes--: ", compiled_data.map(function (item) {return `${item.clef}`;}));
+    console.log("Auto Notes--: ", auto_notes);
+    console.log("Auto Notes--: ", auto_notes.map(function (item) {return `${item.clef}`;}));
+    // determine where to assign them, and add them to the rest of the data.
+    var auto_clefs = shuffled_clefs(auto_notes.length);
+    auto_notes.forEach(function (note, index){
+        var new_note_clef = coerce_clef([teorian_note_to_key(note.starting_note)], _default=auto_clefs[index]);
+        console.log("New Clef: ", new_note_clef, "\n\t Note: ", note, "\n\t Default: ", auto_clefs[index]);
+
+        var new_note = new IntervalInfo(note.starting_note, note.interval, new_note_clef);
+        compiled_data.push(new_note);
+    });
+
+    console.log("All Notes--: ", compiled_data.map(function (item) {return `${item.clef}`;}));
 
 
     clef_order.forEach(function (clef) {
@@ -662,6 +675,22 @@ function handle_clef_grouped_data(data, data_key, get_part, show_question_label 
 
     var i = 0;
 
+    // get auto parts,
+    var auto_notes = compiled_data.filter(function (item) { return item.clef == ClefAuto; });
+    console.log("Auto Notes--: ", auto_notes);
+    console.log("Auto Notes--: ", auto_notes.map(function (item) {return `${item.clef}`;}));
+    // determine where to assign them, and add them to the rest of the data.
+    var auto_clefs = shuffled_clefs(auto_notes.length);
+    auto_notes.forEach(function (note, index){
+        var _notes = get_part(note.starting_note, note.interval);
+        if (_notes != null) {
+            var new_note_clef = coerce_clef(_notes, _default=auto_clefs[index]);
+
+            var new_note = new IntervalInfo(note.starting_note, note.interval, new_note_clef);
+            compiled_data.push(new_note);
+        }
+    });
+
     clef_order.forEach(function (clef) {
         console.log("Clef: ", clef);
 
@@ -724,6 +753,7 @@ function handle_clef_grouped_data(data, data_key, get_part, show_question_label 
         }
     });
 }
+
 
 function scale_clef(starting_note, original_clef) {
     var note = teoria.note(starting_note);
@@ -892,7 +922,6 @@ function get_triad(starting_note, triad) {
     var result = Array();
     var note = teoria.note(starting_note);
 
-    console.log('Starting Note: ', starting_note, '\nNote: ', note, '\nTriad', triad);
     var chord = note.chord(String(triad)).notes();
 
     chord.forEach(function (note) {

@@ -3,6 +3,7 @@ var fs = require("fs");
 
 const conversionMethods = require('../conversionMethods.js');
 
+
 test('Test teorian_note_to_vexflow_note a4 => a/4', () => {
   expect(conversionMethods.teorian_note_to_vexflow_note('a4')).toEqual('a/4');
 });
@@ -279,3 +280,98 @@ describe('slice_array', () => {
     expect(slices[1].length).toEqual(expected_size);
   });
 })
+
+describe('coerce_clef', () => {
+  function assert_treble(triad) {
+    it(`renders ${triad} as 'treble'`, () => {
+      var result = conversionMethods._coerce_clef_helper(triad);
+      expect(result).toEqual('treble');
+    })
+  }
+  function assert_bass(triad) {
+    it(`renders ${triad} as 'bass'`, () => {
+      var result = conversionMethods._coerce_clef_helper(triad);
+      expect(result).toEqual('bass');
+    })
+  }
+  function assert_coin_toss(triad) {
+    it(`renders ${triad} as 'coin_toss'`, () =>{
+      var result = conversionMethods._coerce_clef_helper(triad);
+      expect(result).toEqual('coin_toss');
+    })
+  }
+
+  assert_treble([
+    conversionMethods.teorian_note_to_key('c4'),
+    conversionMethods.teorian_note_to_key('e4'),
+    conversionMethods.teorian_note_to_key('g4'),
+  ]);
+  assert_treble([
+    conversionMethods.teorian_note_to_key('b3'),
+    conversionMethods.teorian_note_to_key('d4'),
+    conversionMethods.teorian_note_to_key('f4'),
+  ]);
+  assert_treble([
+    conversionMethods.teorian_note_to_key('a3'),
+    conversionMethods.teorian_note_to_key('f4'),
+  ]);
+  assert_treble([
+    conversionMethods.teorian_note_to_key('g3'),
+    conversionMethods.teorian_note_to_key('g4'),
+  ]);
+  assert_treble([
+    conversionMethods.teorian_note_to_key('d4'),
+  ])
+  assert_treble([
+    conversionMethods.teorian_note_to_key('b4'),
+  ])
+
+
+  assert_bass([
+    conversionMethods.teorian_note_to_key('b3'),
+  ])
+  assert_bass([
+    conversionMethods.teorian_note_to_key('b2'),
+  ])
+  assert_bass([
+    conversionMethods.teorian_note_to_key('g3'),
+    conversionMethods.teorian_note_to_key('b3'),
+    conversionMethods.teorian_note_to_key('d4'),
+  ])
+  
+  assert_bass([
+    conversionMethods.teorian_note_to_key('f3'),
+    conversionMethods.teorian_note_to_key('f4'),
+  ])
+  
+  assert_coin_toss([
+    conversionMethods.teorian_note_to_key('g3'),
+    conversionMethods.teorian_note_to_key('f4'),
+  ])
+  assert_coin_toss([
+    conversionMethods.teorian_note_to_key('b3'),
+    conversionMethods.teorian_note_to_key('e4'),
+  ])
+  assert_coin_toss([
+    conversionMethods.teorian_note_to_key('a3'),
+    conversionMethods.teorian_note_to_key('c4'),
+    conversionMethods.teorian_note_to_key('e4'),
+  ]);
+  assert_coin_toss([
+    conversionMethods.teorian_note_to_key('a3'),
+    conversionMethods.teorian_note_to_key('e4'),
+  ]);
+  assert_coin_toss([
+    conversionMethods.teorian_note_to_key('e4'),
+    conversionMethods.teorian_note_to_key('e#4'),
+  ]);
+  assert_coin_toss([
+    conversionMethods.teorian_note_to_key('g3'),
+    conversionMethods.teorian_note_to_key('a3'),
+    conversionMethods.teorian_note_to_key('d4'),
+    conversionMethods.teorian_note_to_key('f#4'),
+  ])
+  assert_coin_toss([
+    conversionMethods.teorian_note_to_key('c4'),
+  ])
+});
