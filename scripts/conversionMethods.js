@@ -1,6 +1,9 @@
 const BassClef = 'bass';
 const AltoClef = 'alto';
 const TrebleClef = 'treble';
+
+const ClefAuto = 'auto';
+
 const Major = 'Major';
 const Minor = 'Minor';
 const NaturalMinor = 'Natural Minor'
@@ -8,11 +11,26 @@ const HarmonicMinor = 'Harmonic Minor';
 const MelodicMinor = 'Melodic Minor';
 
 
+try
+{
+    teoria = require('./teoria/teoria.js');
+} catch (error) {
+    // pass
+}
+
+const max_bass_note = new teoria.note('e4').key();
+const min_treble_Note = new teoria.note('a3').key();
+const middle_c_note = new teoria.note('c4').key();
+
 class Key {
     constructor(letter, octave, accidental) {
         this.letter = letter;
         this.octave = octave;
         this.accidental = accidental;
+    }
+
+    toString(){
+        return `{${this.letter}${this.octave}${this.accidental}}`;
     }
 }
 
@@ -201,6 +219,85 @@ function slice_array(n, array) {
     return result;
 }
 
+function _coerce_clef_helper(_notes) {
+    console.debug("Notes: ", _notes);
+    if (_notes.length == 1) {
+        var note = _notes[0]
+        var _note_teorian_style = note.letter + note.octave;
+        console.log("Note: ", _note_teorian_style);
+        var teorian_note = new teoria.note(_note_teorian_style);
+        console.log("Key: ", teorian_note);
+        var key = teorian_note.key();
+
+        console.log("Key: ", key, " VS C4", middle_c_note);
+
+        if (key > middle_c_note) {
+            return TrebleClef;
+        } else if(key < middle_c_note) {
+            return BassClef;
+        } else {
+            return 'coin_toss';
+        }
+    }
+
+    console.debug('Notes: ', _notes);
+    var low_note = _notes[0];
+    var low_teoria = new teoria.note(low_note.letter + low_note.octave);
+    var high_note = _notes[_notes.length - 1];
+    var high_teoria = new teoria.note(high_note.letter + high_note.octave);
+    console.debug('Low note: ', low_note, '\n', low_teoria, '\n\tN: ', low_teoria.key());
+    console.debug('High note: ', high_note, '\n', high_teoria, '\n\tN: ', high_teoria.key());
+
+    var can_be_treble = low_teoria.key() >= min_treble_Note;
+    var can_be_bass = high_teoria.key() <= max_bass_note;
+
+    // toss a coin
+    var coin_toss = can_be_bass && can_be_treble;
+    console.debug('can_be_bass: ', can_be_bass, '\n\tcan_be_treble: ', can_be_treble, '\n\tis_coin_toss: ', coin_toss, '\n\tLow note: ', low_note, '\n\n');
+
+    var new_note_clef = '';
+    if (coin_toss) {
+        new_note_clef = 'coin_toss'
+    }
+    else if (can_be_treble) {
+        new_note_clef = TrebleClef;
+    }
+    else if (can_be_bass) {
+        new_note_clef = BassClef;
+    }
+    else {
+        console.warn('Not sure what to do with', _notes, ' - defaulting to shorter distance from last line on staff');
+
+        var bottom_of_treble = new teoria.note('e4');
+        var top_of_bass = new teoria.note('a3');
+
+        var down_interval = new teoria.interval(bottom_of_treble, low_teoria);
+        var up_interval = new teoria.interval(top_of_bass, high_teoria);
+
+        var down_distance = (down_interval.direction() == 'down')?-down_interval.value():0;
+        var up_distance = (up_interval.direction() == 'up')?up_interval.value():0;
+        console.debug("Up: ", up_interval, " - ", up_distance);
+        console.debug("Down: ", down_interval, " - ", down_distance);
+
+        if(down_distance > up_distance) {
+            new_note_clef = BassClef;
+        } else if(down_distance < up_distance) {
+            new_note_clef = TrebleClef;
+        } else {
+            new_note_clef = 'coin_toss';
+        }
+    }
+    return new_note_clef;
+}
+
+function coerce_clef(_notes, _default) {
+    var result = _coerce_clef_helper(_notes);
+    if(result == 'coin_toss') {
+       result = _default;
+    }
+    return result
+}
+
 
 try {
     var exports = module.exports = {};
@@ -218,6 +315,8 @@ try {
     exports.keys_to_note = keys_to_note;
     exports.teorian_note_to_key = teorian_note_to_key;
     exports.teorian_note_to_vexflow_note = teorian_note_to_vexflow_note;
+    exports._coerce_clef_helper = _coerce_clef_helper;
+    exports.coerce_clef = coerce_clef;
 } catch (error) {
     // pass
 }
