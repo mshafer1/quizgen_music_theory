@@ -7,13 +7,16 @@ title: About
 
 A light utility for generating quizzes
 
-QuizGen.MusicTheoryPractice.Net is a <a href="">Free as in Coffee</a> utility.
+QuizGen.MusicTheoryPractice.Net is a free as in coffee utility.
 Our intent is to make a useful tool for music and music theory teachers to be able to quickly generate printable quizzes for their students.
 
 Check out our full range of quiz types in the menu or on <a href="/newQuiz.html">Generate New Quiz</a>.
 
 ### Free as in Coffee
 That is, completely free to use. I'm not going to say "no" to some coffee money, though.
+<br/>
+<a class="w3-btn w3-black w3-round-xxlarge" target="_blank" href="https://www.buymeacoffee.com/mshafer1"><img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt=""><span style="margin-left:5px;">Buy me a coffee</span></a>
+
 
 ### Dependencies/Thank you's
 This project would not have been possible without these awesome open source or free projects and libraries.
