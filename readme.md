@@ -1,4 +1,4 @@
-# Quzgen.musicTheoryPractice.net
+# Quizgen.musicTheoryPractice.net
 
 A light utility for generating quizzes
 
