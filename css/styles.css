@@ -95,7 +95,7 @@ div.answer-inline {
 }
 
 .onTop {
-    z-index: 100!important;
+    z-index: 99!important;
 }
 
 .my-input {
@@ -138,12 +138,14 @@ input:checked+label div.selectable {
 
 .footer {
     display: flex!important;
+    z-index: 100!important;
 }
 
 .footer > footer {
     position: fixed!important; 
     bottom: 0px!important; 
     left: 0px!important;
+    z-index: 100!important;
 }
 
 
