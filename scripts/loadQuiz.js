@@ -46,6 +46,7 @@ rowSize = 6;
 title = '';
 prompt = '';
 header = '';
+error_message = '';
 VF = Vex.Flow;
 
 CONSTUCTION_SCALING_ENABLED = true;
@@ -100,11 +101,13 @@ function try_parse_seventh_chord_construction_data(get_data, out_data) {
 function try_parse_quiz_data(get_data, out_data, quizTypeKey, NKey, dataLable) {
     var result = false;
 
+    // confirm requested quiz type
     if (get_data[qType] != quizTypeKey) {
         return result;
     }
 
     if (!('indexes' in get_data)) {
+        error_message = 'Error: Field "indexes" must be provided for this quiz type!';
         return result;
     }
 
@@ -121,6 +124,14 @@ function try_parse_quiz_data(get_data, out_data, quizTypeKey, NKey, dataLable) {
             console.log("Looking for: " + key_);
 
             if (!(key_ in get_data)) {
+                if (key == 'BasePitches') {
+                    error_message = `Error: Must provide starting note(s) for row: ${i+1}`;
+                } else if (key == 'Clef') {
+                    error_message = `Error: Could not find Clef for row: ${i+1}`;
+                } else if (key == 'N') {
+                    error_message = `Error: Could not find desired number of ${NKey.trim().substring(1)} for row: ${i+1}`;
+                }
+
                 return result;
             }
 
@@ -151,12 +162,14 @@ function try_parse_key_type_quiz_data(get_data, out_data, expectedQuizType, NKey
     }
 
     if (!(NKey in get_data)) {
+        error_message = `Could not find field "${NKey}" to tell how many to create.`;
         return result;
     }
 
     out_data.N = get_data[NKey];
 
     if (!(keysName in get_data)) {
+        error_message = `Could not find field "${keysName}" to tell what keys to create.`;
         return result;
     }
 
@@ -209,16 +222,40 @@ function init() {
         Math.seedrandom(Number(get_data[QuizID]));
     }
 
-    if (get_data[qType] == scaleRaw && (
-        (mScalesKey in get_data && mStartingNotes in get_data) ||
-        (MScalesKey in get_data && MStartingNotes in get_data) ||
-        (hmScalesKey in get_data && hmStartingNotes in get_data) ||
-        (mmScalesKey in get_data && mmStartingNotes in get_data))) {
-        
-        title = 'Timed Scale Quiz (Major and minor)';
-        prompt = 'Create the requested scale by filling in the appropriate accidentals.';    
-        
-        handle_label_scale(get_data);
+    // apply here so defaults can be stored above
+
+    try {
+        _handle_quiz(get_data)
+        title = wrap_in_element('h1', safe_load_variable(TITLE, get_data, title));
+        prompt = wrap_in_element('p', safe_load_variable(PROMPT, get_data, prompt));
+        header =  wrap_in_element('p', safe_load_variable(HEADER, get_data, header));
+    
+        write_doc();
+    }
+    catch (e) {
+        var error = wrap_in_element('p', e);
+        console.error(error);
+        $(error).appendTo('body');
+        return;
+    }   
+}
+
+function _handle_quiz(get_data) {
+    if (get_data[qType] == scaleRaw ){
+        if ((mScalesKey in get_data && mStartingNotes in get_data) ||
+            (MScalesKey in get_data && MStartingNotes in get_data) ||
+            (hmScalesKey in get_data && hmStartingNotes in get_data) ||
+            (mmScalesKey in get_data && mmStartingNotes in get_data)) {
+            
+            title = 'Timed Scale Quiz (Major and minor)';
+            prompt = 'Create the requested scale by filling in the appropriate accidentals.';    
+            
+            handle_label_scale(get_data);
+        }
+        else {
+            error_message = 'Error: must provide at least one starting note.'
+            throw error_message;
+        }
     }
     else if (try_parse_interval_data(get_data, out)) {
         title = 'Timed Interval Quiz, ID';
@@ -290,16 +327,11 @@ function init() {
         handle_clef_grouped_construction(out, 'Seventh', TriadConstructionAnswerGen, gen_white_same_clef_note, add_bars_between_parts=true, show_question_label = false, show_accidentals=true, scale=CONSTRUCTION_SCALING);
     }
     else {
-        alert("Invalid request for quiz!");
-        return;
+        if (error_message.trim() === "") {
+            error_message = "Invalid request for quiz!"
+        }
+        throw error_message;
     }
-
-    // apply here so defaults can be stored above
-    title = wrap_in_element('h1', safe_load_variable(TITLE, get_data, title));
-    prompt = wrap_in_element('p', safe_load_variable(PROMPT, get_data, prompt));
-    header =  wrap_in_element('p', safe_load_variable(HEADER, get_data, header));
-
-    write_doc();
 }
 
 function wrap_in_element(element, piggy) {
@@ -348,6 +380,8 @@ function handle_note_id(data, show_question_label = true, add_bars_between_parts
     var clefs = [TrebleClef, AltoClef, BassClef]
     var i = 0;
 
+    error_message = "Error: must provide at least some notes and set one of the numbers to more than 0.";
+
     clefs.forEach(function (clef) {
         console.log(clef);
         var clefLabel = clef.replace(/^\w/, c => c.toUpperCase());
@@ -358,9 +392,12 @@ function handle_note_id(data, show_question_label = true, add_bars_between_parts
 
         var notes = shuffled_slice(n, raw_notes);
 
-        console.log("Notes: " + JSON.stringify(notes));
+        console.log("Notes: ", notes);
 
-        var notes = shuffled_slice(n, raw_notes);
+        if (notes.length == 0) {
+            return; // skip out of each
+        }
+        error_message = '';
 
         var slices = slice_array(rowSize, notes);
 
@@ -411,6 +448,10 @@ function handle_note_id(data, show_question_label = true, add_bars_between_parts
             i++;
         }
     });
+
+    if(error_message.length > 0) {
+        throw error_message;
+    }
 }
 
 function gen_white_same_clef_note(part) {
