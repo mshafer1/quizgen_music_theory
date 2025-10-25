@@ -15,7 +15,7 @@ Check out our full range of quiz types in the menu or on <a href="/newQuiz.html"
 ### Free as in Coffee
 That is, completely free to use. I'm not going to say "no" to some coffee money, though.
 <br/>
-<a class="w3-btn w3-black w3-round-xxlarge" target="_blank" href="https://www.buymeacoffee.com/mshafer1"><img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt=""><span style="margin-left:5px;">Buy me a coffee</span></a>
+<a class="w3-btn w3-black w3-round-xxlarge" target="_blank" href="https://www.buymeacoffee.com/makerByNight"><img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt=""><span style="margin-left:5px;">Buy me a coffee</span></a>
 
 
 ### Dependencies/Thank you's
